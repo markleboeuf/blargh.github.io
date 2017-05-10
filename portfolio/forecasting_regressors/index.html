@@ -99,26 +99,6 @@
 <li><a href="#collecting-month-level-traffic">Collecting Month Level Traffic</a></li>
 <li><a href="#collecting-historical-game-data">Collecting Historical Game Data</a></li>
 <li><a href="#model-selection-and-validation">Model Selection And Validation</a></li>
-<li><a href="#current-station-size">Current Station Size</a></li>
-<li><a href="#exploring-the-trips-dataset">Exploring the Trips Dataset</a></li>
-<li><a href="#plotting-trips-per-month-by-season">Plotting Trips Per Month (By Season)</a></li>
-<li><a href="#average-trip-duration">Average Trip Duration</a></li>
-<li><a href="#number-of-trips-by-day-of-week">Number of Trips by Day of Week</a></li>
-<li><a href="#number-of-trips-by-time-of-day">Number of Trips by Time of Day</a></li>
-<li><a href="#number-of-trips-by-member-type">Number of Trips by Member Type</a></li>
-<li><a href="#trip-duration-by-member-type">Trip Duration by Member Type</a></li>
-<li><a href="#member-demographics">Member Demographics</a></li>
-<li><a href="#trip-routes">Trip Routes</a></li>
-<li><a href="#station-by-trip-departure-and-arrival">Station by Trip Departure and arrival</a></li>
-<li><a href="#station-usage">Station Usage</a></li>
-<li><a href="#exploring-the-weather-dataset">Exploring the Weather Dataset</a></li>
-<li><a href="#temperature">Temperature</a></li>
-<li><a href="#events">Events</a></li>
-<li><a href="#combining-weather-and-trip-datasets">Combining Weather and Trip Datasets</a></li>
-<li><a href="#mean-temperature-vs.-number-of-trips">Mean Temperature vs. Number of Trips</a></li>
-<li><a href="#precipitation-vs.-number-of-trips">Precipitation vs. Number of Trips</a></li>
-<li><a href="#conclusions">Conclusions</a></li>
-<li><a href="#suggestions-for-pronto">Suggestions for Pronto!</a></li>
 </ul>
 
 <h2 id="overview">Overview</h2>
@@ -371,11 +351,6 @@ rep('Games.Won',2)
 ),
 actual_monthly_views = rep(validation_df$monthly_page_views, 3)) %&gt;% 
 dplyr::select(forecast_model, predicted_monthly_views, actual_monthly_views)
-
-
-
-
-
 </code></pre>
          
       </div>
