@@ -57,12 +57,6 @@
   </url>
   
   <url>
-    <loc>https://markleboeuf.github.io/tags/arimax/</loc>
-    <lastmod>2016-11-05T19:41:01+05:30</lastmod>
-    <priority>0</priority>
-  </url>
-  
-  <url>
     <loc>https://markleboeuf.github.io/categories/</loc>
     <priority>0</priority>
   </url>
@@ -122,8 +116,14 @@
   </url>
   
   <url>
-    <loc>https://markleboeuf.github.io/tags/</loc>
+    <loc>https://markleboeuf.github.io/tags/sarimax/</loc>
     <lastmod>2016-11-05T19:41:01+05:30</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://markleboeuf.github.io/tags/</loc>
+    <lastmod>2015-07-23T21:13:14-05:00</lastmod>
     <priority>0</priority>
   </url>
   

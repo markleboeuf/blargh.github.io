@@ -99,6 +99,7 @@
 <li><a href="#collecting-month-level-traffic">Collecting Month Level Traffic</a></li>
 <li><a href="#collecting-historical-game-data">Collecting Historical Game Data</a></li>
 <li><a href="#model-selection-and-validation">Model Selection And Validation</a></li>
+<li><a href="#seasonal-arima-model">Seasonal ARIMAX Model</a></li>
 </ul>
 
 <h2 id="overview">Overview</h2>
@@ -148,7 +149,7 @@ page_views_clean &lt;- page_views_by_day %&gt;%
 
 <h3 id="collecting-historical-game-data">Collecting Historical Game Data</h3>
 
-<p>Looks good! Next we&rsquo;ll collect data on how the New England Patriots have historically performed during the playoffs, and then merge this with our page views data set. I&rsquo;m using the <mark>rvest</mark> package to scrape the outcomes (win or lose) of the patriots vs each of the other 31 NFL teams.</p>
+<p>Looks good! Next we&rsquo;ll collect data on how the New England Patriots have historically performed during the playoffs, and then merge this with our page views data set. I&rsquo;m using the <code>rvest</code> package to scrape the outcomes (win or lose) of the patriots vs each of the other 31 NFL teams.</p>
 
 <pre><code class="language-r"> n_teams = 32
  team_name = &quot;new-england-patriots&quot;
@@ -241,7 +242,7 @@ joined_df_game$playoff_games_won, 0)
 
 <p><img src="../forecasting_regressors_images/table4.png" class="img-responsive" style="display: block; margin: auto;" /></p>
 
-<p>Plotting Wins &amp; Page Traffic</p>
+<h3 id="visualizing-wins-vs-traffic">Visualizing Wins vs. Traffic</h3>
 
 <p>Here&rsquo;s how we interpret this. Do we need to know how many they&rsquo;ll plan in or how many they&rsquo;ll win? For example, during Jan/Feb 2008 the Patriots played in all three playoff games but they only won the first two, eventually losing the Super Bowl to New York Giants. Enough talking &ndash; let&rsquo;s plot the relationship between playoff games won and monthly page views.</p>
 
@@ -306,52 +307,242 @@ xlab(&quot;Date&quot;) + ylab(&quot;Monthly Page Views (K)&quot;)
 <p>Since the period we want to forecast for is Jan/Feb 2015, we&rsquo;ll hold out the two months of traffic results from Jan/Feb 2014 as a way to identify which inputs will likely yield the most accurate forecasts. We will specify an ARIMA model with a single external regressor (either games played or games won), and compare the results on our validation set against an ARIMA model that relies on history alone.</p>
 
 <pre><code class="language-r"># filter data until last year and create training and validation time periods
+
 train_validation = joined_df_game %&gt;% 
-dplyr::filter(month_max_date &lt;= &quot;2014-02-28&quot;) %&gt;% 
-dplyr::mutate(train_test_flag = ifelse(year &lt; 2014, &quot;train&quot;, &quot;validation&quot;))
+                   dplyr::filter(month_max_date &lt;= &quot;2014-02-28&quot;) %&gt;% 
+                   dplyr::mutate(train_test_flag = ifelse(year &lt; 2014, 
+                                               &quot;train&quot;, &quot;validation&quot;))
 
 training_df = train_validation %&gt;% 
-dplyr::filter(train_test_flag == 'train')
+              dplyr::filter(train_test_flag == 'train')
 
 validation_df = train_validation %&gt;% 
-dplyr::filter(train_test_flag == 'validation')
+                dplyr::filter(train_test_flag == 'validation')
 
 # create our time-series object 
 page_views_ts = ts(training_df$monthly_page_views, 
-frequency = 12,
-start = c(head(training_df, 1)$year, 
-head(training_df, 1)$month),
-end = c(tail(training_df, 1)$year, 
-tail(training_df, 1)$month))
+                frequency = 12,
+                start = c(head(training_df, 1)$year, 
+                          head(training_df, 1)$month),
+                end = c(tail(training_df, 1)$year, 
+                        tail(training_df, 1)$month))
+
 # specify that we want to make a forecast 2 periods ahead
 prediction_horizon = 2
+
 # arima model with no external regressors
 arima_no_xreg = auto.arima(page_views_ts)
-arima_no_xreg_f =  data.frame(forecast(arima_no_xreg, 
-h = prediction_horizon))
+arima_no_xreg_f =  data.frame(forecast(arima_no_xreg, h = prediction_horizon))
+
 #arima model with playoff games played as an external regessor
 arima_games_played = auto.arima(page_views_ts, xreg = training_df$playoff_games_played)
-arima_games_played_f = data.frame(forecast(arima_games_played, 
-h = prediction_horizon,
-xreg = validation_df$playoff_games_played))
+arima_games_played_f = data.frame(forecast(arima_games_played, h = prediction_horizon,
+                                  xreg = validation_df$playoff_games_played))
+
 #arima model with playoff games won as an external regessor
 arima_games_won = auto.arima(page_views_ts, xreg = training_df$playoff_games_won)
 arima_games_won_f = data.frame(forecast(arima_games_won, 
-h = prediction_horizon,
-xreg = validation_df$playoff_games_won))
+                               h = prediction_horizon,
+                               xreg = validation_df$playoff_games_won))
 #
-forecast_df = rbind(arima_no_xreg_f,
-arima_games_played_f,
-arima_games_won_f) %&gt;% 
-dplyr::rename(predicted_monthly_views = Point.Forecast) %&gt;% 
-dplyr::mutate(forecast_model =
-c(rep('No.Xreg', 2), 
-rep('Games.Played', 2),
-rep('Games.Won',2)
-),
-actual_monthly_views = rep(validation_df$monthly_page_views, 3)) %&gt;% 
-dplyr::select(forecast_model, predicted_monthly_views, actual_monthly_views)
+forecast_df = rbind(arima_no_xreg_f, arima_games_played_f, arima_games_won_f) %&gt;% 
+              dplyr::rename(predicted_monthly_views = Point.Forecast) %&gt;% 
+              dplyr::mutate(forecast_model =
+                           c(rep('No.Xreg', 2), 
+                           rep('Games.Played', 2),
+                           rep('Games.Won',2)),
+                           actual_monthly_views = rep(validation_df$monthly_page_views, 3)) %&gt;% 
+              dplyr::select(forecast_model, predicted_monthly_views, actual_monthly_views)
 </code></pre>
+
+<p><img src="../forecasting_regressors_images/table4b.png" class="img-responsive" style="display: block; margin: auto;" /></p>
+
+<p>Now we can compare our predictions against what actually happened. There are a number of ways to measure error in forecasting, and in this case we&rsquo;ll use the Mean Average Percent Error (MAPE), which is calculated as follows:</p>
+
+<p><img src="../forecasting_regressors_images/mape_equation.png" class="img-responsive" style="display: block; margin: auto;" /></p>
+
+<p>Where e<sub>t</sub> is the difference between the predicted and actual and y<sub>t</sub> is our actual. As with all error metrics, there are pros and cons to quantifying error with MAPE. The main advantage is ease of interpretation. Telling someone &ldquo;our forecasts were off by 50%&rdquo; is easier than saying &ldquo;our forecasts were off by 10,458 units&rdquo;. The main disadvantage is that the scale on which your calculating your error matters. For example, a 10% miss on 10 units (1) is a lot smaller than a 10% MAPE on 100,000 units (10K), yet they are treated the same. Additionally, having a small value in the denominator can make a forecast look much worse than it actually is. So in short, if you are working with small quantities, use a different error metric.</p>
+
+<pre><code class="language-r">
+calcMape = function(predicted_amt, actual_amt){
+                    return(round(mean(abs(predicted_amt - actual_amt)/actual_amt) * 100, 1))
+}
+
+validation_output = forecast_df %&gt;% 
+                    dplyr::group_by(forecast_model) %&gt;% 
+                    dplyr::do(mape = calcMape(.$predicted_monthly_views,
+                                              .$actual_monthly_views)) %&gt;% 
+                    data.frame() %&gt;% 
+                    dplyr::mutate(mape = unlist(mape),
+                                  forecast_model = factor(forecast_model)) %&gt;% 
+                    dplyr::mutate(forecast_model = fct_reorder(forecast_model, mape, .desc = FALSE))
+
+</code></pre>
+
+<p>Let&rsquo;s compare our MAPEs between the forecasting approaches</p>
+
+<pre><code class="language-r">ggplot(validation_output, aes(x = forecast_model, y = round(mape, 0),
+        fill = forecast_model, label = as.character(round(mape, 0)))) + 
+        geom_bar(stat = &quot;identity&quot;) + 
+        theme_monokai_full() + 
+        my_plot_theme() + # see end of post for my_plot_theme() function
+        scale_fill_manual(values = monokai_values[1:nrow(validation_output)]) + 
+        xlab(&quot;Forecasting Inputs&quot;) + ylab(&quot;MAPE&quot;) + 
+        theme(legend.position = &quot;none&quot;) + 
+        geom_label(label.size = 1, size = 10, color = &quot;white&quot;)
+
+</code></pre>
+
+<p><img src="../forecasting_regressors_images/mape_plot.png" class="img-responsive" style="display: block; margin: auto;" /></p>
+
+<p>Based on the results from our validation set, it looks like the model that uses <em>Games Won</em> as an external regressor performed the best with a less than stellar 114 percent MAPE. We could reformulate our external regressor or try a different forecasting approach to improve our MAPE, but we&rsquo;ll keep it simple and just consider the aforementioned approaches.</p>
+
+<p>OK. So we figured out which modeling approach works best, and we have all of the data we need to make a traffic forecast. There&rsquo;s only one problem: We won&rsquo;t know how many games the Patriots are going to win during playoffs. Thus we&rsquo;ll need to first generate a prediction &ndash; 0, 1, 2, or 3 &ndash; for this as well, which will then serve as an input into our final, traffic-forecasting model.</p>
+
+<h3 id="collecting-betting-lines">Collecting Betting Lines</h3>
+
+<p>To help us make an informed decision about the number of games the Patriots will win durin the playoffs, we can leverage historic NFL betting lines. For those of you not familiar with a betting line, it&rsquo;s basically a way for odds-makers to encourage an equal number bets for both teams playing in a game.</p>
+
+<p>Previously we used R to scrape data from the web. We&rsquo;ll switch over to Python for a little bit to gather the win probabilities associated with different betting lines. The <code>BeautifulSoup</code> module is awesome for doing webscraping, so that&rsquo;s what we&rsquo;ll use here. If you want to stay in R, that&rsquo;s totally cool &ndash; the data used for this part can easily be copied and pasted into a text file loaded into R (click here to go to the data). If you want to pull this data through Python, though, here&rsquo;s the code:</p>
+
+<pre><code class="language-python">import urllib2
+from bs4 import BeautifulSoup
+import re
+import pandas as pd
+import sys
+
+opener = urllib2.build_opener()
+opener.addheaders = [('User-Agent', 'Mozilla/5.0')]
+temp_url = &quot;https://www.teamrankings.com/nfl/odds-history/results/&quot;
+page = opener.open(temp_url)
+page_soup = BeautifulSoup(page, 'html.parser')
+table_data = page_soup.find_all(&quot;tr&quot;, {&quot;class&quot;: &quot;text-right nowrap&quot;})
+spread = []
+win_pct = []
+for line in table_data:
+    line_list = str(line).splitlines()
+    try:
+        spread.append(re.search('&lt;td&gt;(.*)&lt;/td&gt;', line_list[1]).group(1))
+        win_pct.append(line_list[4].split(&quot;&gt;&quot;)[1].split(&quot;&lt;&quot;)[0])
+    except:
+        spread.append(None)
+        win_pct.append(None)
+
+historic_odds_df = pd.DataFrame({'spread': spread,
+'win_pct': win_pct})
+
+historic_odds_df.to_csv(sys.argv[1] + &quot;/historic_win_percentages.csv&quot;, index = False)
+</code></pre>
+
+<p>And here is how we can execute the spead_scrape.py script from R.</p>
+
+<pre><code class="language-r">python_location = system(&quot;which python&quot;, intern = TRUE)
+exe_py_command = paste0(python_location, &quot; &quot;, wd, &quot;/spread_scrape.py &quot;, wd)
+print(exe_py_command)
+
+</code></pre>
+
+<p>If you aren&rsquo;t familiar with executing scripts in other languages from R (or the terminal), we can break this command down into further detail. It&rsquo;s quite simple. There are three components to above command:</p>
+
+<ol>
+<li>The location of the Python binaries on my machine &lsquo;//anaconda/bin/python&rsquo;.</li>
+<li>The location of the Python script &lsquo;/Users/mlebo1/Desktop/spost/arimax_forecasting/spread_scrape.py&rsquo;</li>
+<li>The location where I want the output to end up &lsquo;/Users/mlebo1/Desktop/spost/arimax_forecasting&rsquo;</li>
+</ol>
+
+<p>You&rsquo;ll also notice that in the last line of the Python script, theres a <code>sys.argv[1]</code>. That&rsquo;s basically says, &ldquo;I am going to execute this script from the command line, and I&rsquo;m going to pass in 1 argument (in this case the output directory).</p>
+
+<p>Now let&rsquo;s actually do the scraping and see what we get back.</p>
+
+<pre><code class="language-r"># How we execute the python script from R
+system(exe_py_command)
+
+# Read the output back into R
+historic_win_percent = data.table::fread(paste0(wd, &quot;/historic_win_percentages.csv&quot;),
+                                         data.table = FALSE) 
+</code></pre>
+
+<p>Let&rsquo;s look at the first 20 observations.</p>
+
+<p>Perfect. The interpretation is really simple: A team favored by 12 points will win ~78% of their games; bump that spread up to 16 points and there has never been a team favored by 16 points that has lost. Let&rsquo;s see what that looks like starting at a zero-point spread, when both teams are perceived by odds-makers to be an equal match.</p>
+
+<pre><code class="language-r">historic_win_percent_clean = historic_win_percent %&gt;% 
+                             dplyr::filter(spread &lt;= 0) %&gt;% 
+                             dplyr::mutate(win_pct = substring(win_pct, 1, 
+                                                    (nchar(win_pct) - 1))) %&gt;% 
+                             dplyr::mutate(win_pct = as.numeric(win_pct),
+                                           spread = abs(spread)) %&gt;% 
+                             dplyr::rename(favorite = spread)
+
+ggplot(historic_win_percent_clean, aes(x = favorite, y = win_pct)) + 
+    geom_point(alpha = 0) + 
+    geom_line(alpha = 0) + 
+    stat_smooth(span = 2.0, se = FALSE, size = 2, colour = monokai_line_color) + 
+    ylim(50, 110) + 
+    xlim(0, 27) + 
+    scale_x_continuous(breaks = seq(0, 25, 5)) + 
+    scale_y_continuous(breaks = seq(50, 110, 5)) + 
+    theme_monokai_full() + 
+    my_plot_theme() + 
+    xlab(&quot;Point Favorite&quot;) + ylab(&quot;Chance of Winning&quot;) + 
+    geom_vline(xintercept = 7, size = 2, colour = monokai_values[2]) + 
+    geom_vline(xintercept = 5, size = 2, colour = monokai_values[3]) + 
+    geom_vline(xintercept = 3, size = 2, colour = monokai_values[4]) + 
+    annotate(&quot;rect&quot;, xmin = 18, xmax = 19, ymin = 88, ymax = 90, fill = monokai_values[2]) + 
+    annotate(&quot;text&quot;, label = &quot;Game 1 Spread&quot;, x = 23, y = 89, size = 8, color = monokai_values[2]) + 
+    annotate(&quot;rect&quot;, xmin = 18, xmax = 19, ymin = 85, ymax = 87, fill = monokai_values[3]) + 
+    annotate(&quot;text&quot;, label = &quot;Game 2 Spread&quot;, x = 23, y = 86, size = 8, color = monokai_values[3]) + 
+    annotate(&quot;rect&quot;, xmin = 18, xmax = 19, ymin = 82, ymax = 84, fill = monokai_values[4]) + 
+    annotate(&quot;text&quot;, label = &quot;Game 3 Spread&quot;, x = 23, y = 83, size = 8, color = monokai_values[4])
+</code></pre>
+
+<p><img src="../forecasting_regressors_images/point_spread.png" class="img-responsive" style="display: block; margin: auto;" /></p>
+
+<p>Since we are in January we only know the spread for Game 1. The patriots are favored by 7, and we know historically that when a team is favored by 7 they win about ~73% of the time. So I&rsquo;m feeling at least 1 win. What about 2? Here we are going to make an educated guess. We can assume that each subsequent game will be more challenging for the Patriots, so we&rsquo;ll make an educated 5-point spread. Finally, if the Patriots play in the superbowl, let&rsquo;s predict they&rsquo;ll be a 3-point favorite. If we assume that the outcome of each playoff game is independent of the prior game (which, barring a major injury to a key player, is a reasonable assumption) we can calculate the probability of each of these scenarios unfolding:</p>
+
+<p><img src="../forecasting_regressors_images/win_prob.png" class="img-responsive" style="display: block; margin: auto;" /></p>
+
+<h3 id="seasonal-arimax-model">Seasonal ARIMAX Model</h3>
+
+<p>Now that we’ve trained our model and let’s actually see what it looks like.</p>
+
+<pre><code class="language-r">## Series: page_views_train_final 
+## ARIMA(1,1,1)(0,1,1)[12]                    
+## 
+## Coefficients:
+##          ar1      ma1     sma1  train_df_final$playoff_games_won
+##       0.2673  -0.8559  -0.7373                         296550.82
+## s.e.  0.1458   0.0723   0.2563                          36020.02
+## 
+## sigma^2 estimated as 1.28e+10:  log likelihood=-930.05
+## AIC=1870.1   AICc=1871.02   BIC=1881.41
+## 
+## Training set error measures:
+##                     ME     RMSE      MAE       MPE     MAPE      MASE
+## Training set -22993.67 101058.3 61230.45 -26.36236 38.57438 0.6260494
+##                     ACF1
+## Training set -0.01938565
+##                     ME     RMSE      MAE       MPE     MAPE      MASE
+## Training set -22993.67 101058.3 61230.45 -26.36236 38.57438 0.6260494
+##                     ACF1
+## Training set -0.01938565
+</code></pre>
+
+<p>We haven&rsquo;t covered what&rsquo;s going on under the hood, so we&rsquo;ll go into a little detail on how to interpret the output. The great thing about the &lsquo;auto.arima&rsquo; function is that it does the hard work of identifying the best model specification for our training data. While this is a huge time-saver, it helps to understand how and why certain parameters were selected. If you happen to be a forecasting expert and just want to know how to implement the model, feel free to skip this next section.</p>
+
+<p>Our model is <code>ARIMA(1,1,1)(0,1,1)[12]</code>. Let&rsquo;s focus on the first part  <code>ARIMA(1,1,1)</code></p>
+
+<p>ARIMA stands for Auto-Regressive Integrated Moving Average, which is why it is abbreviated. Identifying the <strong>Integrated part</strong>  ARIMA(1, <strong>1</strong>, 1) is the first thing we do. It says &lsquo;this is how much you need to difference (Y~t - Y~t-1~) our time series by to make it stationary on the mean. Cool story Hansel. Now in English. Stationary means that the average (or variance, or any other parameter) of our time series remains constant across time. If we have an upward or downward trend, our mean is not stationary (its changing!), so the model captures how much it is going up or down by each time step, and then subtracts that from each value so it remains flat (or stationary). Indeed, if a time series is stationary, it means that it&rsquo;s values do not depend on where we are in the time series.</p>
+
+<p>Next the <strong>Auto-Regressive</strong> or (AR(1)) part. Auto-regressive roughly translates to &lsquo;regressed on itself&rsquo;, and implies that we can learn something about Y~t+1~ from Y~t~. Said differently, prior values (in this case from 1 prior time-step) are good indicators of subsequent future values, so we capture this with an auto-regressive term.</p>
+
+<p>Finally the <strong>Moving Average</strong> or (MA(1)) part. Moving-average part is similar to the AR part, in that we use prior values to inform our prediction of future values, but instead of focusing on the actual values we focus instead on the prior errors, specifically our forecasting errors. These &lsquo;errors&rsquo; are computed as we fit the model, and like many things in life, we use our past errors to inform our future predictions.</p>
+
+<p>Now let&rsquo;s discuss the second part: <code>(0,1,1)[12]</code>. This is the seasonality portion of our model and can be interpreted similarly to the first part. The model is determining the difference in each month&rsquo;s number of views across time, so Jan. 2015 - Jan. 2014 - Jan 2013&hellip;you get the point. That&rsquo;s the integrated part. The model also calculates a historical moving average with exponential weighting. The amount of weighting (or smoothing) is determined by the <code>sma1</code> coefficient contained in the above model. Coefficients that are closer to 1 indicate that more months (across history) are being used to determine how much future months will differ from the average of previous months.</p>
+
+<p>Mention the X here.</p>
+
+<p>If that all makes sense, let&rsquo;s test our model on the final data, with our external variable set to 2 playoff games, and see how our prediction of Tom Brady&rsquo;s page views compared to what actually happened.</p>
          
       </div>
     </div>

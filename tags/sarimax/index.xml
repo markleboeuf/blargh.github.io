@@ -1,23 +1,23 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Arimax on Mark LeBoeuf</title>
-    <link>/tags/arimax/</link>
-    <description>Recent content in Arimax on Mark LeBoeuf</description>
+    <title>Sarimax on Mark LeBoeuf</title>
+    <link>https://markleboeuf.github.io/tags/sarimax/</link>
+    <description>Recent content in Sarimax on Mark LeBoeuf</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>&amp;copy;2016 Mark LeBoeuf</copyright>
     <lastBuildDate>Sat, 05 Nov 2016 19:41:01 +0530</lastBuildDate>
     
-	<atom:link href="/tags/arimax/index.xml" rel="self" type="application/rss+xml" />
+	<atom:link href="https://markleboeuf.github.io/tags/sarimax/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
       <title>Forecasting with External Regressors</title>
-      <link>/portfolio/forecasting_regressors/</link>
+      <link>https://markleboeuf.github.io/portfolio/forecasting_regressors/</link>
       <pubDate>Sat, 05 Nov 2016 19:41:01 +0530</pubDate>
       
-      <guid>/portfolio/forecasting_regressors/</guid>
+      <guid>https://markleboeuf.github.io/portfolio/forecasting_regressors/</guid>
       <description>&lt;p&gt;This post focuses on some of my favorite things: Data, Sports, and Forecasting. Today we&amp;rsquo;ll discuss how to leverage external regressors when creating forecasts. We&amp;rsquo;ll do some webscraping in R and Python to create our dataset, and then try to forecast how many people will Visit Tom Brady&amp;rsquo;s wikipedia page.
 &lt;/p&gt;</description>
     </item>
