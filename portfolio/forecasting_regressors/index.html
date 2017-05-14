@@ -99,12 +99,12 @@
 <li><a href="#collecting-month-level-traffic">Collecting Month Level Traffic</a></li>
 <li><a href="#collecting-historical-game-data">Collecting Historical Game Data</a></li>
 <li><a href="#model-selection-and-validation">Model Selection And Validation</a></li>
-<li><a href="#seasonal-arima-model">Seasonal ARIMAX Model</a></li>
+<li><a href="#seasonal-arimax-model">Seasonal ARIMAX Model</a></li>
 </ul>
 
 <h2 id="overview">Overview</h2>
 
-<p>Imagine the following scenario. It&rsquo;s January 1st, 2015 and the New England Patriots have made the playoffs yet again (sigh..). You run a webpage dedicated to Tom Brady and want to ensure you have enough servers ready to meet traffic to your website during the playoffs. Based on the past few years, you&rsquo;ve noticed that traffic during January and February increases when the patriots win their playoff games. Thus you need a traffic forecast for this time period in order to get an idea of how many people will visit your site.</p>
+<p>Imagine it&rsquo;s January 1st, 2015 and the New England Patriots have made the playoffs yet again (sigh..). You run a webpage dedicated to Tom Brady and want to ensure you have enough servers ready to meet traffic to your website during the playoffs. Based on the past few years, you&rsquo;ve noticed that traffic during January and February increases when the patriots win their playoff games. Thus you need a traffic forecast for this time period in order to get an idea of how many people will visit your site.</p>
 
 <p>Additionally, you want some insight on the effect of winning 1, 2, or 3 playoff games has on monthly traffic. For example, what happens if the Patriots two playoffs relative to one game? Finally, you want an estimate of the probability of each of these scenarios unfolding&ndash;that is, the Patriots&rsquo; chances of winning 0, 1, 2, or all 3 playoff games. To achieve these objectives, we&rsquo;ll rely on three seperate sources of data:</p>
 
@@ -131,7 +131,7 @@ setwd(wd)
 <p>Now we&rsquo;ll collect historical page views. This data comes from Wikipedia and will serve as the dependent variable in our forecast.</p>
 
 <pre><code class="language-r">page_views_by_day &lt;- wp_trend(&quot;Tom Brady&quot;, from = &quot;2006-09-01&quot;,
-to = &quot;2015-03-01&quot;)
+                                           to = &quot;2015-03-01&quot;)
 
 page_views_clean$date = as.Date(page_views_clean$date)
 
@@ -403,7 +403,7 @@ validation_output = forecast_df %&gt;%
 
 <p>To help us make an informed decision about the number of games the Patriots will win durin the playoffs, we can leverage historic NFL betting lines. For those of you not familiar with a betting line, it&rsquo;s basically a way for odds-makers to encourage an equal number bets for both teams playing in a game.</p>
 
-<p>Previously we used R to scrape data from the web. We&rsquo;ll switch over to Python for a little bit to gather the win probabilities associated with different betting lines. The <code>BeautifulSoup</code> module is awesome for doing webscraping, so that&rsquo;s what we&rsquo;ll use here. If you want to stay in R, that&rsquo;s totally cool &ndash; the data used for this part can easily be copied and pasted into a text file loaded into R (click here to go to the data). If you want to pull this data through Python, though, here&rsquo;s the code:</p>
+<p>Previously we used R to scrape data from the web. We&rsquo;ll switch over to Python for a little bit to gather the win probabilities associated with different betting lines. The <code>BeautifulSoup</code> module is awesome for doing webscraping, so that&rsquo;s what we&rsquo;ll use here. If you want to stay in R, that&rsquo;s totally cool &ndash; the data used for this part can easily be copied and pasted into a text file loaded into R (click <a href="https://bootstrapious.com/p/creative-portfolio">here</a> to go to the data). If you want to pull this data through Python, though, here&rsquo;s the code:</p>
 
 <pre><code class="language-python">import urllib2
 from bs4 import BeautifulSoup
@@ -540,9 +540,72 @@ ggplot(historic_win_percent_clean, aes(x = favorite, y = win_pct)) +
 
 <p>Now let&rsquo;s discuss the second part: <code>(0,1,1)[12]</code>. This is the seasonality portion of our model and can be interpreted similarly to the first part. The model is determining the difference in each month&rsquo;s number of views across time, so Jan. 2015 - Jan. 2014 - Jan 2013&hellip;you get the point. That&rsquo;s the integrated part. The model also calculates a historical moving average with exponential weighting. The amount of weighting (or smoothing) is determined by the <code>sma1</code> coefficient contained in the above model. Coefficients that are closer to 1 indicate that more months (across history) are being used to determine how much future months will differ from the average of previous months.</p>
 
-<p>Mention the X here.</p>
+<p>Finally the coefficient for our external regressor &ndash; number of post-season games won &ndash; has a value of 296550. This coefficient is interpreted just like a linear regression model; for each additional Patriot&rsquo;s post-season win, we expect ~ 296K more visits to Tom Brady&rsquo;s page.</p>
 
 <p>If that all makes sense, let&rsquo;s test our model on the final data, with our external variable set to 2 playoff games, and see how our prediction of Tom Brady&rsquo;s page views compared to what actually happened.</p>
+
+<pre><code class="language-r">test_df_final = train_test_df %&gt;% 
+dplyr::filter(train_test_flag == 'test') %&gt;% 
+dplyr::select(year, month, month_max_date, monthly_page_views)
+
+test_df_prediction =  data.frame(forecast(arima_games_won_final,
+xreg = c(2, 2),
+h = 2))                    
+test_df_final$predicted_monthly_views = test_df_prediction$Point.Forecast
+print(test_df_final)
+print(calcMape(test_df_final$predicted_monthly_views, test_df_final$monthly_page_views))
+</code></pre>
+
+<p>Our MAPE is about 35%, which is considerably better than the MAPE on our holdout set. However, our prediction of the Patriots only winning 2 games was wrong. The patriots won 3 post season games and beat the Seattle Seahawks 28-24 to win the superbowl. So what would&rsquo;ve have happened if we our external regressor would&rsquo;ve have been correct (3 instead of 2)? Or maybe we were too conservative and only predicted 1 win. How would&rsquo;ve each of these scenarios affect our forecasting accuracy? Let&rsquo;s find out.</p>
+
+<pre><code class="language-r">what_if_df = data.frame(year = rep(test_df_final$year, 3),
+                        month = rep(test_df_final$month, 3),
+                        month_max_date = rep(test_df_final$month_max_date, 3),
+                        playoff_games_won = rep(1:3, times=1, each=2)
+                        )
+forecast_vector = c()
+
+for(games_played in unique(what_if_df$playoff_games_won)){
+    temp_df = what_if_df %&gt;%
+    dplyr::filter_(interp(paste0(&quot;playoff_games_won == &quot;, games_played)))
+    temp_forecast = data.frame(forecast(arima_games_won_final,
+                               xreg = temp_df$playoff_games_won,
+                               h = prediction_horizon))
+    forecast_vector = c(forecast_vector, temp_forecast$Point.Forecast)
+}
+
+what_if_df$forecasted_views = forecast_vector
+what_if_df$actual_views = rep(test_df_final$monthly_page_views, 3)
+</code></pre>
+
+<p>And now let&rsquo;s plot the MAPEs.</p>
+
+<pre><code class="language-r">what_if_df = what_if_df %&gt;% 
+             dplyr::group_by(playoff_games_won) %&gt;%
+             dplyr::do(mape = calcMape(.$forecasted_views, .$actual_views)) %&gt;%
+             data.frame() %&gt;%
+             dplyr::mutate(mape = unlist(mape),
+                           playoff_games_won = factor(playoff_games_won)) %&gt;%
+             dplyr::mutate(playoff_games_won = fct_reorder(playoff_games_won, 
+                                                           mape, 
+                                                           .desc = FALSE))
+ggplot(what_if_df, aes(x = playoff_games_won, y = round(mape, 0),
+                    fill = playoff_games_won, label = as.character(round(mape, 0)))) + 
+        geom_bar(stat = &quot;identity&quot;) + 
+        theme_monokai_full() + 
+        my_plot_theme() + 
+        scale_fill_manual(values = monokai_values[1:length(unique(what_if_df$playoff_games_won))]) + 
+xlab(&quot;Value of Playoff Games Won&quot;) + ylab(&quot;MAPE&quot;) + 
+theme(legend.position = &quot;none&quot;) + 
+geom_label(label.size = 1, size = 10, color = &quot;white&quot;)
+
+</code></pre>
+
+<p><img src="../forecasting_regressors_images/mape_plot_final.png" class="img-responsive" style="display: block; margin: auto;" /></p>
+
+<p>Hang on a second. So the model with the correct number of playoff games won (3) actually had the lowest accuracy? Yes and here&rsquo;s why: Across the history of our time series, the Patriots had never actually won 3 playoff games. They had only won 0, 1 or 2 games. Thus we are extrapolating to values not contained in our data set, which can be a recipe for disaster. If you look at the change in our forecast as we increase the number of playoff games won by 1 for the month of February, we expect an additional 296K visitors. We are making the assumption that there is a linear relationship between wins and page views, such that each additional win generates +296K views. This is clearly not the case, and our incorrect assumption is reflected in the accuracy of the resulting forecast.</p>
+
+<p>So there you go. Hopefully this post has eliminated some of the mystery around creating forecasts with external regressors.</p>
          
       </div>
     </div>
