@@ -22,5 +22,24 @@
 &lt;/p&gt;</description>
     </item>
     
+    <item>
+      <title>Random Forest Prediction Intervals</title>
+      <link>https://markleboeuf.github.io/portfolio/random_forest_prediction_intervals/</link>
+      <pubDate>Thu, 12 Jan 2017 19:41:01 +0530</pubDate>
+      
+      <guid>https://markleboeuf.github.io/portfolio/random_forest_prediction_intervals/</guid>
+      <description>&lt;p&gt;&lt;/p&gt;</description>
+    </item>
+    
+    <item>
+      <title>Two Flavors of Parallel Simulation</title>
+      <link>https://markleboeuf.github.io/portfolio/two_flavors_of_parallelism/</link>
+      <pubDate>Thu, 12 Jan 2017 19:41:01 +0530</pubDate>
+      
+      <guid>https://markleboeuf.github.io/portfolio/two_flavors_of_parallelism/</guid>
+      <description>&lt;p&gt;Tired of waiting around for your simulations to finish? Run them in parallel! This post covers two seperate ways to add  parallelism &amp;ndash; and speed &amp;ndash; to your R code.
+&lt;/p&gt;</description>
+    </item>
+    
   </channel>
 </rss>

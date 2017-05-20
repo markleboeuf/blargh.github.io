@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<title>Random Forest Prediction Intervals</title>
+<meta name="description" content="Code and Stuff">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="all,follow">
+<meta name="googlebot" content="index,follow,snippet,archive">
+<link rel="stylesheet" href="https://markleboeuf.github.io/css/bootstrap.min.css">
+<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Roboto:400,300,700,400italic">
+<link rel="stylesheet" href="https://markleboeuf.github.io/css/font-awesome.min.css">
+<link rel="stylesheet" href="https://markleboeuf.github.io/css/owl.carousel.css">
+<link rel="stylesheet" href="https://markleboeuf.github.io/css/owl.theme.css">
+
+
+  <link href="https://markleboeuf.github.io/css/style.red.css" rel="stylesheet" id="theme-stylesheet">
+
+
+<link href="https://markleboeuf.github.io/css/custom.css" rel="stylesheet">
+<link rel="shortcut icon" href="https://markleboeuf.github.io/img/favicon.png">
+
+
+</head>
+<body>
+  <div id="all">
+      <div class="container-fluid">
+          <div class="row row-offcanvas row-offcanvas-left">
+              <div id="sidebar" class="col-xs-6 col-sm-4 col-md-3 sidebar-offcanvas">
+  <div class="sidebar-content">
+    <h1 class="sidebar-heading"><a href="/">Mark LeBoeuf</a></h1>
+    
+      <p class="sidebar-p">I am a Data Scientist, currently based in Portland, OR.</p>
+    
+    <ul class="sidebar-menu">
+      
+      
+        <li><a href="https://markleboeuf.github.io/">Home</a></li>
+      
+        <li><a href="https://markleboeuf.github.io/about/">About</a></li>
+      
+    </ul>
+    <p class="social">
+  
+  
+  
+  <a href="full%20profile%20url%20in%20twitter" data-animate-hover="pulse" class="external twitter">
+    <i class="fa fa-twitter"></i>
+  </a>
+  
+  
+  
+  
+  <a href="full%20profile%20url%20in%20linkedin" data-animate-hover="pulse">
+    <i class="fa fa-linkedin"></i>
+  </a>
+  
+  
+  
+  <a href="full%20profile%20url%20in%20github" data-animate-hover="pulse">
+    <i class="fa fa-github"></i>
+  </a>
+  
+</p>
+
+
+    <div class="copyright">
+      <p class="credit">
+        
+          &copy;2016 Mark LeBoeuf
+        
+        | Template by <a href="https://bootstrapious.com/free-templates" class="external">Bootstrapious.com</a>
+
+&amp; ported to Hugo by <a href="https://github.com/kishaningithub">Kishan B</a>
+
+      </p>
+    </div>
+  </div>
+</div>
+
+              
+<div class="col-xs-12 col-sm-8 col-md-9 content-column white-background">
+  <div class="small-navbar visible-xs">
+  <button type="button" data-toggle="offcanvas" class="btn btn-ghost pull-left"> <i class="fa fa-align-left"> </i>Menu</button>
+  <h1 class="small-navbar-heading"><a href="/">Mark LeBoeuf</a></h1>
+</div>
+
+  <div class="row">
+    <div class="col-lg-8">
+      <div class="content-column-content">
+         <h1>Random Forest Prediction Intervals</h1>
+         <p></p>
+
+<p><img src="../two_flavors_of_parallelism_images/two_flavors.jpg" class="img-responsive" style="display: block; margin: auto;" /></p>
+
+<ul>
+<li><a href="#overview">Overview</a></li>
+<li><a href="#parallel-simulations-with-foreach">Parallel Simulations with Foreach</a></li>
+<li><a href="#parallel-simulations-with-multidplyr">Parallel Simulations with Multidplyr</a></li>
+<li><a href="#foreach-vs.-Multidplyr">Foreach Vs. Multidplyr</a></li>
+</ul>
+
+<h2 id="overview">Overview</h2>
+
+<p>In a prior post we discussed how to use monte carlo simulation for power analysis. We kept the total number of iterations relatively low (less than 100) in order to illustrate the process. However, the real value of simulation emerges when you can run lots of simulations, because the more iterations you run the better idea you get about the thing you are trying to estimate (see <em>Law of Large Numbers</em>). In the case of estimating the power of an experiment, the more simulated experiments we run the closer we&rsquo;ll get to the true probability of committing a type II error. Simulating the experimental paradigm sequentially is fine but it takes a long time when you increase the number of simulations to, say, 10K or 100K. Any time you come across a task that involves repeated sampling from a distribution &ndash; think parallel. The results of one simulation do not feed into or depend on the results of another. Thus we can run many simulated experiments at the same time. This is a common theme of any task that is parallelizable, which might be one of the most challenging words to say. In this post I&rsquo;m going to discuss two seperate ways in R to implement a power analysis simulation. And although we&rsquo;ll focus only on paralellism in the context of power, the workflow discussed here can be generalized to almost any task that involves repeated sampling.</p>
+
+<p>##Parallel Simulations with Foreach</p>
+
+<p>I&rsquo;ll briefly review the task at hand. Researchers conducted a study examining the impact of continued sleep deprivation (defined as receiving only 3 hours of sleep per night) on reaction time. The study was run for 9 days and the researchers found a significant effect for Number of Days. As you can imagine, participants were a lot slower to react on days <sup>8</sup>&frasl;<sub>9</sub> relative to days 0/1. We want to replicate this effect but don&rsquo;t have the time to wait 9 days for a result. Our question, then, is whether we could still detect an effect of sleep deprivation after only 4 days. The goal is to achieve at least 80% power, which means that if we replicated the experiment 10 times under the exact same conditions, we would find a significant effect (<em>p</em> &lt; 0.05) in at least 8 of the experiments.</p>
+
+<p>We&rsquo;ll use the findings from the prior study over the first 4 days as our base data set. The process will be modeled with a mixed effects model with a random intercept for each participant. Our fixed effect &ndash; the thing we are interested in &ndash; is days of sleep deprivation. Let&rsquo;s load up our libraries and fit the initial model with the first 4 days of the experiment.</p>
+
+<p><img src="../forecasting_regressors_images/table1.png" class="img-responsive" style="display: block; margin: auto;" /></p>
+
+<pre><code class="language-r">
+libs = c('foreach', 'doParallel', 'lme4', 'dplyr', 'broom', 'ggplot2', 'multidplyr', 'knitr')
+lapply(libs, require, character.only = TRUE)
+sleep_df = lme4::sleepstudy %&gt;% 
+           dplyr::filter(Days %in% c(0, 1, 2, 3))
+
+fit = lmer(Reaction ~ Days + (1|Subject), data = sleep_df)
+
+</code></pre>
+
+<pre><code class="language-r">## Linear mixed model fit by REML ['lmerMod']
+## Formula: Reaction ~ Days + (1 | Subject)
+##    Data: sleep_df
+## 
+## REML criterion at convergence: 660.4
+## 
+## Scaled residuals: 
+##      Min       1Q   Median       3Q      Max 
+## -3.14771 -0.50969 -0.08642  0.48985  2.05082 
+## 
+## Random effects:
+##  Groups   Name        Variance Std.Dev.
+##  Subject  (Intercept) 755.7    27.49   
+##  Residual             379.1    19.47   
+## Number of obs: 72, groups:  Subject, 18
+## 
+## Fixed effects:
+##             Estimate Std. Error t value
+## (Intercept)  255.392      7.532   33.91
+## Days           7.989      2.052    3.89
+## 
+## Correlation of Fixed Effects:
+##      (Intr)
+## Days -0.409
+
+## Computing profile confidence intervals ...
+
+##                  2.5 %    97.5 %
+## .sig01       18.702382  39.73719
+## .sigma       16.152095  23.58800
+## (Intercept) 240.429427 270.35528
+## Days          3.931803  12.04555
+</code></pre>
+
+<p>Our model indicates that after controlling for baseline differences in participant reaction time (i.e., our random intercept), each additional day increases reaction time by about 8 seconds (7.989 to be exact). Our confidence interval for this coefficient indicates a significant effect, as it does not contain 0, but the range is fairly wide. Let&rsquo;s determine how this uncertainty in our parameter estimate affects overall experimental power. We&rsquo;ll make predictionns on our base dataset with the model defined above, and then add noise (defined by our residuals from our initial model fit) to simulate the sampling process.</p>
+
+<pre><code class="language-r">model_predictions = predict(fit, sleep_df)
+
+standard_deviation = sd(fit@resp$y - fit@resp$mu)
+
+n_simulations = 100
+
+</code></pre>
+
+<h2 id="testing-power-with-foreach">Testing Power With foreach</h2>
+         
+      </div>
+    </div>
+  </div>
+</div>
+
+          </div>
+      </div>
+  </div>
+  <script src="https://markleboeuf.github.io/js/jquery.min.js"></script>
+<script src="https://markleboeuf.github.io/js/bootstrap.min.js"></script>
+<script src="https://markleboeuf.github.io/js/jquery.cookie.js"> </script>
+<script src="https://markleboeuf.github.io/js/ekko-lightbox.js"></script>
+<script src="https://markleboeuf.github.io/js/jquery.scrollTo.min.js"></script>
+<script src="https://markleboeuf.github.io/js/masonry.pkgd.min.js"></script>
+<script src="https://markleboeuf.github.io/js/imagesloaded.pkgd.min.js"></script>
+<script src="https://markleboeuf.github.io/js/owl.carousel.min.js"></script>
+<script src="https://markleboeuf.github.io/js/front.js"></script>
+
+</body>
+</html>

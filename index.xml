@@ -23,6 +23,25 @@
     </item>
     
     <item>
+      <title>Two Flavors of Parallel Simulation</title>
+      <link>https://markleboeuf.github.io/portfolio/two_flavors_of_parallelism/</link>
+      <pubDate>Thu, 12 Jan 2017 19:41:01 +0530</pubDate>
+      
+      <guid>https://markleboeuf.github.io/portfolio/two_flavors_of_parallelism/</guid>
+      <description>&lt;p&gt;Tired of waiting around for your simulations to finish? Run them in parallel! This post covers two seperate ways to add  parallelism &amp;ndash; and speed &amp;ndash; to your R code.
+&lt;/p&gt;</description>
+    </item>
+    
+    <item>
+      <title>Random Forest Prediction Intervals</title>
+      <link>https://markleboeuf.github.io/portfolio/random_forest_prediction_intervals/</link>
+      <pubDate>Thu, 12 Jan 2017 19:41:01 +0530</pubDate>
+      
+      <guid>https://markleboeuf.github.io/portfolio/random_forest_prediction_intervals/</guid>
+      <description>&lt;p&gt;&lt;/p&gt;</description>
+    </item>
+    
+    <item>
       <title>Name of the work 5</title>
       <link>https://markleboeuf.github.io/portfolio/work5/</link>
       <pubDate>Sat, 05 Nov 2016 19:53:42 +0530</pubDate>
@@ -79,16 +98,6 @@
       
       <guid>https://markleboeuf.github.io/portfolio/work11/</guid>
       <description>&lt;p&gt;Far far away, behind the word mountains, far from the countries Vokalia and Consonantia, there live the blind texts. A small river named Duden flows by their place and supplies it with the necessary regelialia. It is a paradisematic country, in which roasted parts of sentences fly into your mouth.
-&lt;/p&gt;</description>
-    </item>
-    
-    <item>
-      <title>Name of the work 1</title>
-      <link>https://markleboeuf.github.io/portfolio/work1/</link>
-      <pubDate>Sat, 05 Nov 2016 18:25:22 +0530</pubDate>
-      
-      <guid>https://markleboeuf.github.io/portfolio/work1/</guid>
-      <description>&lt;p&gt;Even the all-powerful Pointing has no control about the blind texts it is an almost unorthographic life. One day however a small line of blind text by the name of Lorem Ipsum decided to leave for the far World of Grammar.
 &lt;/p&gt;</description>
     </item>
     
