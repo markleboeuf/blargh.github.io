@@ -396,7 +396,7 @@ type_II_vec = c(type_II_vec, as.integer(dplyr::between(0, ci_df$lower_bound, ci_
 <pre><code>[1] &quot;EXPECTED POWER IS: 41%&quot;
 </code></pre>
 
-<p>So there you have it &ndash; our simulation obtained almost identical results to build the built in package. If we increased the number of simulations, the power estimates would converge to the same number. However, if you copied this code and ran it in R, you&rsquo;ll notice that it ran pretty slow.  In a seperate [post]( I&rsquo;ll show you how to speed up any simulation by executing the entire process in parallel in order to run more simulations and get better estimates! Stay tuned!</p>
+<p>So there you have it &ndash; our simulation obtained almost identical results relative to the <code>simr</code> package. If we increased the number of simulations, the power estimates would converge to the same number. However, if you copied this code and ran it in R, you&rsquo;ll notice that it ran pretty slow.  In a seperate <a href="https://markleboeuf.github.io/portfolio/two_flavors_of_parallelism/">post</a> I&rsquo;ll show you how to speed up any simulation by executing the entire process in parallel in order to run more simulations and get better estimates! Stay tuned!</p>
          
       </div>
     </div>
