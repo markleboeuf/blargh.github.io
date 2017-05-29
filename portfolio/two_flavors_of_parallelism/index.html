@@ -7,18 +7,18 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="all,follow">
 <meta name="googlebot" content="index,follow,snippet,archive">
-<link rel="stylesheet" href="https://markleboeuf.github.io/css/bootstrap.min.css">
+<link rel="stylesheet" href="/css/bootstrap.min.css">
 <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Roboto:400,300,700,400italic">
-<link rel="stylesheet" href="https://markleboeuf.github.io/css/font-awesome.min.css">
-<link rel="stylesheet" href="https://markleboeuf.github.io/css/owl.carousel.css">
-<link rel="stylesheet" href="https://markleboeuf.github.io/css/owl.theme.css">
+<link rel="stylesheet" href="/css/font-awesome.min.css">
+<link rel="stylesheet" href="/css/owl.carousel.css">
+<link rel="stylesheet" href="/css/owl.theme.css">
 
 
-  <link href="https://markleboeuf.github.io/css/style.red.css" rel="stylesheet" id="theme-stylesheet">
+  <link href="/css/style.red.css" rel="stylesheet" id="theme-stylesheet">
 
 
-<link href="https://markleboeuf.github.io/css/custom.css" rel="stylesheet">
-<link rel="shortcut icon" href="https://markleboeuf.github.io/img/favicon.png">
+<link href="/css/custom.css" rel="stylesheet">
+<link rel="shortcut icon" href="/img/favicon.png">
 
 
 </head>
@@ -35,9 +35,9 @@
     <ul class="sidebar-menu">
       
       
-        <li><a href="https://markleboeuf.github.io/">Home</a></li>
+        <li><a href="/">Home</a></li>
       
-        <li><a href="https://markleboeuf.github.io/about/">About</a></li>
+        <li><a href="/about/">About</a></li>
       
     </ul>
     <p class="social">
@@ -165,8 +165,6 @@ standard_deviation = sd(fit@resp$y - fit@resp$mu)
 n_simulations = 100
 </code></pre>
 
-<h3 id="testing-power-with-foreach">Testing Power With foreach</h3>
-
 <p><code>For</code> loops in R are great for small operations but are the absolute worst for larger operations. Enter <code>foreach</code>. The syntax is a little bit different from your typical <code>for</code> loop. Let&rsquo;s first see how to implement our power simulation <strong>sequentially</strong> using <code>foreach</code>. Note that this approach is identical to using a regular <code>for</code> loop.</p>
 
 <pre><code class="language-r">sequential_start_time &lt;- Sys.time()
@@ -262,7 +260,7 @@ print(paste0(&quot;TOTAL POWER: &quot;, (n_simulations - sum(power_results$resul
 
 <p>If we ran our experiment under these conditions, we&rsquo;d detect an effect that we know exists in about 1 of every 2 experiments. This isn&rsquo;t ideal. The next step here would be to further increase the number of days or participants, but I don&rsquo;t want to focus too much on the experimental design. Instead, let&rsquo;s move on to the second approach to parallelism that keeps all of our operations in the <code>tidyverse</code>, which is total R programming zen.</p>
 
-<h3 id="parallel-simulation-with-multidplyr">Parallel Simulation with multidplyr</h3>
+<h3 id="parallel-simulations-with-multidplyr">Parallel Simulations with multidplyr</h3>
 
 <p>If you haven&rsquo;t used dplyr before, I would strongly suggest learning it. It is a huge boon for productivity, as you can express all of your data munging operations in clean, easy to read syntax. <code>Multidplyr</code> builds on <code>dplyr</code> by allowing operations to performed in parallel. It is a natural fit when you have grouped data and want to apply the same function to each group. The groups in our data will be each sampling iteration. I&rsquo;ll go through line by line and explain what&rsquo;s happening.</p>
 
@@ -380,15 +378,15 @@ print(paste0(&quot;TOTAL POWER: &quot;, (n_simulations - sum(power_results$resul
           </div>
       </div>
   </div>
-  <script src="https://markleboeuf.github.io/js/jquery.min.js"></script>
-<script src="https://markleboeuf.github.io/js/bootstrap.min.js"></script>
-<script src="https://markleboeuf.github.io/js/jquery.cookie.js"> </script>
-<script src="https://markleboeuf.github.io/js/ekko-lightbox.js"></script>
-<script src="https://markleboeuf.github.io/js/jquery.scrollTo.min.js"></script>
-<script src="https://markleboeuf.github.io/js/masonry.pkgd.min.js"></script>
-<script src="https://markleboeuf.github.io/js/imagesloaded.pkgd.min.js"></script>
-<script src="https://markleboeuf.github.io/js/owl.carousel.min.js"></script>
-<script src="https://markleboeuf.github.io/js/front.js"></script>
+  <script src="/js/jquery.min.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+<script src="/js/jquery.cookie.js"> </script>
+<script src="/js/ekko-lightbox.js"></script>
+<script src="/js/jquery.scrollTo.min.js"></script>
+<script src="/js/masonry.pkgd.min.js"></script>
+<script src="/js/imagesloaded.pkgd.min.js"></script>
+<script src="/js/owl.carousel.min.js"></script>
+<script src="/js/front.js"></script>
 
 </body>
 </html>

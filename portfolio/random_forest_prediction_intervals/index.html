@@ -7,18 +7,18 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="all,follow">
 <meta name="googlebot" content="index,follow,snippet,archive">
-<link rel="stylesheet" href="https://markleboeuf.github.io/css/bootstrap.min.css">
+<link rel="stylesheet" href="/css/bootstrap.min.css">
 <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Roboto:400,300,700,400italic">
-<link rel="stylesheet" href="https://markleboeuf.github.io/css/font-awesome.min.css">
-<link rel="stylesheet" href="https://markleboeuf.github.io/css/owl.carousel.css">
-<link rel="stylesheet" href="https://markleboeuf.github.io/css/owl.theme.css">
+<link rel="stylesheet" href="/css/font-awesome.min.css">
+<link rel="stylesheet" href="/css/owl.carousel.css">
+<link rel="stylesheet" href="/css/owl.theme.css">
 
 
-  <link href="https://markleboeuf.github.io/css/style.red.css" rel="stylesheet" id="theme-stylesheet">
+  <link href="/css/style.red.css" rel="stylesheet" id="theme-stylesheet">
 
 
-<link href="https://markleboeuf.github.io/css/custom.css" rel="stylesheet">
-<link rel="shortcut icon" href="https://markleboeuf.github.io/img/favicon.png">
+<link href="/css/custom.css" rel="stylesheet">
+<link rel="shortcut icon" href="/img/favicon.png">
 
 
 </head>
@@ -35,9 +35,9 @@
     <ul class="sidebar-menu">
       
       
-        <li><a href="https://markleboeuf.github.io/">Home</a></li>
+        <li><a href="/">Home</a></li>
       
-        <li><a href="https://markleboeuf.github.io/about/">About</a></li>
+        <li><a href="/about/">About</a></li>
       
     </ul>
     <p class="social">
@@ -89,84 +89,422 @@
     <div class="col-lg-8">
       <div class="content-column-content">
          <h1>Random Forest Prediction Intervals</h1>
-         <p></p>
+         <p>Take a stroll through the random forest to learn how to quantify uncertainty in your predictions with one of the more popular applied machine learning algorithms.</p>
 
-<p><img src="../two_flavors_of_parallelism_images/two_flavors.jpg" class="img-responsive" style="display: block; margin: auto;" /></p>
+<p></p>
+
+<p><img src="../random_forest_pi_images/forest.jpg" class="img-responsive" style="display: block; margin: auto;" /></p>
 
 <ul>
 <li><a href="#overview">Overview</a></li>
-<li><a href="#parallel-simulations-with-foreach">Parallel Simulations with Foreach</a></li>
-<li><a href="#parallel-simulations-with-multidplyr">Parallel Simulations with Multidplyr</a></li>
-<li><a href="#foreach-vs.-Multidplyr">Foreach Vs. Multidplyr</a></li>
+<li><a href="#confidence-and-prediction-intervals">Confidence And Prediction Intervals</a></li>
+<li><a href="#random-forest-prediction-intervals">Random Forest Prediction Intervals</a></li>
+<li><a href="#quantifying-risk">Quantifying Risk</a></li>
 </ul>
 
 <h2 id="overview">Overview</h2>
 
-<p>In a prior post we discussed how to use monte carlo simulation for power analysis. We kept the total number of iterations relatively low (less than 100) in order to illustrate the process. However, the real value of simulation emerges when you can run lots of simulations, because the more iterations you run the better idea you get about the thing you are trying to estimate (see <em>Law of Large Numbers</em>). In the case of estimating the power of an experiment, the more simulated experiments we run the closer we&rsquo;ll get to the true probability of committing a type II error. Simulating the experimental paradigm sequentially is fine but it takes a long time when you increase the number of simulations to, say, 10K or 100K. Any time you come across a task that involves repeated sampling from a distribution &ndash; think parallel. The results of one simulation do not feed into or depend on the results of another. Thus we can run many simulated experiments at the same time. This is a common theme of any task that is parallelizable, which might be one of the most challenging words to say. In this post I&rsquo;m going to discuss two seperate ways in R to implement a power analysis simulation. And although we&rsquo;ll focus only on paralellism in the context of power, the workflow discussed here can be generalized to almost any task that involves repeated sampling.</p>
+<p>People are mainly interested in your prediction or forecast. &ldquo;How much&rdquo; or &ldquo;How Many&rdquo; are what people want to know. Yet there is an equally important component to prediction &ndash; &ldquo;How Certain&rdquo; or &ldquo;How Confident&rdquo;. There is where confidence and prediction intervals enter into the equation. I&rsquo;ll first cover the difference between these two and then we&rsquo;ll do some implementation to see how we can capture uncertainty surrounding our predictions with a Random Forest.</p>
 
-<p>##Parallel Simulations with Foreach</p>
+<h3 id="confidence-and-prediction-intervals">Confidence And Prediction Intervals</h3>
 
-<p>I&rsquo;ll briefly review the task at hand. Researchers conducted a study examining the impact of continued sleep deprivation (defined as receiving only 3 hours of sleep per night) on reaction time. The study was run for 9 days and the researchers found a significant effect for Number of Days. As you can imagine, participants were a lot slower to react on days <sup>8</sup>&frasl;<sub>9</sub> relative to days 0/1. We want to replicate this effect but don&rsquo;t have the time to wait 9 days for a result. Our question, then, is whether we could still detect an effect of sleep deprivation after only 4 days. The goal is to achieve at least 80% power, which means that if we replicated the experiment 10 times under the exact same conditions, we would find a significant effect (<em>p</em> &lt; 0.05) in at least 8 of the experiments.</p>
+<p>These two terms are often used interchangably but they are really quite different. Let&rsquo;s say we want to estimate Salary as a function of years of education via linear regression. Confidence intervals capture uncertainty around a parameter estimate (e.g., the average increase in salary for each additional year of education). If we were to repeatedly take samples of  people, measure their salary and years of education, and calculate a different regression equation for each sample, then 95% of the confidence intervals generated from each regression should contain the true parameter.</p>
 
-<p>We&rsquo;ll use the findings from the prior study over the first 4 days as our base data set. The process will be modeled with a mixed effects model with a random intercept for each participant. Our fixed effect &ndash; the thing we are interested in &ndash; is days of sleep deprivation. Let&rsquo;s load up our libraries and fit the initial model with the first 4 days of the experiment.</p>
+<p>Prediction intervals take uncertainty of parameter estimates into account as well but also consider the uncertainty around trying to predict the value of an unseen, single observation (variability of individual observations around the parameter). This is why prediction intervals are always wider than confidence intervals &ndash; because we have to consider more sources of uncertainty.</p>
 
-<p><img src="../forecasting_regressors_images/table1.png" class="img-responsive" style="display: block; margin: auto;" /></p>
+<p>With these differences in mind, let&rsquo;s see how prediction intervals are used in practice. We are going to predict neighborhood median housing values based on 2 inputs: average number of rooms per house and property taxes. We&rsquo;ll do a 70-30 split to create our training and test datasets, respectively. On our training data, we&rsquo;ll implement leave-one-out cross validation to get an idea of how well our prediction interval methodology will perform on new, unseen data. If we set a 95% prediction interval, then ideally 95% of the values should fall within their interval during validation. Let&rsquo;s load the data.</p>
 
-<pre><code class="language-r">
-libs = c('foreach', 'doParallel', 'lme4', 'dplyr', 'broom', 'ggplot2', 'multidplyr', 'knitr')
+<pre><code class="language-r">libs = c('randomForest', 'dplyr', 'data.table', 'knitr', 'ggplot2', 'artyfarty', 'car', 'forcats', 'lazyeval', 'broom')
+
 lapply(libs, require, character.only = TRUE)
-sleep_df = lme4::sleepstudy %&gt;% 
-           dplyr::filter(Days %in% c(0, 1, 2, 3))
 
-fit = lmer(Reaction ~ Days + (1|Subject), data = sleep_df)
+df &lt;- data.table::fread(&quot;https://archive.ics.uci.edu/ml/machine-learning-databases/housing/housing.data&quot;,
+    data.table = FALSE)
 
+names(df) &lt;- c('CRIM', 'ZN', 'INDUS', 
+               'CHAS', 'NOX', 'RM', 'AGE', 
+               'DIS', 'RAD', 'TAX', 'PTRATIO', 
+               'B', 'LSTAT', 'MEDV')
+
+dv = 'MEDV'
+iv = c('RM', 'TAX')
+
+df_input = df %&gt;% 
+           dplyr::select_(.dots = c(iv, dv))
 </code></pre>
 
-<pre><code class="language-r">## Linear mixed model fit by REML ['lmerMod']
-## Formula: Reaction ~ Days + (1 | Subject)
-##    Data: sleep_df
-## 
-## REML criterion at convergence: 660.4
-## 
-## Scaled residuals: 
-##      Min       1Q   Median       3Q      Max 
-## -3.14771 -0.50969 -0.08642  0.48985  2.05082 
-## 
-## Random effects:
-##  Groups   Name        Variance Std.Dev.
-##  Subject  (Intercept) 755.7    27.49   
-##  Residual             379.1    19.47   
-## Number of obs: 72, groups:  Subject, 18
-## 
-## Fixed effects:
-##             Estimate Std. Error t value
-## (Intercept)  255.392      7.532   33.91
-## Days           7.989      2.052    3.89
-## 
-## Correlation of Fixed Effects:
-##      (Intr)
-## Days -0.409
+<p>Let&rsquo;s check out the first 5 rows.</p>
 
-## Computing profile confidence intervals ...
+<p><img src="../random_forest_pi_images/table1.png" class="img-responsive" style="display: block; margin: auto;" /></p>
 
-##                  2.5 %    97.5 %
-## .sig01       18.702382  39.73719
-## .sigma       16.152095  23.58800
-## (Intercept) 240.429427 270.35528
-## Days          3.931803  12.04555
+<p>Great success! Ok now let&rsquo;s specify our Random Forest model. We don&rsquo;t hardcode any of the values here because we might later want to add in new predictors and don&rsquo;t want to change our model specification every time. So we&rsquo;ll generate a generic input formula like this.</p>
+
+<pre><code class="language-r">model_spec = as.formula(paste0(dv, &quot; ~ &quot;, 
+                        paste0(setdiff(names(df_input), dv), 
+                        collapse = &quot; + &quot;)))
 </code></pre>
 
-<p>Our model indicates that after controlling for baseline differences in participant reaction time (i.e., our random intercept), each additional day increases reaction time by about 8 seconds (7.989 to be exact). Our confidence interval for this coefficient indicates a significant effect, as it does not contain 0, but the range is fairly wide. Let&rsquo;s determine how this uncertainty in our parameter estimate affects overall experimental power. We&rsquo;ll make predictionns on our base dataset with the model defined above, and then add noise (defined by our residuals from our initial model fit) to simulate the sampling process.</p>
+<p>Let&rsquo;s create our training and testing datasets. Additionally, we&rsquo;ll add a variable <code>random_pred_index</code> to identify which observation we want to hold out during cross validation.</p>
 
-<pre><code class="language-r">model_predictions = predict(fit, sleep_df)
+<pre><code class="language-r">set.seed(123)
+pct_train = 0.70
 
-standard_deviation = sd(fit@resp$y - fit@resp$mu)
+train_indices = sample.int(n = nrow(df_input), 
+                           size = floor(pct_train * nrow(df_input)), 
+                           replace = FALSE)
 
-n_simulations = 100
+train_df = df_input[train_indices,]
+test_df = df_input[-train_indices,]
 
+random_pred_index = sample(1:nrow(train_df), nrow(train_df), replace = FALSE)
 </code></pre>
 
-<h2 id="testing-power-with-foreach">Testing Power With foreach</h2>
+<h3 id="random-forest-prediction-intervals">Random Forest Prediction Intervals</h3>
+
+<p>The number of trees is set to 10 for illustration purposes. We&rsquo;ll also go through the loop once to illustrate what&rsquo;s actually going on.</p>
+
+<pre><code class="language-r">ntrees = 10
+
+for(i in random_pred_index){
+    print(paste0(&quot;HOLDING OUT OBSERVATION NUMBER: &quot;, i))
+    temp_train_df = train_df[-i,]
+    temp_validation = train_df[i,]
+    temp_rf_fit = randomForest(model_spec, 
+                               data = temp_train_df, 
+                               ntree = ntrees)
+    temp_rf_pred = predict(temp_rf_fit, temp_validation, predict.all = TRUE)
+    break
+}
+</code></pre>
+
+<p>Let&rsquo;s examine the predicted values for this observation.</p>
+
+<pre><code class="language-r">print(temp_rf_pred$individual)
+</code></pre>
+
+<pre><code class="language-r">##    [,1] [,2] [,3] [,4]  [,5]  [,6]   [,7] [,8]     [,9] [,10]
+## 81   28 24.5 28.5   25 28.25 24.12 24.475   25 28.03333    25
+</code></pre>
+
+<p>The above values represent the final prediction from each tree. Since random forest uses bagging (i.e., it takes a random sample of our data each time it builds a tree), each of the predictions will differ from one another. These estimates will serve as the first part of our prediction interval.</p>
+
+<p>The second part captures the prediction accuracy of each of our trees, which is referred to as Out-of-bag estimate. Remember how I mentioned that random forest takes a random sample of our data each time it builds a tree? The data that isn’t sampled is used to test how well an individual tree captured the signal in our data and produced an accurate prediction on the non-sampled data. Let’s see how well each of our trees performed by examining their mean-square error.</p>
+
+<pre><code class="language-r">print(round(temp_rf_fit$mse, 1))
+</code></pre>
+
+<pre><code class="language-r">##  [1] 51.6 48.9 46.3 49.2 46.0 39.5 39.9 38.3 37.5 36.3
+</code></pre>
+
+<p>We see that tree number 10 (36.3) had the lowest out-of-bag MSE while tree number 1 (51.6) had the highest MSE. The accuracy information will serve as the second part.</p>
+
+<p>Now that we have both pieces of information, let’s calculate a prediction interval for this observation. For the sake of simplicity we’ll assume that our observations are distributed normally about the mean – an assumption we will test a little bit later. Each of the 10 predictions above will serve as the mean, and the square-root of our mean-squared error will serve as our standard deviation. We will then take 10 samples from a distribution with these parameters, add them to the predictions from each tree, and then sort the updated values form lowest to highest. The values that fall at the 2.5th percentile and 97.5th percentile will serve as the lower and upper bounds for our prediction interval.</p>
+
+<pre><code class="language-r">lower_bound = 0.025
+upper_bound = 0.975
+prediction_interval_values = temp_rf_pred$individual + rnorm(ntrees, 0, sqrt(temp_rf_fit$mse))
+lower_upper_bound_values = quantile(prediction_interval_values, c(lower_bound, upper_bound))
+print(lower_upper_bound_values)
+</code></pre>
+
+<pre><code class="language-r">##     2.5%    97.5% 
+## 15.48663 37.67624
+</code></pre>
+
+<p>That&rsquo;s it. Next we will re-run the above code with all of the training cases, and then we&rsquo;ll investigate 2 things:</p>
+
+<ol>
+<li>Whether our assumption of normality is justified.</li>
+<li>The percentage of observations that fall within our interval (i.e., Coverage Rate)</li>
+</ol>
+
+<pre><code>ntrees = 100
+predicted_values = c()
+actual_values = c()
+lower_bound_values = c()
+upper_bound_values = c()
+lower_bound = 0.025
+upper_bound = 0.975
+pct_train = 0.70
+#
+model_spec = as.formula(paste0(dv, &quot; ~ &quot;, paste0(setdiff(names(df_input), dv), collapse = &quot; + &quot;)))
+train_indices = sample.int(n = nrow(df_input), size = floor(pct_train * nrow(df_input)), replace = FALSE)
+train_df = df_input[train_indices,]
+test_df = df_input[-train_indices,]
+random_pred_index = sample(1:nrow(train_df), nrow(train_df), replace = FALSE)
+for(i in random_pred_index){
+    print(paste0(&quot;HOLDING OUT OBSERVATION NUMBER: &quot;, i))
+    temp_train_df = train_df[-i,]
+    temp_validation = train_df[i,]
+    temp_rf_fit = randomForest(model_spec, 
+                               data = temp_train_df, 
+                               ntree = ntrees)
+    temp_rf_pred = predict(temp_rf_fit, temp_validation, predict.all = TRUE)
+    predicted_values = c(predicted_values, unname(temp_rf_pred$aggregate))
+    actual_values = c(actual_values, temp_validation$MEDV)
+    prediction_interval_values = temp_rf_pred$individual + rnorm(ntrees, 0, sqrt(temp_rf_fit$mse))
+    lower_upper_bound_values = unname(quantile(prediction_interval_values, c(lower_bound, upper_bound)))
+    lower_bound_values = c(lower_bound_values, lower_upper_bound_values[1])
+    upper_bound_values = c(upper_bound_values, lower_upper_bound_values[2])
+}
+validation_df = data.frame(actual_values = actual_values,
+                           predicted_values = predicted_values,
+                           lb = lower_bound_values,
+                           ub = upper_bound_values) %&gt;% 
+                dplyr::mutate(residuals = actual_values - predicted_values,
+                              pi_range = ub - lb)
+</code></pre>
+
+<p>Here are the first 5 rows of validation dataset.</p>
+
+<p><img src="../random_forest_pi_images/table2.png" class="img-responsive" style="display: block; margin: auto;" /></p>
+
+<p>First we’ll examine our residuals to determine if our assumption of normality for the prediction intervals is justified.</p>
+
+<pre><code class="language-r">qqPlot(validation_df$residuals, ylab = &quot;Residuals&quot;)
+</code></pre>
+
+<p><img src="../random_forest_pi_images/plot1.png" class="img-responsive" style="display: block; margin: auto;" /></p>
+
+<p>Overall the residuals appear to be normally be distributed but there are few big misses at the tails. Let’s run a more formal test.</p>
+
+<pre><code class="language-r">shapiro.test(validation_df$residuals)
+</code></pre>
+
+<pre><code class="language-r">## 
+##  Shapiro-Wilk normality test
+## 
+## data:  validation_df$residuals
+## W = 0.82478, p-value &lt; 2.2e-16
+</code></pre>
+
+<p>The output of this test, specifically our p-value, indicates that there is a very small chance that our residuals come from a normal distribution. Let’s look at the data from another angle.</p>
+
+<pre><code class="language-r">ggplot(validation_df, aes(x = residuals)) +  geom_histogram(aes(y=..density..),
+        binwidth=.5,
+        colour=&quot;black&quot;, fill= monokai_line_color) +
+        theme_monokai_full() + 
+        my_plot_theme() +
+        geom_density(alpha=.5, fill=monokai_values[2])
+</code></pre>
+
+<p><img src="../random_forest_pi_images/residuals_plot.png" class="img-responsive" style="display: block; margin: auto;" /></p>
+
+<p>That looks pretty normal. There are four observations that we drastically underpredicted. Normally we would go back and try to include another variable to potentially improve our predictive accuracy. However, the residuals appear to roughly follow a normal distribution.</p>
+
+<p>While it is easy to get caught up in formal tests, at the end of the day what we really care about is the performance. Indeed, the question we should ask is whether the departure from normality will impact our coverage rate. In this case: Do around 95% of the actuals fall within our prediction intervals?</p>
+
+<pre><code class="language-r">ggplot(validation_df, aes(x = predicted_values, y = actual_values)) + 
+       theme_monokai_full() + 
+       my_plot_theme() +
+       geom_errorbar(aes(ymin = lb, ymax = ub), color = monokai_line_color[1], size = 2) + 
+       geom_point(size = 2, color = monokai_values[1]) + 
+       ylab(&quot;Actual Values&quot;) + xlab(&quot;Predicted Values&quot;)
+</code></pre>
+
+<p><img src="../random_forest_pi_images/plot3.png" class="img-responsive" style="display: block; margin: auto;" /></p>
+
+<pre><code class="language-r">percent_of_values_in_pi = round(nrow(validation_df %&gt;% 
+                          dplyr::filter(actual_values &gt; lb &amp; 
+                          actual_values &lt; ub))/nrow(validation_df) * 100)
+
+print(paste0(&quot;PERCENT OF VALUES IN PI: &quot;, percent_of_values_in_pi, &quot;%&quot;))
+</code></pre>
+
+<pre><code class="language-r">## [1] &quot;PERCENT OF VALUES IN PI: 98%&quot;
+</code></pre>
+
+<pre><code class="language-r">print(paste0(&quot;VALIDATION MEAN ABSOLUTE ERROR: &quot;, round(mean(abs(validation_df$residuals)), 1)))
+</code></pre>
+
+<pre><code class="language-r">## [1] &quot;VALIDATION MEAN ABSOLUTE ERROR: 3.5&quot;
+</code></pre>
+
+<pre><code class="language-r">print(paste0(&quot;AVERAGE PI WIDTH: &quot;, round(mean(validation_df$ub - validation_df$lb), 1)))
+</code></pre>
+
+<pre><code class="language-r">## [1] &quot;AVERAGE PI WIDTH: 25.3&quot;
+</code></pre>
+
+<p>98% of the values fell within the prediction intervals, which is close to our 95% goal. So while the residuals violated the assumption of normality, it doesn’t appear to affect our coverage rate. Our MAE was 3.5, and the average width across all of our prediction intervals was 25.3.</p>
+
+<p>As with most things in life, we need a reference point (to compare our performance metrics above). Let’s keep it simple and start with the good ol` linear model and re-run the validation part. We’ll also regenerate the prediction intervals and have a look at how they differ between the two models.</p>
+
+<pre><code class="language-r">validation_df_lm = data.frame(NULL)
+
+for(i in random_pred_index){
+    print(paste0(&quot;HOLDING OUT OBSERVATION NUMBER: &quot;, i))
+    temp_train_df = train_df[-i,]
+    temp_validation = train_df[i,]
+    temp_lm_fit = lm(model_spec, data = temp_train_df)
+    validation_df_lm = data.frame(predict(temp_lm_fit, temp_validation, interval = &quot;prediction&quot;)) %&gt;%
+        dplyr::rename(predicted_values = fit,
+                      lb = lwr,
+                      ub = upr) %&gt;%
+        dplyr::mutate(actual_values = temp_validation$MEDV) %&gt;%
+        dplyr::mutate(residuals = actual_values - predicted_values) %&gt;% 
+        dplyr::bind_rows(validation_df_lm)
+}
+</code></pre>
+
+<pre><code class="language-r">ggplot(validation_df_lm, aes(x = predicted_values, y = actual_values)) + 
+    theme_monokai_full() + 
+    my_plot_theme() +
+    geom_errorbar(aes(ymin = lb, ymax = ub), color = monokai_line_color[1], size = 2) + 
+    geom_point(size = 2, color = monokai_values[1]) + 
+    ylab(&quot;Actual Values&quot;) + xlab(&quot;Predicted Values&quot;)
+</code></pre>
+
+<p><img src="../random_forest_pi_images/plot4.png" class="img-responsive" style="display: block; margin: auto;" /></p>
+
+<pre><code class="language-r">percent_of_values_in_pi = round(nrow(validation_df_lm %&gt;% 
+                          dplyr::filter(actual_values &gt; lb &amp; 
+                          actual_values &lt; ub))/nrow(validation_df_lm) * 100)
+
+print(paste0(&quot;PERCENT OF VALUES IN PI: &quot;, percent_of_values_in_pi, &quot;%&quot;))
+</code></pre>
+
+<pre><code class="language-r">## [1] &quot;PERCENT OF VALUES IN PI: 95%&quot;
+</code></pre>
+
+<pre><code class="language-r">print(paste0(&quot;VALIDATION MEAN ABSOLUTE ERROR: &quot;, round(mean(abs(validation_df_lm$residuals)), 1)))
+</code></pre>
+
+<pre><code class="language-r">## [1] &quot;VALIDATION MEAN ABSOLUTE ERROR: 4.2&quot;
+</code></pre>
+
+<pre><code class="language-r">print(paste0(&quot;AVERAGE PI WIDTH: &quot;, round(mean(validation_df_lm$ub - validation_df_lm$lb), 1)))
+</code></pre>
+
+<pre><code class="language-r">## [1] &quot;AVERAGE PI WIDTH: 25.4&quot;
+</code></pre>
+
+<p>The prediction interval coverage rate of 95%. This is the coverage rate we expected but it less than our random forest model (98%). Is this because our random forest model just produced super wide intervals that aren’t helpful (e.g., the price of this home will be somewhere between $100K and $20Million)? Let’s compare the average width of all the prediction intervals between the two models to get some insight on this question. The average width for the linear model is 25.4, while the random forest average PI width is 25.3. This indicates that the random forest model is slightly better at capturing the uncertainty when predicting a new, unseen observation, given that both models are generating prediction intervals of equal width. Finally, the MAE is lower for random forest relative to the linear model on the validation set (3.5 vs. 4.2), so it looks like there is some non-linearity in the data that the linear model just can’t capture.</p>
+
+<p>Besides being the more accurate model and generating slightly better prediction intervals (at least in this case), there is one other feature that I really like about random forest prediction intervals. I’ll go over this in the next section.</p>
+
+<h3 id="quantifying-risk">Quantifying Risk</h3>
+
+<p>Ideally we want our prediction intervals to tell us two things:</p>
+
+<ol>
+<li>Whats the range of potential outcomes?</li>
+<li>How confident am I in my prediction?</li>
+</ol>
+
+<p>Thus far we’ve focused mainly on point #1. But point #2 is also very important.
+When comparing the PIs of two methods we&rsquo;ve reviewed thus far, you&rsquo;ll notice the PIs for the linear model were relatively constant across our range of predicted values. In contrast, the PIs for the random forest were changing from one observation to the next, such that some intervals were much wider than others. So how do both methods account for the fact that some things are just harder to predict than others? The linear model does it by examing how far the value of <strong>x<sub>ij</sub></strong> is from the average of <strong>x<sub>i</sub></strong>. Values that are closer to average of <strong>x<sub>i</sub></strong> will have narrower prediction intervals; values that are further away from average of <strong>x<sub>i</sub></strong> will have wider prediction intervals. This makes intuitive sense: We can be more certain about our predictions when the input values are closer to the center. However, if you examine the linear model PI plot above, you&rsquo;ll see that this doesn&rsquo;t make much of a difference in terms the width of our prediction intervals.</p>
+
+<p>If we take the width of the interval as a measure of our confidence, then there should be a significant positive correlation between PI width and our residuals. Wider intervals should correspond to bigger errors, while narrow intervals should have smaller errors. Let’s compare the relationships between the PI intervals and residuals for the two models outlined thus far and calculate a correlation coefficient for each.</p>
+
+<pre><code class="language-r">lm_pi_range = validation_df_lm$ub  - validation_df_lm$lb
+lm_residual = abs(validation_df_lm$residuals)
+rf_pi_range = validation_df$ub - validation_df$lb
+rf_residual = abs(validation_df$residuals)
+
+pi_range_df = data.frame(model = c(rep(&quot;lm&quot;, length(lm_pi_range)), rep(&quot;rf&quot;, length(rf_pi_range))),
+                         pi_range = c(lm_pi_range, rf_pi_range),
+                         residuals = c(lm_residual, rf_residual))
+
+cor_by_model = pi_range_df %&gt;%
+               dplyr::group_by(model) %&gt;%
+               dplyr::do(tidy(cor.test(.$residuals, .$pi_range))) %&gt;%
+               dplyr::select(model, estimate, p.value) %&gt;%
+               dplyr::mutate(estimate = round(estimate, 2),
+               p.value = round(p.value, 2))
+               data.frame()
+pi_range_df = pi_range_df %&gt;%
+              dplyr::inner_join(cor_by_model)
+</code></pre>
+
+<pre><code class="language-r">ggplot(pi_range_df, aes(x = pi_range, y = abs(residuals), color = model)) + geom_point() +
+    stat_smooth(method = &quot;lm&quot;, se = FALSE, alpha = 0.5) +
+    theme_monokai_full() +
+    my_plot_theme() +
+    xlab(&quot;PI Range&quot;) + ylab(&quot;ABSOLUTE RESIDUAL&quot;) +
+    scale_color_manual(values = monokai_values[1:2]) + 
+annotate(&quot;text&quot;, label = paste0(&quot;LM pearson.r = &quot;, 
+                                pi_range_df %&gt;% 
+                                dplyr::filter(model == &quot;lm&quot;) %&gt;% 
+                                dplyr::select(estimate) %&gt;% 
+                                distinct()), x = 50, y = 50, 
+                                size = 7, color = monokai_values[1]) + 
+annotate(&quot;text&quot;, label = paste0(&quot;RF pearson.r = &quot;, 
+                                pi_range_df %&gt;% 
+                                dplyr::filter(model == &quot;rf&quot;) %&gt;% 
+                                dplyr::select(estimate) %&gt;% 
+                                distinct()), x = 50, y = 45, 
+                                size = 7, color = monokai_values[2])
+</code></pre>
+
+<p><img src="../random_forest_pi_images/plot5.png" class="img-responsive" style="display: block; margin: auto;" /></p>
+
+<p>Both correlation coefficients were significant, but the restricted range for the linear model precludes an assessment (and it&rsquo;s in the wrong direction!). The random forest model shows what we expected, although the correlation is somewhat weak at 0.18. Ideally we’d like to see a stronger relationship but the random forest approach to generating PIs does appear to capture this uncertainty. Additionally, recall that pearson&rsquo;s R measures the <strong>linear</strong> relationship between two variables. Spearman&rsquo;s correlation might be more appropriate here, as we are simply interested in the <strong>monotonic</strong> relationship rather than the strength.</p>
+
+<p>Let’s examine how the random forest model performs on our test set. This time we’ll use the full training set to build our model.</p>
+
+<pre><code class="language-r">train_fit = randomForest(model_spec,
+                        data = train_df,
+                        ntree = 100)
+
+final_prediction = predict(train_fit, test_df, predict.all = TRUE)
+
+prediction_interval_values = final_prediction$individual + rnorm(ntrees, 0, sqrt(train_fit$mse))
+
+upper_lower_bounds = data.frame(t((apply(prediction_interval_values, 1, function(x) quantile(x, c(lower_bound, upper_bound))))))
+
+names(upper_lower_bounds) = c(&quot;lower&quot;, &quot;upper&quot;)
+
+performance_df = data.frame(actual_values = test_df$MEDV,
+                            predicted_values = final_prediction$aggregate,
+                            lb = upper_lower_bounds$lower,
+                            ub = upper_lower_bounds$upper,
+                            residuals = test_df$MEDV - final_prediction$aggregate)
+</code></pre>
+
+<pre><code class="language-r">ggplot(performance_df, aes(x = predicted_values, y = actual_values)) +
+       theme_monokai_full() +
+       my_plot_theme() +
+       geom_errorbar(aes(ymin = lb, ymax = ub), color = monokai_line_color[1]) +
+       geom_point(size = 1, color = monokai_values[1]) +
+       ylab(&quot;Actual Values&quot;) + xlab(&quot;Predicted Values&quot;)
+</code></pre>
+
+<p><img src="../random_forest_pi_images/plot6.png" class="img-responsive" style="display: block; margin: auto;" /></p>
+
+<p>Now let&rsquo;s examine the model&rsquo;s performance.</p>
+
+<pre><code class="language-r">percent_of_values_in_pi = round(nrow(performance_df %&gt;%
+                          dplyr::filter(actual_values &gt; lb &amp;
+                          actual_values &lt; ub))/nrow(performance_df) * 100)
+
+print(paste0(&quot;PERCENT OF VALUES IN PI: &quot;, percent_of_values_in_pi, &quot;%&quot;))
+</code></pre>
+
+<pre><code class="language-r">## [1] &quot;PERCENT OF VALUES IN PI: 99%&quot;
+</code></pre>
+
+<pre><code class="language-r">print(paste0(&quot;TEST MEAN ABSOLUTE ERROR: &quot;, round(mean(abs(performance_df$residuals)), 1)))
+</code></pre>
+
+<pre><code class="language-r">## [1] &quot;TEST MEAN ABSOLUTE ERROR: 3.2&quot;
+</code></pre>
+
+<pre><code class="language-r">print(paste0(&quot;AVERAGE PI WIDTH: &quot;, round(mean(performance_df$ub - performance_df$lb), 1)))
+</code></pre>
+
+<pre><code class="language-r">## [1] &quot;AVERAGE PI WIDTH: 23.8&quot;
+</code></pre>
+
+<pre><code class="language-r">print(paste0(&quot;CORRELATION BETWEEN PI WIDTH &amp; RESIDUAL: &quot;, 
+                round(cor(abs(performance_df$residuals), 
+                (performance_df$ub - performance_df$lb)), 2)))
+</code></pre>
+
+<pre><code class="language-r">## [1] &quot;CORRELATION BETWEEN PI WIDTH &amp; RESIDUAL: 0.32&quot;
+</code></pre>
+
+<p>The results are encouraging. Our coverage rate is comparable to our validation set; the test error is lower than the validation set, indicating that we didn’t overfit; the width of our PIs are similar to validation; and the relationship between our PI width and absolute errors is in the correct direction. In short our model – and prediction intervals – are working properly.</p>
          
       </div>
     </div>
@@ -176,15 +514,15 @@ n_simulations = 100
           </div>
       </div>
   </div>
-  <script src="https://markleboeuf.github.io/js/jquery.min.js"></script>
-<script src="https://markleboeuf.github.io/js/bootstrap.min.js"></script>
-<script src="https://markleboeuf.github.io/js/jquery.cookie.js"> </script>
-<script src="https://markleboeuf.github.io/js/ekko-lightbox.js"></script>
-<script src="https://markleboeuf.github.io/js/jquery.scrollTo.min.js"></script>
-<script src="https://markleboeuf.github.io/js/masonry.pkgd.min.js"></script>
-<script src="https://markleboeuf.github.io/js/imagesloaded.pkgd.min.js"></script>
-<script src="https://markleboeuf.github.io/js/owl.carousel.min.js"></script>
-<script src="https://markleboeuf.github.io/js/front.js"></script>
+  <script src="/js/jquery.min.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+<script src="/js/jquery.cookie.js"> </script>
+<script src="/js/ekko-lightbox.js"></script>
+<script src="/js/jquery.scrollTo.min.js"></script>
+<script src="/js/masonry.pkgd.min.js"></script>
+<script src="/js/imagesloaded.pkgd.min.js"></script>
+<script src="/js/owl.carousel.min.js"></script>
+<script src="/js/front.js"></script>
 
 </body>
 </html>

@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<title>Monte Carlo Power Calculations for Mixed Effects Models</title>
+<meta name="description" content="Code and Stuff">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="all,follow">
+<meta name="googlebot" content="index,follow,snippet,archive">
+<link rel="stylesheet" href="/css/bootstrap.min.css">
+<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Roboto:400,300,700,400italic">
+<link rel="stylesheet" href="/css/font-awesome.min.css">
+<link rel="stylesheet" href="/css/owl.carousel.css">
+<link rel="stylesheet" href="/css/owl.theme.css">
+
+
+  <link href="/css/style.red.css" rel="stylesheet" id="theme-stylesheet">
+
+
+<link href="/css/custom.css" rel="stylesheet">
+<link rel="shortcut icon" href="/img/favicon.png">
+
+
+</head>
+<body>
+  <div id="all">
+      <div class="container-fluid">
+          <div class="row row-offcanvas row-offcanvas-left">
+              <div id="sidebar" class="col-xs-6 col-sm-4 col-md-3 sidebar-offcanvas">
+  <div class="sidebar-content">
+    <h1 class="sidebar-heading"><a href="/">Mark LeBoeuf</a></h1>
+    
+      <p class="sidebar-p">I am a Data Scientist, currently based in Portland, OR.</p>
+    
+    <ul class="sidebar-menu">
+      
+      
+        <li><a href="/">Home</a></li>
+      
+        <li><a href="/about/">About</a></li>
+      
+    </ul>
+    <p class="social">
+  
+  
+  
+  <a href="full%20profile%20url%20in%20twitter" data-animate-hover="pulse" class="external twitter">
+    <i class="fa fa-twitter"></i>
+  </a>
+  
+  
+  
+  
+  <a href="full%20profile%20url%20in%20linkedin" data-animate-hover="pulse">
+    <i class="fa fa-linkedin"></i>
+  </a>
+  
+  
+  
+  <a href="full%20profile%20url%20in%20github" data-animate-hover="pulse">
+    <i class="fa fa-github"></i>
+  </a>
+  
+</p>
+
+
+    <div class="copyright">
+      <p class="credit">
+        
+          &copy;2016 Mark LeBoeuf
+        
+        | Template by <a href="https://bootstrapious.com/free-templates" class="external">Bootstrapious.com</a>
+
+&amp; ported to Hugo by <a href="https://github.com/kishaningithub">Kishan B</a>
+
+      </p>
+    </div>
+  </div>
+</div>
+
+              
+<div class="col-xs-12 col-sm-8 col-md-9 content-column white-background">
+  <div class="small-navbar visible-xs">
+  <button type="button" data-toggle="offcanvas" class="btn btn-ghost pull-left"> <i class="fa fa-align-left"> </i>Menu</button>
+  <h1 class="small-navbar-heading"><a href="/">Mark LeBoeuf</a></h1>
+</div>
+
+  <div class="row">
+    <div class="col-lg-8">
+      <div class="content-column-content">
+         <h1>Monte Carlo Power Calculations for Mixed Effects Models</h1>
+         <p>That&rsquo;s a dense title &ndash; Monte Carlo Simulation, Power, Mixed-Effect models. Each of these topics could be their own post. However, I&rsquo;m going to discuss their interrelations in the context of experimental power and keep everything high-level. The goal is to get an intuitive idea of how we can leverage simulation to provide sample size estimates for experiments with nested data.<br />
+</p>
+
+<p><img src="../monte_carlo_mixed_effects_images/monte-carlo.jpg" class="img-responsive" style="display: block; margin: auto;" /></p>
+
+<ul>
+<li><a href="#what-is-power">What is Power</a></li>
+<li><a href="#simulating-power">Simulating Power</a></li>
+<li><a href="#a-brief-primer-on-random-effects">A Brief Primer on Random Effects</a></li>
+<li><a href="#calculating-power-for-mixed-effects-models">Calculating Power for Mixed Effects Models</a></li>
+<li><a href="#build-your-own-simulator">Build Your Own Simulator</a></li>
+</ul>
+
+<h3 id="what-is-power">What is power?</h3>
+
+<p>Power is the ability to detect an effect, given that one exists. I&rsquo;ll illustrate this concept with a simple example. Let&rsquo;s say you are conducting a study on the effects of a weight loss pill. One group gets the weight loss will while the other receives a placebo. For the pill to be marketable, you want to claim an average loss of 3lbs. This is our <strong>effect size</strong>. Estimating an effect size can be a bit tricky; you can use history or simply figure out what size of effect you want to see (in this case a difference of 3lbs). Additionally, we&rsquo;ll have to specify a standard deviation. This can come from similar, prior studies or a pilot study. To keep things simple, let&rsquo;s say we reviewed some literature on similiar weight loss studies and observed a standard deviation of 8. We&rsquo;ll also assume that both groups exhibit the same degree of variance. Now that we&rsquo;ve established our effect size and standard deviation, we need to know how many people to include in the study. If each participant is paid $100 for completing the 1 month study and we have a budget of \$10,000, then our sample size can be at most 100 participants, with 50 randomly assigned to the placebo condition and the remaining 50 assigned to the pill condition. Finally we&rsquo;ll use the conventional significance level of 0.05. So now we have our pieces required to calculate experimental power:</p>
+
+<ol>
+<li>Effect size &amp; Standard Deviation</li>
+<li>Sample Size</li>
+<li>Significance Level</li>
+</ol>
+
+<p>Let&rsquo;s illustrate how we would implement the above situation&ndash;and calculate power&ndash;in R.</p>
+
+<pre><code class="language-r">library(broom)
+library(dplyr)
+library(artyfarty)
+library(ggplot2)
+library(lme4)
+library(simr)
+sample_size_per_group = 50
+desired_effect_size = 3
+standard_deviation = 8
+alpha = 0.05
+expected_power = stats::power.t.test(n = sample_size_per_group,
+                                     delta = desired_effect_size,
+                                     sd = standard_deviation,
+                                     sig.level = alpha,
+                                     type = &quot;two.sample&quot;,
+                                     alternative = &quot;two.sided&quot;
+                                    )
+print(paste0(&quot;EXPECTED POWER IS: &quot;, round(expected_power$power * 100, 0), &quot;%&quot;))
+</code></pre>
+
+<pre><code>## [1] &quot;EXPECTED POWER IS: 46%&quot;
+</code></pre>
+
+<p>We have a 46% chance of actually detecting an effect if we ran a study with these exact parameters &ndash; an effect that we know exists! That&rsquo;s pretty low. What would happen if we increased our budget to $20,000 and doubled the number of participants in each group.</p>
+
+<pre><code class="language-r">sample_size_per_group = 100
+desired_effect_size = 3
+standard_deviation = 8
+alpha = 0.05
+expected_power = stats::power.t.test(n = sample_size_per_group,
+                                     delta = desired_effect_size,
+                                     sd = standard_deviation,
+                                     sig.level = alpha,
+                                     type = &quot;two.sample&quot;,
+                                     alternative = &quot;two.sided&quot;
+                                    )
+print(paste0(&quot;EXPECTED POWER IS: &quot;, round(expected_power$power * 100, 0), &quot;%&quot;))
+</code></pre>
+
+<pre><code>## [1] &quot;EXPECTED POWER IS: 75%&quot;
+</code></pre>
+
+<p>So our power went up, which makes sense. As we increase our sample size, we become more confident in our ability to estimate the true effect. In the next section I&rsquo;ll discuss how to obtain these exact results through a simulated experiment.</p>
+
+<h3 id="simulating-power">Simulating Power</h3>
+
+<p>If you are like me, I need to know what&rsquo;s actually going on. The process of calculating power initially seemed a bit mysterious to me. And when things don&rsquo;t make sense or seem a bit opaque the best way to understand them is to write some code and go line by line to figure out where these numbers come from. So that&rsquo;s what we&rsquo;ll do.</p>
+
+<p>Imagine we ran 1000 studies with the parameters outlined above. After each study, we conducted an independent-samples t-test, calculated the p-value, and determined whether it was less than our alpha (0.05). In all the cases where the value was greater than 0.05, we commited a type II error, because we know there is a difference between our two groups.
+Let&rsquo;s add up this number, subtract it from 1000, and the total is our power.</p>
+
+<pre><code class="language-r">set.seed(123)
+pvalue_vector = c()
+for(i in 1:1000){
+    type_II_error = NULL
+    placebo_group_mean = 0
+    pill_group_mean = -3
+
+    placebo_group = rnorm(sample_size_per_group, 
+                      mean = placebo_group_mean,
+                      sd = standard_deviation)
+
+    pill_group = rnorm(sample_size_per_group,
+                   mean = pill_group_mean,
+                   sd = standard_deviation)
+
+    temp_dataframe = data.frame(weight_difference = c(pill_group, placebo_group),
+                            group = c(rep(&quot;pill&quot;, sample_size_per_group),
+                                      rep(&quot;placebo&quot;, sample_size_per_group)))
+
+    temp_p_value = tidy(t.test(weight_difference ~ group,
+                               data = temp_dataframe)$p.value
+    if(temp_p_value &lt; 0.05){
+    type_II_error = 0
+    } else {
+    type_II_error = 1
+    }
+    pvalue_vector = c(pvalue_vector, type_II_error)
+}
+
+print(paste0(&quot;EXPECTED POWER IS: &quot;, round(100 - sum(pvalue_vector)/1000 * 100, 0), &quot;%&quot;))
+</code></pre>
+
+<pre><code>## [1] &quot;EXPECTED POWER IS: 76%&quot;
+</code></pre>
+
+<p>Pretty neat! Our 76% estimate is almost identical to the 75% estimate generated from the built-in power calculator. In the next section we&rsquo;ll extend these ideas to a class of models referred to as <em>Random Effects</em>.</p>
+
+<h3 id="a-brief-primer-on-random-effects">A Brief Primer on Random Effects</h3>
+
+<p>Have you ever ran a study where the things you were studying (e.g., people, animals, plants) were part of a hierarchy? For example, students are part of the same classroom; workers are part of the same company; animals live in the same tree; plants grow on the same plot of land. In each of the instances, the things from the same environment will (presumably) be more like one another than the things from different environments. These are typically referred to as <strong>nested</strong> data, and we want to account for the fact that there is structure to the variability between the things we are studying.</p>
+
+<h3 id="calculating-power-for-mixed-effects-models">Calculating Power for Mixed Effects Models</h3>
+
+<p>The study we&rsquo;ll use to illustrate these concepts comes with the <code>lme4</code> package. Being part of this study sounded pretty terrible, so I hope the participants got some decent compensation. Anyways, here&rsquo;s the lowdown: 18 truck drivers were limited to three hours of sleep over a period of 10 days. Their reaction times on a series of tests were measured several times a day, and single reaction time measurement was entered for each participant per day. The fixed effect &ndash; or the thing we are interested in &ndash; was number of days of sleep deprivation. The random effect is the participant. The researchers want to generalize their findings to all people &ndash; not just the people included in the study&ndash; so differences between participants is of little interest. Thus they want to control for this variability by specifiying a random effect, and ideally get a better idea of how the fixed effect (Number of days of sleep deprivation) impacts reaction time. We&rsquo;ll keep it simple and use a random effect for the intercept. What this means is that some participants will react faster (slower) than others, regardless of whether they were sleep deprived. We can check the valildity of this assumption with a basic boxplot.</p>
+
+<pre><code>monokai_values = c(&quot;#F92672&quot;, &quot;#66D9EF&quot;, &quot;#A6E22E&quot;, &quot;#FD971F&quot;)
+monokai_line_color = &quot;#A59F85&quot;
+
+my_plot_theme = function(){
+    font_family = &quot;Helvetica&quot;
+    font_face = &quot;bold&quot;
+    return(theme(
+    axis.text.x = element_text(size = 18, face = font_face, family = font_family),
+    axis.text.y = element_text(size = 18, face = font_face, family = font_family),
+    axis.title.x = element_text(size = 20, face = font_face, family = font_family),
+    axis.title.y = element_text(size = 20, face = font_face, family = font_family),
+    strip.text.y = element_text(size = 18, face = font_face, family = font_family),
+    plot.title = element_text(size = 18, face = font_face, family = font_family),
+    legend.position = &quot;top&quot;,
+    legend.title = element_text(colour = &quot;white&quot;, size = 16,
+    face = font_face,
+    family = font_family),
+    legend.text = element_text(colour = &quot;white&quot;, size = 14,
+    face = font_face,
+    family = font_family)
+))
+}
+
+sleep_df = lme4::sleepstudy
+
+ggplot(sleep_df, aes(x = factor(Subject), y = Reaction)) + geom_boxplot(color = monokai_values[1]) + 
+    theme_monokai_full() + 
+    my_plot_theme() + 
+    xlab(&quot;Subject ID&quot;) + ylab(&quot;Reaction Time&quot;)
+</code></pre>
+
+<p><img src="../monte_carlo_mixed_effects_images/subject_boxplot.png" class="img-responsive" style="display: block; margin: auto;" /></p>
+
+<p>If the median of each of our boxplots were approximately equal, then we might be able to get away with a fixed effect or simply not include the subject effect at all. But clearly this isn&rsquo;t the case. Here is the form of our model</p>
+
+<pre><code>sleep_fit = lmer(Reaction ~ Days + (1|Subject), data = sleep_df)
+print(summary(sleep_fit))
+</code></pre>
+
+<pre><code>Linear mixed model fit by REML ['lmerMod']
+Formula: Reaction ~ Days + (1 | Subject)
+Data: sleep_df
+
+REML criterion at convergence: 1786.5
+
+Scaled residuals: 
+Min      1Q  Median      3Q     Max 
+-3.2257 -0.5529  0.0109  0.5188  4.2506 
+
+Random effects:
+Groups   Name        Variance Std.Dev.
+Subject  (Intercept) 1378.2   37.12   
+Residual              960.5   30.99   
+Number of obs: 180, groups:  Subject, 18
+
+Fixed effects:
+Estimate Std. Error t value
+(Intercept) 251.4051     9.7467   25.79
+Days         10.4673     0.8042   13.02
+
+Correlation of Fixed Effects:
+(Intr)
+Days -0.371
+</code></pre>
+
+<p>And given these inputs, here is the power (if we were to repeat the experiment exactly).</p>
+
+<pre><code>nsim = 25
+sleep_sim = powerSim(sleep_fit, nsim = nsim)
+print(sleep_sim)
+</code></pre>
+
+<pre><code>This appears to be an &quot;observed power&quot; calculationPower for predictor 'Days', (95% confidence interval):
+100.0% (86.28, 100.0)
+
+Test: Kenward Roger (package pbkrtest)
+Effect size for Days is 10.
+
+Based on 25 simulations, (0 warnings, 0 errors)
+alpha = 0.05, nrow = 180
+
+Time elapsed: 0 h 0 m 5 s
+
+nb: result might be an observed power calculation
+
+</code></pre>
+
+<p>This indicates that we are all but guranteed to detect an effect if we run the study with 18 participants for a period of 10 days. The folks who did this study obviously wanted to leave nothing to chance! What if we tried to replicate the study with the same conditions but for fewer days than 10. How would our power change if we only ran the study for 2 or 3 days? We&rsquo;ll use the <code>powerCurve</code> function to deteremine how the number of days affects our power. I&rsquo;m going to use the default settings except change the number of simulations to 100 (from 1000).</p>
+
+<pre><code>nsim = 100
+power_curve &lt;- powerCurve(sleep_fit, nsim = nsim)
+print(plot(power_curve))
+</code></pre>
+
+<p><img src="../monte_carlo_mixed_effects_images/power_calculations.png" class="img-responsive" style="display: block; margin: auto;" /></p>
+
+<p>It looks like 3 days would&rsquo;ve been sufficient to achieve at least 80% power, which is just a convention similiar to p &lt; 0.05. I was really excited after using this package because of its ability to fit many  different model specifications. The only issue was that I wasn&rsquo;t entirely clear on the underlying process being used to determine power. According the tutorial from the authors (see <a href="http://onlinelibrary.wiley.com/doi/10.1111/2041-210X.12504/full">here</a>), there are three steps involved in calculating power via simulation:</p>
+
+<ol>
+<li>Simulate new values for the response variable using the model provided</li>
+<li>refit the model to the simulated response</li>
+<li>apply a statistical test fo the simulated fit.</li>
+</ol>
+
+<p>It was that first part where I wasn&rsquo;t entirly clear on, so I decided to build my own from scratch and comapre the results.</p>
+
+<h3 id="building-our-own-simulator">Building our Own Simulator</h3>
+
+<p>We established our model above as <code>Reaction ~ Days + (1|Subject)</code>. So what do they mean by &ldquo;simulate new values for the response variable&rdquo;? The new values will be those produced by our model plus error associated with sampling. That second part is thing we are going to simulate. We will assume that are independent randomly distributed residuals are normally distributed, with a mean of zero and a standard deviation of&hellip;and a standard deviation of&hellip;aww shit how do we come up with this number? We can initially start with the residuals from our model and use that as the standard deviation. Here&rsquo;s how we&rsquo;ll do it:</p>
+         
+      </div>
+    </div>
+  </div>
+</div>
+
+          </div>
+      </div>
+  </div>
+  <script src="/js/jquery.min.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+<script src="/js/jquery.cookie.js"> </script>
+<script src="/js/ekko-lightbox.js"></script>
+<script src="/js/jquery.scrollTo.min.js"></script>
+<script src="/js/masonry.pkgd.min.js"></script>
+<script src="/js/imagesloaded.pkgd.min.js"></script>
+<script src="/js/owl.carousel.min.js"></script>
+<script src="/js/front.js"></script>
+
+</body>
+</html>

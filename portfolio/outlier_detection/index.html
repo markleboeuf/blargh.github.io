@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<title>Time Series Outlier Detection</title>
+<meta name="description" content="Code and Stuff">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="all,follow">
+<meta name="googlebot" content="index,follow,snippet,archive">
+<link rel="stylesheet" href="/css/bootstrap.min.css">
+<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Roboto:400,300,700,400italic">
+<link rel="stylesheet" href="/css/font-awesome.min.css">
+<link rel="stylesheet" href="/css/owl.carousel.css">
+<link rel="stylesheet" href="/css/owl.theme.css">
+
+
+  <link href="/css/style.red.css" rel="stylesheet" id="theme-stylesheet">
+
+
+<link href="/css/custom.css" rel="stylesheet">
+<link rel="shortcut icon" href="/img/favicon.png">
+
+
+</head>
+<body>
+  <div id="all">
+      <div class="container-fluid">
+          <div class="row row-offcanvas row-offcanvas-left">
+              <div id="sidebar" class="col-xs-6 col-sm-4 col-md-3 sidebar-offcanvas">
+  <div class="sidebar-content">
+    <h1 class="sidebar-heading"><a href="/">Mark LeBoeuf</a></h1>
+    
+      <p class="sidebar-p">I am a Data Scientist, currently based in Portland, OR.</p>
+    
+    <ul class="sidebar-menu">
+      
+      
+        <li><a href="/">Home</a></li>
+      
+        <li><a href="/about/">About</a></li>
+      
+    </ul>
+    <p class="social">
+  
+  
+  
+  <a href="full%20profile%20url%20in%20twitter" data-animate-hover="pulse" class="external twitter">
+    <i class="fa fa-twitter"></i>
+  </a>
+  
+  
+  
+  
+  <a href="full%20profile%20url%20in%20linkedin" data-animate-hover="pulse">
+    <i class="fa fa-linkedin"></i>
+  </a>
+  
+  
+  
+  <a href="full%20profile%20url%20in%20github" data-animate-hover="pulse">
+    <i class="fa fa-github"></i>
+  </a>
+  
+</p>
+
+
+    <div class="copyright">
+      <p class="credit">
+        
+          &copy;2016 Mark LeBoeuf
+        
+        | Template by <a href="https://bootstrapious.com/free-templates" class="external">Bootstrapious.com</a>
+
+&amp; ported to Hugo by <a href="https://github.com/kishaningithub">Kishan B</a>
+
+      </p>
+    </div>
+  </div>
+</div>
+
+              
+<div class="col-xs-12 col-sm-8 col-md-9 content-column white-background">
+  <div class="small-navbar visible-xs">
+  <button type="button" data-toggle="offcanvas" class="btn btn-ghost pull-left"> <i class="fa fa-align-left"> </i>Menu</button>
+  <h1 class="small-navbar-heading"><a href="/">Mark LeBoeuf</a></h1>
+</div>
+
+  <div class="row">
+    <div class="col-lg-8">
+      <div class="content-column-content">
+         <h1>Time Series Outlier Detection</h1>
+         <p>Does this look weird? Find out a straightforward approach to detecting and replacing outliers in time series.
+</p>
+
+<ul>
+<li><a href="#overview">Overview</a></li>
+<li><a href="#outlier-detection">Outlier Detection</a></li>
+<li><a href="#parallel-simulations-with-multidplyr">Parallel Simulations with Multidplyr</a></li>
+</ul>
+
+<h2 id="overview">Overview</h2>
+
+<p>This post will discuss outliers in the context of time-series forecasting. While there are a number of definitions for an outlier, I generally think of an outlier as the following: An unexpected event that is unlikely to happen again, or an <strong>Additive Outlier</strong> (see <a href="https://www.ibm.com/support/knowledgecenter/SS3RA7_15.0.0/com.ibm.spss.modeler.help/ts_outliers_overview.htm">here</a> for an extensive list of different types of outliers). For example, website traffic drops precipitiously because of a server fire or insurance claims spike because of an unprecedented, 500-year weather event. Both of these events can be considered as random occurences that (we hope) are unlikely to occur again, or at least do not occur at a regular cadence. Yet if you were attempting to predict future website traffic or understand the seasonal patterns of insurance claims, the aforementioned events may greatly impact our forecast. Thus there are two main reasons for conducting an outlier analysis prior to generating a forecast:</p>
+
+<ol>
+<li>Outliers can bias forecasts</li>
+<li>Outliers can inflate estimated variance and produce prediction intervals that are too wide</li>
+</ol>
+
+<p>This post will cover the use of seasonal-decomposition to isolate errors that cannot be explained as a function of trend or seasonality. We&rsquo;ll then discuss two simple, commonly used approaches for identifying outliers, followed by a brief overview of how to replace outliers with more sensible values. Finally we&rsquo;ll test and see how including or excluding outliers affects the accuracy of our forecasts as well as the width of our prediction intervals. These questions will be explored within the context of monthly milk production from 1962-1975, where the value for each month represents the pounds of milk produced per cow (Riveting stuff, right?).</p>
+
+<h3 id="outlier-detection">Outlier Detection</h3>
+
+<p>The data for this post is located <a href="https://datamarket.com/data/set/22ox/monthly-milk-production-pounds-per-cow-jan-62-dec-75#!ds=22ox&amp;display=line">here</a>. Let&rsquo;s bring it into R and have a quick look.</p>
+
+<pre><code>library(dplyr)
+library(artyfarty)
+library(ggplot2)
+library(forecast)
+library(reshape)
+library(knitr)
+wd = &quot;path_to_your_data&quot;
+fn = &quot;monthly-milk-production-pounds-p.csv&quot;
+setwd(wd)
+df = read.csv(fn)
+names(df) = c(&quot;Month&quot;, &quot;Milk_Production&quot;)
+df$Month = as.Date(paste(df$Month, &quot;01&quot;, sep = &quot;-&quot;),
+format = &quot;%Y-%m-%d&quot;)
+</code></pre>
+
+<p><img src="../outlier_detection_images/table1.png" class="img-responsive" style="display: block; margin: auto;" /></p>
+
+<p>Now that we have our time series dataframe, let&rsquo;s introduce six outliers into our time series. I picked these data points and their values at random.</p>
+
+<pre><code class="language-r">df$Milk_Production[30] = df$Milk_Production[30] + 70
+df$Milk_Production[55] = df$Milk_Production[55] - 50
+df$Milk_Production[99] = df$Milk_Production[99] - 200
+df$Milk_Production[100] = df$Milk_Production[100] + 100
+df$Milk_Production[152] = df$Milk_Production[152] + 30
+df$Milk_Production[153] = df$Milk_Production[153] - 80
+
+outlier_df = df[c(30, 55, 99, 100, 152, 153),]
+</code></pre>
+
+<p>Let&rsquo;s examine what our time series looks like. The red points indicate the outliers we just introduced.</p>
+
+<pre><code class="language-r">color_values = c(&quot;#D9D9D9&quot;, &quot;#33C5F3&quot;, &quot;#F16C62&quot;, &quot;#A8CE38&quot;, &quot;#FCB51E&quot;, &quot;#F92672&quot;)
+my_plot_theme = function(){
+    font_family = &quot;Helvetica&quot;
+    font_face = &quot;bold&quot;
+    return(theme(
+    axis.text.x = element_text(size = 18, face = font_face, family = font_family),
+    axis.text.y = element_text(size = 18, face = font_face, family = font_family),
+    axis.title.x = element_text(size = 20, face = font_face, family = font_family),
+    axis.title.y = element_text(size = 20, face = font_face, family = font_family),
+    strip.text.y = element_text(size = 18, face = font_face, family = font_family),
+    plot.title = element_text(size = 18, face = font_face, family = font_family),
+    legend.position = &quot;top&quot;,
+    legend.title = element_text(colour = &quot;white&quot;, size = 16,
+    face = font_face,
+    family = font_family),
+    legend.text = element_text(colour = &quot;white&quot;, size = 14,
+    face = font_face,
+    family = font_family)
+))
+}
+
+
+
+ggplot(df, aes(x = Month, y = Milk_Production)) +
+    geom_point(size = 2, color = color_values[2]) + geom_line(size = 2, color = color_values[2]) +
+    theme_monokai_full() + 
+    my_plot_theme() + 
+    scale_color_manual(values = c(color_values[1:2])) + 
+    theme(legend.title = element_blank()) + 
+    xlab(&quot;Date&quot;) + ylab(&quot;Milk Production&quot;) + 
+    geom_point(data = outlier_df, colour = &quot;red&quot;, size = 4)
+</code></pre>
+
+<p><img src="../outlier_detection_images/plot1.png" class="img-responsive" style="display: block; margin: auto;" /></p>
+
+<p>Let&rsquo;s break our time series out into three seperate components: Seasonal, Trend, and Remainder. The seasonal and trend are structural parts of the time series that we can explain, while the Remainder is everything that&rsquo;s left over that we cannot explain. This is portion of our time series we&rsquo;ll focus on when considering for anamoulous data points.</p>
+
+<pre><code>ts_decomposition = data.frame(stl(ts(df$Milk_Production, frequency = 12), 
+                                     s.window = &quot;periodic&quot;)$time.series) %&gt;% 
+                             reshape::melt() %&gt;% 
+                             dplyr::mutate(Month = rep(df$Month, 3)) %&gt;% 
+                             dplyr::rename(component = variable)
+</code></pre>
+
+<pre><code>ggplot(ts_decomposition, aes(x = Month, y = value, fill = component)) + 
+    geom_bar(stat = &quot;identity&quot;) + 
+    facet_grid(component~ ., scales = &quot;free&quot;) + 
+    theme_monokai_full() +
+    my_plot_theme() + 
+    scale_fill_manual(values = c(color_values[1:3])) +
+    theme(legend.title = element_blank()) +
+    ylab(&quot;&quot;) + xlab(&quot;Date&quot;)
+</code></pre>
+
+<p><img src="../outlier_detection_images/season_trend_remainder.png" class="img-responsive" style="display: block; margin: auto;" /></p>
+
+<p>Based on this break out, there is one clear anomaly (the -200 point). The other five aren&rsquo;t as salient but we know they are there. Let&rsquo;s try out our two approaches: The first is the +- 3 standard deviation rule. Any residual that is +- 3 SDs is considered an anomaly. If our residuals are normally distributed, then by chance alone 27 of every 10000 points should fall outside of these boundaries. Thus it is possible (but unlikely) when you detect a residual of this magnitude or greater. The second method leverages the Interquartile Range (or IQR). The IQR is the difference between the value at the 75th and 25th percentiles of your residuals. You then multiply the range by some constant (often 1.5). Any values outside of this range are considered an anomaly.</p>
+
+<p>I don&rsquo;t want to bury the lede here, so I&rsquo;ll just come right out and say it: The +-3 SD rule is not the approach you want to use. In the real world, which can admittedly be a scary place, forecasting is done at scale.  You&rsquo;ll be generating lots and lots of forecasts, so many that you wont be able to verify the assumptions or examine the residuals for each one (very scary). Thus it is imperative to use methods for outlier detection that are <strong>robust</strong>. What does this mean? In short, a measure that quantifies &ldquo;outlierness&rdquo; must be immune to the effects of outliers. Hang on&hellip;I&rsquo;m confused. I&rsquo;ll visualize what this means below.</p>
+
+<pre><code># +- 3 SD approach
+remainder = ts_decomposition %&gt;% 
+            dplyr::filter(component == 'remainder')
+sd_remainder = sd(remainder$value)          
+anomaly_boundary = c(-sd_remainder * 3, sd_remainder * 3)
+
+remainder_sd = remainder %&gt;% 
+               dplyr::mutate(is_anomaly = ifelse(value &gt; anomaly_boundary[2] | 
+                             value &lt; anomaly_boundary[1], &quot;yes&quot;, &quot;no&quot;))
+</code></pre>
+
+<pre><code class="language-r">ggplot(remainder_sd, aes(x = value, fill = is_anomaly)) +  geom_histogram(aes(y=..density..),
+    bins = 30,
+    colour=&quot;black&quot;) +
+    theme_monokai_full() + 
+    my_plot_theme() +
+    geom_vline(xintercept = anomaly_boundary[1], size = 2, linetype = &quot;dotted&quot;,
+    color = color_values[1]) + 
+    geom_vline(xintercept = anomaly_boundary[2], size = 2, linetype = &quot;dotted&quot;,
+    color = color_values[1]) + 
+    xlab(&quot;Remainder&quot;) + 
+    scale_fill_manual(values = c(color_values[1],color_values[3]))
+</code></pre>
+
+<p><img src="../outlier_detection_images/sd_remainder.png" class="img-responsive" style="display: block; margin: auto;" /></p>
+
+<p>This method identified 3 of the 6 outliers It missed the other 3 because the one really big outlier (-200) inflated our standard deviation, making the other 3, smaller outliers undetectable. Let&rsquo;s see how the IQR approach performed.</p>
+
+<pre><code class="language-r"># IQR approach
+spread = 1.5
+pct_50 = unname(quantile(remainder$value, 0.5))
+iqr = diff(unname(quantile(remainder$value, c(0.25, 0.75))))
+lb = unname(quantile(remainder$value, 0.25)) - (spread * iqr)
+ub = unname(quantile(remainder$value, 0.75)) + (spread * iqr)
+remainder_iqr = remainder %&gt;% 
+                mutate(is_anomaly = ifelse(value &gt; ub | value &lt; lb, &quot;yes&quot;, &quot;no&quot;))
+</code></pre>
+
+<pre><code class="language-r">ggplot(remainder_iqr, aes(x = component, y = value)) + 
+    geom_boxplot() + 
+    geom_point(size = 4, aes(color = is_anomaly,
+    fill = is_anomaly)) +
+    theme_monokai_full() + 
+    my_plot_theme() + 
+    xlab(&quot;&quot;) + ylab(&quot;Remainder&quot;) + 
+    theme(axis.text.x = element_blank()) + 
+    scale_color_manual(values = c(color_values[1],color_values[3]))
+</code></pre>
+
+<p><img src="../outlier_detection_images/boxplot_iqr.png" class="img-responsive" style="display: block; margin: auto;" /></p>
+
+<p>The IQR method detected all 6 of the synthetic outliers. However, does any of this matter? Data cleaning steps are a means to an end. We address outliers in our data so we (presumably) get better forecasts and more accurate prediction intervals. Let&rsquo;s compare the forecasting accuracy between three methods: None (just leave the outliers in there and make a forecast), SD, and IQR. The last two methods will use linear interpolation to replace the outliers.</p>
+
+<pre><code class="language-r">anom_index_sd = which(match(remainder_sd$is_anomaly, &quot;yes&quot;) %in% c(1))
+anom_index_iqr = which(match(remainder_iqr$is_anomaly, &quot;yes&quot;) %in% c(1))
+sd_df = df
+iqr_df = df
+#
+sd_df$Milk_Production[anom_index_sd] = NA
+iqr_df$Milk_Production[anom_index_iqr] = NA
+n_holdout = 12
+validation_set = df$Milk_Production[(nrow(sd_df) - n_holdout + 1):nrow(sd_df)]
+
+# generate 3 seperate forecasts comparing IQR, SD, and None
+ts_sd_train = forecast(auto.arima(na.interp(ts(sd_df$Milk_Production[1:(nrow(sd_df) - n_holdout)], 
+frequency = 12))), 
+h = n_holdout)
+
+ts_iqr_train = forecast(auto.arima(na.interp(ts(iqr_df$Milk_Production[1:(nrow(sd_df) - n_holdout)], 
+frequency = 12))), 
+h = n_holdout)
+
+ts_orig_train = forecast(auto.arima(ts(df$Milk_Production[1:(nrow(sd_df) - n_holdout)],
+frequency = 12)), 
+h = n_holdout)
+
+forecast_df = data.frame(anom_method = c(rep(&quot;IQR&quot;, n_holdout),
+                                         rep(&quot;SD&quot;, n_holdout),
+                                         rep(&quot;None&quot;, n_holdout)),
+                         forecasted_amt = c(ts_iqr_train$mean,
+                                            ts_sd_train$mean,
+                                            ts_orig_train$mean),
+                         actual_amt = rep(validation_set, 3))
+</code></pre>
+
+<pre><code class="language-r">forecast_df = forecast_df %&gt;% 
+              dplyr::mutate(residual_squared = (actual_amt - forecasted_amt)^2) %&gt;% 
+              dplyr::group_by(anom_method) %&gt;% 
+              dplyr::summarise(mse = mean(residual_squared)) %&gt;% 
+              data.frame() %&gt;% 
+              dplyr::mutate(anom_method = factor(anom_method)) %&gt;% 
+              dplyr::mutate(anom_method = forcats::fct_reorder(anom_method, mse, .desc = FALSE))
+
+ggplot(forecast_df, aes(x = anom_method, y = round(mse, 0),
+    fill = anom_method, label = as.character(round(mse, 0)))) + 
+    geom_bar(stat = &quot;identity&quot;) + 
+    theme_monokai_full() + 
+    my_plot_theme() + 
+    scale_fill_manual(values = color_values[1:length(unique(forecast_df$anom_method))]) + 
+    xlab(&quot;Outlier Replacement Method&quot;) + ylab(&quot;Mean Square Error&quot;) + 
+    theme(legend.position = &quot;none&quot;) + 
+    geom_label(label.size = 1, size = 10, color = &quot;white&quot;)
+</code></pre>
+
+<p><img src="../outlier_detection_images/mse_comparison.png" class="img-responsive" style="display: block; margin: auto;" /></p>
+
+<p>Replacing the outliers via the IQR method leads to the most accurate 12-month ahead forecast. Now let&rsquo;s examine the prediction intervals of each method, specifically the range as well as the coverage rate.</p>
+
+<pre><code class="language-r">
+pi_df = data.frame(anom_method = c(rep(&quot;IQR&quot;, n_holdout),
+                                   rep(&quot;SD&quot;, n_holdout),
+                                   rep(&quot;None&quot;, n_holdout)),
+                   upper_bound = c(ts_iqr_train$upper[,2],
+                                   ts_sd_train$upper[,2],
+                                   ts_orig_train$upper[,2]),
+                   lower_bound = c(ts_iqr_train$lower[,2],
+                                   ts_sd_train$lower[,2],
+                                   ts_orig_train$lower[,2]),
+                   actual_amt = rep(validation_set, 3)) %&gt;% 
+        dplyr::mutate(pi_range = upper_bound - lower_bound) %&gt;% 
+        dplyr::mutate(actual_in_pi_range = as.integer(actual_amt &lt; upper_bound &amp; actual_amt &gt; lower_bound))
+</code></pre>
+
+<pre><code class="language-r">ggplot(pi_df, aes(x = anom_method, y = pi_range, color = anom_method)) + 
+    geom_boxplot() + 
+    theme_monokai_full() + 
+    my_plot_theme() + 
+    scale_color_manual(values = c(color_values[1:3])) + 
+    xlab(&quot;Outlier Replacement Method&quot;) + ylab(&quot;Prediction Interval Range&quot;) + 
+    theme(legend.position = &quot;none&quot;)
+</code></pre>
+
+<p><img src="../outlier_detection_images/pi_range_boxplot.png" class="img-responsive" style="display: block; margin: auto;" /></p>
+
+<p>The median PI range is the narrowest for the IQR and the widest when we don&rsquo;t replace any of the outliers. Finally let&rsquo;s consider the <strong>coverage rate</strong>, which is how often the actual value fell within the monthly prediction interval.</p>
+
+<pre><code class="language-r">print(pi_df %&gt;% 
+     dplyr::group_by(anom_method) %&gt;% 
+     dplyr::summarise(coverage_rate = round(sum(actual_in_pi_range)/12 * 100, 1)) %&gt;% 
+     data.frame())
+</code></pre>
+
+<pre><code>##   anom_method coverage_rate
+## 1         IQR         100.0
+## 2        None         100.0
+## 3          SD          91.7
+</code></pre>
+
+<p>The IQR and None approaches provided 100% coverage, while the SD method missed one month, yielding a coverage rate of ~92%.</p>
+
+<p>Taken together, the IQR method provided the most accurate forecasts and prediction intervals. While this is only one example, it is interesting to note that using the SD method actually reduced our forecasting accuracy and coverage rate below what would&rsquo;ve happened had we not taken any steps to remedy our outliers prior to fitting a model. This really illustrates the value of using a <strong>robust</strong> method for anomaly detection.</p>
+         
+      </div>
+    </div>
+  </div>
+</div>
+
+          </div>
+      </div>
+  </div>
+  <script src="/js/jquery.min.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+<script src="/js/jquery.cookie.js"> </script>
+<script src="/js/ekko-lightbox.js"></script>
+<script src="/js/jquery.scrollTo.min.js"></script>
+<script src="/js/masonry.pkgd.min.js"></script>
+<script src="/js/imagesloaded.pkgd.min.js"></script>
+<script src="/js/owl.carousel.min.js"></script>
+<script src="/js/front.js"></script>
+
+</body>
+</html>

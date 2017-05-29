@@ -2,121 +2,148 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Tags on Mark LeBoeuf</title>
-    <link>https://markleboeuf.github.io/tags/</link>
+    <link>/tags/</link>
     <description>Recent content in Tags on Mark LeBoeuf</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>&amp;copy;2016 Mark LeBoeuf</copyright>
     <lastBuildDate>Thu, 12 Jan 2017 19:41:01 +0530</lastBuildDate>
     
-	<atom:link href="https://markleboeuf.github.io/tags/index.xml" rel="self" type="application/rss+xml" />
+	<atom:link href="/tags/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
       <title>Foreach</title>
-      <link>https://markleboeuf.github.io/tags/foreach/</link>
+      <link>/tags/foreach/</link>
       <pubDate>Thu, 12 Jan 2017 19:41:01 +0530</pubDate>
       
-      <guid>https://markleboeuf.github.io/tags/foreach/</guid>
+      <guid>/tags/foreach/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Forecasting</title>
+      <link>/tags/forecasting/</link>
+      <pubDate>Sun, 12 Mar 2017 19:41:01 +0530</pubDate>
+      
+      <guid>/tags/forecasting/</guid>
       <description></description>
     </item>
     
     <item>
       <title>Multidplyr</title>
-      <link>https://markleboeuf.github.io/tags/multidplyr/</link>
+      <link>/tags/multidplyr/</link>
       <pubDate>Thu, 12 Jan 2017 19:41:01 +0530</pubDate>
       
-      <guid>https://markleboeuf.github.io/tags/multidplyr/</guid>
+      <guid>/tags/multidplyr/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Outlier Detection</title>
+      <link>/tags/outlier-detection/</link>
+      <pubDate>Sun, 12 Mar 2017 19:41:01 +0530</pubDate>
+      
+      <guid>/tags/outlier-detection/</guid>
       <description></description>
     </item>
     
     <item>
       <title>Parallel</title>
-      <link>https://markleboeuf.github.io/tags/parallel/</link>
+      <link>/tags/parallel/</link>
       <pubDate>Thu, 12 Jan 2017 19:41:01 +0530</pubDate>
       
-      <guid>https://markleboeuf.github.io/tags/parallel/</guid>
+      <guid>/tags/parallel/</guid>
       <description></description>
     </item>
     
     <item>
       <title>Plot</title>
-      <link>https://markleboeuf.github.io/tags/plot/</link>
+      <link>/tags/plot/</link>
       <pubDate>Thu, 23 Jul 2015 21:13:14 -0500</pubDate>
       
-      <guid>https://markleboeuf.github.io/tags/plot/</guid>
+      <guid>/tags/plot/</guid>
       <description></description>
     </item>
     
     <item>
       <title>Prediction Interval</title>
-      <link>https://markleboeuf.github.io/tags/prediction-interval/</link>
-      <pubDate>Thu, 12 Jan 2017 19:41:01 +0530</pubDate>
+      <link>/tags/prediction-interval/</link>
+      <pubDate>Sun, 12 Feb 2017 19:41:01 +0530</pubDate>
       
-      <guid>https://markleboeuf.github.io/tags/prediction-interval/</guid>
+      <guid>/tags/prediction-interval/</guid>
       <description></description>
     </item>
     
     <item>
       <title>Python</title>
-      <link>https://markleboeuf.github.io/tags/python/</link>
+      <link>/tags/python/</link>
       <pubDate>Sat, 05 Nov 2016 19:41:01 +0530</pubDate>
       
-      <guid>https://markleboeuf.github.io/tags/python/</guid>
+      <guid>/tags/python/</guid>
       <description></description>
     </item>
     
     <item>
       <title>R</title>
-      <link>https://markleboeuf.github.io/tags/r/</link>
+      <link>/tags/r/</link>
       <pubDate>Sat, 05 Nov 2016 19:41:01 +0530</pubDate>
       
-      <guid>https://markleboeuf.github.io/tags/r/</guid>
+      <guid>/tags/r/</guid>
       <description></description>
     </item>
     
     <item>
       <title>R Markdown</title>
-      <link>https://markleboeuf.github.io/tags/r-markdown/</link>
+      <link>/tags/r-markdown/</link>
       <pubDate>Thu, 23 Jul 2015 21:13:14 -0500</pubDate>
       
-      <guid>https://markleboeuf.github.io/tags/r-markdown/</guid>
+      <guid>/tags/r-markdown/</guid>
       <description></description>
     </item>
     
     <item>
       <title>Random Forest</title>
-      <link>https://markleboeuf.github.io/tags/random-forest/</link>
-      <pubDate>Thu, 12 Jan 2017 19:41:01 +0530</pubDate>
+      <link>/tags/random-forest/</link>
+      <pubDate>Sun, 12 Feb 2017 19:41:01 +0530</pubDate>
       
-      <guid>https://markleboeuf.github.io/tags/random-forest/</guid>
+      <guid>/tags/random-forest/</guid>
       <description></description>
     </item>
     
     <item>
       <title>Regression</title>
-      <link>https://markleboeuf.github.io/tags/regression/</link>
+      <link>/tags/regression/</link>
       <pubDate>Thu, 23 Jul 2015 21:13:14 -0500</pubDate>
       
-      <guid>https://markleboeuf.github.io/tags/regression/</guid>
+      <guid>/tags/regression/</guid>
       <description></description>
     </item>
     
     <item>
       <title>Sarimax</title>
-      <link>https://markleboeuf.github.io/tags/sarimax/</link>
+      <link>/tags/sarimax/</link>
       <pubDate>Sat, 05 Nov 2016 19:41:01 +0530</pubDate>
       
-      <guid>https://markleboeuf.github.io/tags/sarimax/</guid>
+      <guid>/tags/sarimax/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Seasonal Decomposition</title>
+      <link>/tags/seasonal-decomposition/</link>
+      <pubDate>Sun, 12 Mar 2017 19:41:01 +0530</pubDate>
+      
+      <guid>/tags/seasonal-decomposition/</guid>
       <description></description>
     </item>
     
     <item>
       <title>Webscraping</title>
-      <link>https://markleboeuf.github.io/tags/webscraping/</link>
+      <link>/tags/webscraping/</link>
       <pubDate>Sat, 05 Nov 2016 19:41:01 +0530</pubDate>
       
-      <guid>https://markleboeuf.github.io/tags/webscraping/</guid>
+      <guid>/tags/webscraping/</guid>
       <description></description>
     </item>
     

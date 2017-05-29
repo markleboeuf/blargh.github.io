@@ -2,168 +2,191 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
-    <loc>https://markleboeuf.github.io/portfolio/forecasting_regressors/</loc>
+    <loc>/portfolio/forecasting_regressors/</loc>
     <lastmod>2016-11-05T19:41:01+05:30</lastmod>
   </url>
   
   <url>
-    <loc>https://markleboeuf.github.io/portfolio/two_flavors_of_parallelism/</loc>
+    <loc>/portfolio/two_flavors_of_parallelism/</loc>
     <lastmod>2017-01-12T19:41:01+05:30</lastmod>
   </url>
   
   <url>
-    <loc>https://markleboeuf.github.io/portfolio/random_forest_prediction_intervals/</loc>
+    <loc>/portfolio/random_forest_prediction_intervals/</loc>
+    <lastmod>2017-02-12T19:41:01+05:30</lastmod>
+  </url>
+  
+  <url>
+    <loc>/portfolio/outlier_detection/</loc>
+    <lastmod>2017-03-12T19:41:01+05:30</lastmod>
+  </url>
+  
+  <url>
+    <loc>/portfolio/monte_carlo_mixed_effects/</loc>
     <lastmod>2017-01-12T19:41:01+05:30</lastmod>
   </url>
   
   <url>
-    <loc>https://markleboeuf.github.io/portfolio/work5/</loc>
-    <lastmod>2016-11-05T19:53:42+05:30</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://markleboeuf.github.io/portfolio/work6/</loc>
+    <loc>/portfolio/work6/</loc>
     <lastmod>2016-11-05T19:56:17+05:30</lastmod>
   </url>
   
   <url>
-    <loc>https://markleboeuf.github.io/portfolio/work7/</loc>
+    <loc>/portfolio/work7/</loc>
     <lastmod>2016-11-05T19:57:40+05:30</lastmod>
   </url>
   
   <url>
-    <loc>https://markleboeuf.github.io/portfolio/work8/</loc>
+    <loc>/portfolio/work8/</loc>
     <lastmod>2016-11-05T19:59:22+05:30</lastmod>
   </url>
   
   <url>
-    <loc>https://markleboeuf.github.io/portfolio/work10/</loc>
+    <loc>/portfolio/work10/</loc>
     <lastmod>2016-11-05T20:22:08+05:30</lastmod>
   </url>
   
   <url>
-    <loc>https://markleboeuf.github.io/portfolio/work11/</loc>
+    <loc>/portfolio/work11/</loc>
     <lastmod>2016-11-05T20:23:59+05:30</lastmod>
   </url>
   
   <url>
-    <loc>https://markleboeuf.github.io/contact/</loc>
+    <loc>/contact/</loc>
     <lastmod>2016-11-06T13:00:25+05:30</lastmod>
   </url>
   
   <url>
-    <loc>https://markleboeuf.github.io/about/</loc>
+    <loc>/about/</loc>
     <lastmod>2016-11-05T21:05:33+05:30</lastmod>
   </url>
   
   <url>
-    <loc>https://markleboeuf.github.io/post/2015-07-23-r-rmarkdown/</loc>
+    <loc>/post/2015-07-23-r-rmarkdown/</loc>
     <lastmod>2015-07-23T21:13:14-05:00</lastmod>
   </url>
   
   <url>
-    <loc>https://markleboeuf.github.io/categories/</loc>
+    <loc>/categories/</loc>
     <priority>0</priority>
   </url>
   
   <url>
-    <loc>https://markleboeuf.github.io/tags/foreach/</loc>
+    <loc>/tags/foreach/</loc>
     <lastmod>2017-01-12T19:41:01+05:30</lastmod>
     <priority>0</priority>
   </url>
   
   <url>
-    <loc>https://markleboeuf.github.io/</loc>
+    <loc>/tags/forecasting/</loc>
+    <lastmod>2017-03-12T19:41:01+05:30</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>/</loc>
     <lastmod>2016-11-05T19:41:01+05:30</lastmod>
     <priority>0</priority>
   </url>
   
   <url>
-    <loc>https://markleboeuf.github.io/tags/multidplyr/</loc>
+    <loc>/tags/multidplyr/</loc>
     <lastmod>2017-01-12T19:41:01+05:30</lastmod>
     <priority>0</priority>
   </url>
   
   <url>
-    <loc>https://markleboeuf.github.io/tags/parallel/</loc>
+    <loc>/tags/outlier-detection/</loc>
+    <lastmod>2017-03-12T19:41:01+05:30</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>/tags/parallel/</loc>
     <lastmod>2017-01-12T19:41:01+05:30</lastmod>
     <priority>0</priority>
   </url>
   
   <url>
-    <loc>https://markleboeuf.github.io/tags/plot/</loc>
+    <loc>/tags/plot/</loc>
     <lastmod>2015-07-23T21:13:14-05:00</lastmod>
     <priority>0</priority>
   </url>
   
   <url>
-    <loc>https://markleboeuf.github.io/portfolio/</loc>
+    <loc>/portfolio/</loc>
     <lastmod>2016-11-05T19:41:01+05:30</lastmod>
     <priority>0</priority>
   </url>
   
   <url>
-    <loc>https://markleboeuf.github.io/post/</loc>
+    <loc>/post/</loc>
     <lastmod>2015-07-23T21:13:14-05:00</lastmod>
     <priority>0</priority>
   </url>
   
   <url>
-    <loc>https://markleboeuf.github.io/tags/prediction-interval/</loc>
-    <lastmod>2017-01-12T19:41:01+05:30</lastmod>
+    <loc>/tags/prediction-interval/</loc>
+    <lastmod>2017-02-12T19:41:01+05:30</lastmod>
     <priority>0</priority>
   </url>
   
   <url>
-    <loc>https://markleboeuf.github.io/tags/python/</loc>
+    <loc>/tags/python/</loc>
     <lastmod>2016-11-05T19:41:01+05:30</lastmod>
     <priority>0</priority>
   </url>
   
   <url>
-    <loc>https://markleboeuf.github.io/tags/r/</loc>
+    <loc>/tags/r/</loc>
     <lastmod>2016-11-05T19:41:01+05:30</lastmod>
     <priority>0</priority>
   </url>
   
   <url>
-    <loc>https://markleboeuf.github.io/categories/r/</loc>
+    <loc>/categories/r/</loc>
     <lastmod>2015-07-23T21:13:14-05:00</lastmod>
     <priority>0</priority>
   </url>
   
   <url>
-    <loc>https://markleboeuf.github.io/tags/r-markdown/</loc>
+    <loc>/tags/r-markdown/</loc>
     <lastmod>2015-07-23T21:13:14-05:00</lastmod>
     <priority>0</priority>
   </url>
   
   <url>
-    <loc>https://markleboeuf.github.io/tags/random-forest/</loc>
-    <lastmod>2017-01-12T19:41:01+05:30</lastmod>
+    <loc>/tags/random-forest/</loc>
+    <lastmod>2017-02-12T19:41:01+05:30</lastmod>
     <priority>0</priority>
   </url>
   
   <url>
-    <loc>https://markleboeuf.github.io/tags/regression/</loc>
+    <loc>/tags/regression/</loc>
     <lastmod>2015-07-23T21:13:14-05:00</lastmod>
     <priority>0</priority>
   </url>
   
   <url>
-    <loc>https://markleboeuf.github.io/tags/sarimax/</loc>
+    <loc>/tags/sarimax/</loc>
     <lastmod>2016-11-05T19:41:01+05:30</lastmod>
     <priority>0</priority>
   </url>
   
   <url>
-    <loc>https://markleboeuf.github.io/tags/</loc>
+    <loc>/tags/seasonal-decomposition/</loc>
+    <lastmod>2017-03-12T19:41:01+05:30</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>/tags/</loc>
     <lastmod>2017-01-12T19:41:01+05:30</lastmod>
     <priority>0</priority>
   </url>
   
   <url>
-    <loc>https://markleboeuf.github.io/tags/webscraping/</loc>
+    <loc>/tags/webscraping/</loc>
     <lastmod>2016-11-05T19:41:01+05:30</lastmod>
     <priority>0</priority>
   </url>
