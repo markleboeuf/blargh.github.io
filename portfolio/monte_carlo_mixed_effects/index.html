@@ -104,7 +104,7 @@
 
 <h3 id="what-is-power">What is power?</h3>
 
-<p>Power is the ability to detect an effect, given that one exists. I&rsquo;ll illustrate this concept with a simple example. Let&rsquo;s say you are conducting a study on the effects of a weight loss pill. One group gets the weight loss will while the other receives a placebo. For the pill to be marketable, you want to claim an average loss of 3lbs. This is our <strong>effect size</strong>. Estimating an effect size can be a bit tricky; you can use history or simply figure out what size of effect you want to see (in this case a difference of 3lbs). Additionally, we&rsquo;ll have to specify a standard deviation. This can come from similar, prior studies or a pilot study. To keep things simple, let&rsquo;s say we reviewed some literature on similiar weight loss studies and observed a standard deviation of 8. We&rsquo;ll also assume that both groups exhibit the same degree of variance. Now that we&rsquo;ve established our effect size and standard deviation, we need to know how many people to include in the study. If each participant is paid $100 for completing the 1 month study and we have a budget of \$10,000, then our sample size can be at most 100 participants, with 50 randomly assigned to the placebo condition and the remaining 50 assigned to the pill condition. Finally we&rsquo;ll use the conventional significance level of 0.05. So now we have our pieces required to calculate experimental power:</p>
+<p>Power is the ability to detect an effect, given that one exists. I&rsquo;ll illustrate this concept with a simple example. Let&rsquo;s say you are conducting a study on the effects of a weight loss pill. One group receives the experimental weight loss pill while the other receives a placebo. For the pill to be marketable, you want to claim an average loss of 3lbs. This is our <strong>effect size</strong>. Estimating an effect size can be a bit tricky; you can use history or simply figure out what size of effect you want to see (in this case a difference of 3lbs). Additionally, we&rsquo;ll have to specify a standard deviation. This can come from similar, previous studies or a pilot study. To keep things simple, let&rsquo;s say we reviewed some literature on similiar weight loss studies and observed a standard deviation of 8lbs. We&rsquo;ll also assume that both groups exhibit the same degree of variance. Now that we&rsquo;ve established our effect size and standard deviation, we need to know how many people to include in the study. If each participant is paid $100 for completing the 1 month study and we have a budget of $10,000, then our sample size can be at most 100 participants, with 50 randomly assigned to the placebo condition and the remaining 50 assigned to the pill condition. Finally we&rsquo;ll use the conventional significance level of 0.05. So now we have our pieces required to calculate experimental power:</p>
 
 <ol>
 <li>Effect size &amp; Standard Deviation</li>
@@ -362,11 +362,11 @@ type_II_vec = c(type_II_vec, as.integer(dplyr::between(0, ci_df$lower_bound, ci_
 <pre><code class="language-r">[1] &quot;EXPECTED POWER IS: 100%&quot;
 </code></pre>
 
-<p>Exactly what we expected. What would happen if we reduced the number of days in our study to three? The <code>simr</code> package said our power would be right around 90%. Of our 100 simulations, will we commit a type II error in approximately 10 of them?</p>
+<p>Exactly what we expected. What would happen if we reduced the number of days in our study to two? The <code>simr</code> package said our power would be right around 50%. Of our 50 simulations, will we commit a type II error in approximately half of them?</p>
 
 <pre><code class="language-r">set.seed(123)
 sleep_df_3day = sleep_df %&gt;% 
-                 dplyr::filter(Days %in% c(0, 1, 2, 3))
+                 dplyr::filter(Days %in% c(0, 1, 2))
 sleep_fit_3day = lmer(Reaction ~ Days + (1|Subject), data = sleep_df_3day)
 type_II_vec = c()
 n_simulations = 100
@@ -393,10 +393,10 @@ type_II_vec = c(type_II_vec, as.integer(dplyr::between(0, ci_df$lower_bound, ci_
 <pre><code class="language-r">print(paste0(&quot;EXPECTED POWER IS: &quot;, n_simulations - sum(type_II_vec), &quot;%&quot;))
 </code></pre>
 
-<pre><code>[1] &quot;EXPECTED POWER IS: 41%&quot;
+<pre><code>[1] &quot;EXPECTED POWER IS: 44%&quot;
 </code></pre>
 
-<p>So there you have it &ndash; our simulation obtained almost identical results relative to the <code>simr</code> package. If we increased the number of simulations, the power estimates would converge to the same number. However, if you copied this code and ran it in R, you&rsquo;ll notice that it ran pretty slow.  In a seperate <a href="https://markleboeuf.github.io/portfolio/two_flavors_of_parallelism/">post</a> I&rsquo;ll show you how to speed up any simulation by executing the entire process in parallel in order to run more simulations and get better estimates! Stay tuned!</p>
+<p>So there you have it &ndash; our simulation obtained similar results relative to the <code>simr</code> package. If we increased the number of simulations, the power estimates would converge to the same number. However, if you copied this code and ran it in R, you&rsquo;ll notice that it ran pretty slow.  In a seperate <a href="https://markleboeuf.github.io/portfolio/two_flavors_of_parallelism/">post</a> I&rsquo;ll show you how to speed up any simulation by executing the entire process in parallel in order to run more simulations and get better estimates! Stay tuned!</p>
          
       </div>
     </div>

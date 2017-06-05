@@ -12,11 +12,6 @@
   </url>
   
   <url>
-    <loc>https://markleboeuf.github.io/portfolio/random_forest_prediction_intervals/</loc>
-    <lastmod>2017-02-12T19:41:01+05:30</lastmod>
-  </url>
-  
-  <url>
     <loc>https://markleboeuf.github.io/portfolio/outlier_detection/</loc>
     <lastmod>2017-03-12T19:41:01+05:30</lastmod>
   </url>
@@ -24,6 +19,21 @@
   <url>
     <loc>https://markleboeuf.github.io/portfolio/monte_carlo_mixed_effects/</loc>
     <lastmod>2017-01-12T19:41:01+05:30</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://markleboeuf.github.io/portfolio/random_forest_prediction_intervals/</loc>
+    <lastmod>2017-02-12T19:41:01+05:30</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://markleboeuf.github.io/portfolio/counterfactual_prediction/</loc>
+    <lastmod>2017-05-01T19:41:01+05:30</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://markleboeuf.github.io/portfolio/early_trend_detection/</loc>
+    <lastmod>2017-05-01T19:41:01+05:30</lastmod>
   </url>
   
   <url>
@@ -43,6 +53,24 @@
   
   <url>
     <loc>https://markleboeuf.github.io/categories/</loc>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://markleboeuf.github.io/tags/causality/</loc>
+    <lastmod>2017-05-01T19:41:01+05:30</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://markleboeuf.github.io/tags/counterfactual-prediction/</loc>
+    <lastmod>2017-05-01T19:41:01+05:30</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://markleboeuf.github.io/tags/dtw/</loc>
+    <lastmod>2017-05-01T19:41:01+05:30</lastmod>
     <priority>0</priority>
   </url>
   
@@ -174,7 +202,13 @@
   
   <url>
     <loc>https://markleboeuf.github.io/tags/</loc>
-    <lastmod>2017-01-12T19:41:01+05:30</lastmod>
+    <lastmod>2017-05-01T19:41:01+05:30</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://markleboeuf.github.io/tags/trend-detection/</loc>
+    <lastmod>2017-05-01T19:41:01+05:30</lastmod>
     <priority>0</priority>
   </url>
   
