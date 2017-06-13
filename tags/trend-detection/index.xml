@@ -2,22 +2,22 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Trend Detection on Mark LeBoeuf</title>
-    <link>/tags/trend-detection/</link>
+    <link>https://markleboeuf.github.io/tags/trend-detection/</link>
     <description>Recent content in Trend Detection on Mark LeBoeuf</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>&amp;copy;2016 Mark LeBoeuf</copyright>
     <lastBuildDate>Mon, 01 May 2017 19:41:01 +0530</lastBuildDate>
     
-	<atom:link href="/tags/trend-detection/index.xml" rel="self" type="application/rss+xml" />
+	<atom:link href="https://markleboeuf.github.io/tags/trend-detection/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
       <title>Early Trend Detection</title>
-      <link>/portfolio/early_trend_detection/</link>
+      <link>https://markleboeuf.github.io/portfolio/early_trend_detection/</link>
       <pubDate>Mon, 01 May 2017 19:41:01 +0530</pubDate>
       
-      <guid>/portfolio/early_trend_detection/</guid>
+      <guid>https://markleboeuf.github.io/portfolio/early_trend_detection/</guid>
       <description>&lt;p&gt;&lt;/p&gt;</description>
     </item>
     
