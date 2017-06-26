@@ -23,6 +23,17 @@
     </item>
     
     <item>
+      <title>Keras CNN Walkthrough</title>
+      <link>https://markleboeuf.github.io/portfolio/keras_walk_through_end_to_end/</link>
+      <pubDate>Mon, 01 May 2017 19:41:01 +0530</pubDate>
+      
+      <guid>https://markleboeuf.github.io/portfolio/keras_walk_through_end_to_end/</guid>
+      <description>&lt;p&gt;Most Keras tutorials I&amp;rsquo;ve come across outline the process of creating a Convolutional Neural Network (CNN) with built-in datasets. While this is a great place to begin, there&amp;rsquo;s a bit more involved in terms of pre-processing when starting out with just a bunch of pictures. This post provides a quick, end-to-end walkthrough of how to implement a CNN with Keras in Python from scratch.&lt;/p&gt;
+
+&lt;p&gt;&lt;/p&gt;</description>
+    </item>
+    
+    <item>
       <title>Two Flavors of Parallel Simulation</title>
       <link>https://markleboeuf.github.io/portfolio/two_flavors_of_parallelism/</link>
       <pubDate>Thu, 12 Jan 2017 19:41:01 +0530</pubDate>
@@ -54,7 +65,7 @@
     </item>
     
     <item>
-      <title>Early Trend Detection</title>
+      <title>Keras CNN Walkthrough</title>
       <link>https://markleboeuf.github.io/portfolio/early_trend_detection/</link>
       <pubDate>Mon, 01 May 2017 19:41:01 +0530</pubDate>
       

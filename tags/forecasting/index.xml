@@ -24,23 +24,23 @@
     </item>
     
     <item>
-      <title>Early Trend Detection</title>
-      <link>https://markleboeuf.github.io/portfolio/early_trend_detection/</link>
-      <pubDate>Mon, 01 May 2017 19:41:01 +0530</pubDate>
-      
-      <guid>https://markleboeuf.github.io/portfolio/early_trend_detection/</guid>
-      <description>&lt;p&gt;Identifying a trend before it starts is a major area of focus in the analytics realm, because it can inform key business decisions yet remains extremely difficult. This post outlines one trend-detection method in an effort to predict where a stock&amp;rsquo;s price will go in the future.&lt;/p&gt;
-
-&lt;p&gt;&lt;/p&gt;</description>
-    </item>
-    
-    <item>
       <title>Establishing Causality with Counterfactual Prediction</title>
       <link>https://markleboeuf.github.io/portfolio/counterfactual_prediction/</link>
       <pubDate>Mon, 01 May 2017 19:41:01 +0530</pubDate>
       
       <guid>https://markleboeuf.github.io/portfolio/counterfactual_prediction/</guid>
       <description>&lt;p&gt;Sometimes a controlled experiment isn&amp;rsquo;t an option yet you want to establish causality. This post outlines a method for quantifying the effects of an intervention via counterfactual predictions.&lt;/p&gt;
+
+&lt;p&gt;&lt;/p&gt;</description>
+    </item>
+    
+    <item>
+      <title>Keras CNN Walkthrough</title>
+      <link>https://markleboeuf.github.io/portfolio/early_trend_detection/</link>
+      <pubDate>Mon, 01 May 2017 19:41:01 +0530</pubDate>
+      
+      <guid>https://markleboeuf.github.io/portfolio/early_trend_detection/</guid>
+      <description>&lt;p&gt;Identifying a trend before it starts is a major area of focus in the analytics realm, because it can inform key business decisions yet remains extremely difficult. This post outlines one trend-detection method in an effort to predict where a stock&amp;rsquo;s price will go in the future.&lt;/p&gt;
 
 &lt;p&gt;&lt;/p&gt;</description>
     </item>
