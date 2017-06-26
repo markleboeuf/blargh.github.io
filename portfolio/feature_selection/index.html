@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<title>Feature Selection for the Wine Connoisseur</title>
+<meta name="description" content="Code and Stuff">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="all,follow">
+<meta name="googlebot" content="index,follow,snippet,archive">
+<link rel="stylesheet" href="https://markleboeuf.github.io/css/bootstrap.min.css">
+<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Roboto:400,300,700,400italic">
+<link rel="stylesheet" href="https://markleboeuf.github.io/css/font-awesome.min.css">
+<link rel="stylesheet" href="https://markleboeuf.github.io/css/owl.carousel.css">
+<link rel="stylesheet" href="https://markleboeuf.github.io/css/owl.theme.css">
+
+
+  <link href="https://markleboeuf.github.io/css/style.red.css" rel="stylesheet" id="theme-stylesheet">
+
+
+<link href="https://markleboeuf.github.io/css/custom.css" rel="stylesheet">
+<link rel="shortcut icon" href="https://markleboeuf.github.io/img/favicon.png">
+
+
+</head>
+<body>
+  <div id="all">
+      <div class="container-fluid">
+          <div class="row row-offcanvas row-offcanvas-left">
+              <div id="sidebar" class="col-xs-6 col-sm-4 col-md-3 sidebar-offcanvas">
+  <div class="sidebar-content">
+    <h1 class="sidebar-heading"><a href="/">Mark LeBoeuf</a></h1>
+    
+      <p class="sidebar-p">I am a Data Scientist currently based in Portland, OR.</p>
+    
+    <ul class="sidebar-menu">
+      
+      
+        <li><a href="https://markleboeuf.github.io/">Home</a></li>
+      
+        <li><a href="https://markleboeuf.github.io/about/">About</a></li>
+      
+    </ul>
+    <p class="social">
+  
+  
+  
+  
+  
+  
+  <a href="https://www.linkedin.com/in/markleboeuf/" data-animate-hover="pulse">
+    <i class="fa fa-linkedin"></i>
+  </a>
+  
+  
+  
+  <a href="https://github.com/markleboeuf/markleboeuf.github.io" data-animate-hover="pulse">
+    <i class="fa fa-github"></i>
+  </a>
+  
+</p>
+
+
+    <div class="copyright">
+      <p class="credit">
+        
+          &copy;2016 Mark LeBoeuf
+        
+        | Template by <a href="https://bootstrapious.com/free-templates" class="external">Bootstrapious.com</a>
+
+&amp; ported to Hugo by <a href="https://github.com/kishaningithub">Kishan B</a>
+
+      </p>
+    </div>
+  </div>
+</div>
+
+              
+<div class="col-xs-12 col-sm-8 col-md-9 content-column white-background">
+  <div class="small-navbar visible-xs">
+  <button type="button" data-toggle="offcanvas" class="btn btn-ghost pull-left"> <i class="fa fa-align-left"> </i>Menu</button>
+  <h1 class="small-navbar-heading"><a href="/">Mark LeBoeuf</a></h1>
+</div>
+
+  <div class="row">
+    <div class="col-lg-8">
+      <div class="content-column-content">
+         <h1>Feature Selection for the Wine Connoisseur</h1>
+         <p>Feature selection is an integral part of machine learning, and this post explores what happens when lots of irrelevant features are added into the modeling process. We&rsquo;ll also identify which algorithms are affected the most by such features. These questions will be addressed as we build a classifier and try to predict which wines we&rsquo;ll like based on their chemical properties. So pour yourself a glass of Pinot Noir and fire up your R terminal!</p>
+
+<p></p>
+
+<p><img src="../feature_selection_images/grapes.jpg" class="img-responsive" style="display: block; margin: auto;" /></p>
+
+<ul>
+<li><a href="#overview">Overview</a></li>
+<li><a href="#auc-as-a-measure-of-classification-accuracy">AUC as a Measure of Classification Accuracy</a></li>
+<li><a href="#adding-irrelevant-predictors"> Adding Irrelevant predictors</a></li>
+</ul>
+
+<h3 id="overview">Overview</h3>
+
+<p>These are main reasons for reducing the number of potential input features:</p>
+
+<ol>
+<li>Faster training times</li>
+<li>Easier interpretation</li>
+<li>Improved accuracy</li>
+</ol>
+
+<p>The focus here will primarly be on point 3, as we address two questions:</p>
+
+<ul>
+<li>Does having noisy, unncessary variables as inputs reduce classification performance?</li>
+<li>And, if so, which algorithms are the most robust to the ill-effects of these unncessary variables?</li>
+</ul>
+
+<p>We&rsquo;ll explore these questions with one my favorite datasets located <a href="https://archive.ics.uci.edu/ml/machine-learning-databases/wine-quality/">here</a>. Based on the methodology outlined <a href="http://projects.csail.mit.edu/wiki/pub/Evodesign/SensoryEvaluationsDatabase/winequality09.pdf">here</a>, a bunch of Wine experts got together and evaluated both White and Red wines. Each row represents the chemical properties of a wine in addition to a rating (0 = very bad, 10 = excellent). Each wine was rated by at least three people, and the median of their ratings was used as the final score. I have no idea how you get paid to drink wine, but somewhere in my life I chose the wrong career path. Thus the goal here is to predict the rating based on the chemical properties of the wine, such as its pH, Alcohol Concentration, or Total Sulfur Dioxide (whatever that means).</p>
+
+<pre><code>libs = c('forcats', 'dplyr', 'h2o', 'openair', 'ggplot2','knitr', 'artyfarty')
+lapply(libs, require, character.only = TRUE)
+
+# link: https://archive.ics.uci.edu/ml/machine-learning-databases/wine-quality/
+working_directory = &quot;/Users/mlebo1/Desktop/spost/feature_selection&quot;
+setwd(working_directory)
+red_wine = read.csv('winequality-white.csv', sep = &quot;;&quot;) %&gt;% 
+           dplyr::mutate(wine.type = &quot;red&quot;)
+white_wine = read.csv('winequality-red.csv', sep = &quot;;&quot;) %&gt;% 
+           dplyr::mutate(wine.type = &quot;white&quot;)
+wine_df = red_wine %&gt;% 
+          dplyr::bind_rows(white_wine)
+wine_df = wine_df[c(c(1:11, 13), 12)]
+#
+wine_df = wine_df %&gt;% 
+          dplyr::mutate(wine.class = ifelse(quality &gt;= 7, &quot;IdDrinkThat&quot;, &quot;NoThanks&quot;)) %&gt;% 
+          dplyr::select(-quality) %&gt;% 
+          dplyr::mutate(wine.class = factor(wine.class))
+</code></pre>
+
+<p>This dataset is exceptionally clean. Typically we would do some exploratory analysis to check for outliers, missing values, incorrect codings, or any other number of problems that can sabotage our predictions. In this case we wont have do that and can get right into the variable selection.</p>
+
+<p>We&rsquo;ll initially leverage the <strong>gradient boosted machine</strong> (GBM) algorithm in the <code>h2o</code> library for variable selection. One of the nice features of GBM is that it automatically tells you which variables are important. Recall that GBM is an iterative algorithm that fits many simple decision trees, where the errors from the prior tree become the dependent variable for each subsequent tree. A feature&rsquo;s importance is determined by how much its introduction into a given tree reduces the error. The total reduction in error for a given feature is then averaged across all of the trees the feature appeared in. Thus splitting on important variables should lead to larger reductions in error during training relative to less important variables.</p>
+
+<p>With that in mind let&rsquo;s do an initial pass and see which variables are important. We&rsquo;ll do a <sup>70</sup>&frasl;<sub>30</sub> train/test split, start up <code>h2o</code>, and fit an initial model.</p>
+
+<pre><code>trainTestSplit = function(df, split_proportion){
+  set.seed(123)
+  out_list = list()
+  data_split = sample(1:2, 
+                      size = nrow(df), 
+                      prob = split_proportion, 
+                      replace = TRUE)
+  
+  out_list$train = df[data_split == 1,]
+  out_list$test = df[data_split == 2,]
+  return(out_list)
+}
+split_proportion = c(0.7, 0.3)
+df_split = trainTestSplit(wine_df, split_proportion)
+</code></pre>
+
+<p>Next we&rsquo;ll gather our variable importance metric.</p>
+
+<pre><code># nthreads = -1 means use all of the cores
+h2o.init(nthreads = -1)
+
+train_h2o = as.h2o(df_split$train)
+test_h2o = as.h2o(df_split$test)
+y_var = &quot;wine.class&quot;
+x_var = setdiff(names(train_h2o),y_var)
+gbm_fit = h2o.gbm(x = x_var, 
+                         y = y_var,
+                         distribution = &quot;bernoulli&quot;,
+                         training_frame = train_h2o,
+                         stopping_rounds = 3,
+                         stopping_metric = &quot;AUC&quot;)
+</code></pre>
+
+<p>And let&rsquo;s plot our results based on the relative importance of each feature.</p>
+
+<pre><code>
+my_plot_theme = function(){
+  font_family = &quot;Helvetica&quot;
+  font_face = &quot;bold&quot;
+  return(theme(
+    axis.text.x = element_text(size = 18, face = font_face, family = font_family),
+    axis.text.y = element_text(size = 18, face = font_face, family = font_family),
+    axis.title.x = element_text(size = 20, face = font_face, family = font_family),
+    axis.title.y = element_text(size = 20, face = font_face, family = font_family),
+    strip.text.y = element_text(size = 18, face = font_face, family = font_family),
+    strip.text.x = element_text(size = 18, face = font_face, family = font_family),
+    plot.title = element_text(size = 18, face = font_face, family = font_family),
+    legend.position = &quot;top&quot;,
+    legend.title = element_text(colour = &quot;white&quot;, size = 16,
+                                face = font_face,
+                                family = font_family),
+    legend.text = element_text(colour = &quot;white&quot;, size = 14,
+                               face = font_face,
+                               family = font_family)
+  ))
+}
+  data.frame(gbm_fit@model$variable_importances) %&gt;% 
+    dplyr::select(variable, relative_importance) %&gt;% 
+    dplyr::mutate(relative_importance = round(relative_importance),
+                variable = factor(variable)) %&gt;% 
+  dplyr::mutate(variable = fct_reorder(variable, relative_importance, .desc = TRUE)) %&gt;% 
+  ggplot(aes(x = variable, y = relative_importance,
+                   fill = variable, label = as.character(relative_importance))) + 
+    geom_bar(stat = &quot;identity&quot;) + 
+    geom_label(label.size = 1, size = 5, color = &quot;white&quot;)  + 
+    theme_monokai_full() + 
+    my_plot_theme() + 
+    theme(legend.position = &quot;none&quot;) + 
+    ylab(&quot;Relative Importance&quot;) + 
+    xlab(&quot;Variable&quot;) + 
+    theme(axis.text.x = element_text(angle = 90, hjust = 1, size = 12))
+</code></pre>
+
+<p><img src="../feature_selection_images/plot1.png" class="img-responsive" style="display: block; margin: auto;" /></p>
+
+<p>It looks like all of the variables have a positive impact on our classification performance, so we&rsquo;ll include all of them. Next we&rsquo;re going to calculate AUC (Area Under Curve) for the following methods:</p>
+
+<ul>
+<li>GBM</li>
+<li>Random Forest (RF)</li>
+<li>Neural Network (NN)</li>
+<li>Logistic Regression (LR)</li>
+</ul>
+
+<p>We&rsquo;ll use this as a point of comparison as additional irrelevant predictor variables are added. Our goal is to see how the addition of such variables affects AUC on the test set. Let&rsquo;s calculate our baseline numbers.</p>
+
+<pre><code>rf_fit = h2o.randomForest(x = x_var,
+                          y = y_var,
+                          training_frame = train_h2o,
+                          stopping_rounds = 3,
+                          stopping_metric = &quot;AUC&quot;)
+
+nn_fit = h2o.deeplearning(x = x_var,
+                          y = y_var,
+                          training_frame = train_h2o,
+                          stopping_rounds = 3,
+                          stopping_metric = &quot;AUC&quot;)
+
+glm_fit = h2o.glm(x = x_var,
+                   y = y_var,
+                   family = &quot;binomial&quot;,
+                   training_frame = train_h2o)
+
+gbm_auc = h2o.auc(h2o.performance(gbm_fit, newdata = test_h2o))
+rf_auc = h2o.auc(h2o.performance(rf_fit, newdata = test_h2o))
+nn_auc = h2o.auc(h2o.performance(nn_fit, newdata = test_h2o))
+glm_auc = h2o.auc(h2o.performance(glm_fit, newdata = test_h2o))
+
+auc_df = data.frame(n_noise_vars = rep(0, 4),
+                          method = c('gbm', 'rf', 'nn', 'glm'),
+                           AUC = c(gbm_auc, rf_auc, nn_auc, glm_auc)) %&gt;% 
+                dplyr::arrange(desc(AUC))
+</code></pre>
+
+<p><img src="../feature_selection_images/plot2.png" class="img-responsive" style="display: block; margin: auto;" /></p>
+
+<p>This provides us with a general baseline. In the following section we&rsquo;ll see what happens to the Area Under the Curve (AUC) as we add in lots of irrelevant predictors. But first let&rsquo;s explore why we are using AUC as our evaluation metric.</p>
+
+<h3 id="auc-as-a-measure-of-classification-accuracy">AUC as a Measure of Classification Accuracy</h3>
+
+<p>Measuring model performance when your dependent variable is binary is more &ldquo;involved&rdquo;&rdquo; than measuring performance with a continuous dependent variable. With a continuous DV, large residuals are worse than small residuals, and this can be quantified along a continuum. In contrast, you can have a classifier that&rsquo;s extremely accurate &ndash; it provides the correct classification 99.99% of the time &ndash; but actually doesn&rsquo;t tell you anything useful. This situation typically arises when you have imbalanced classes, such as trying to predict whether or not someone has a disease when it only occurs in 1 of 100,000 people. By chance alone the classifier would be right 99,999 times out of 100,000 if you just said &ldquo;no one has the disease ever&rdquo;.</p>
+
+<p>Let&rsquo;s consider the class balance in our wine dataset.</p>
+
+<pre><code>round(table(wine_df$wine.class)/nrow(wine_df) * 100, 1)
+## 
+## IdDrinkThat    NoThanks 
+##        19.7        80.3
+</code></pre>
+
+<p>According to our refined, discerning pallette, 80% of wines would fall by chance alone in the &lsquo;NoThanks&rsquo; category. We could achieve 80% accuracy by simply assigning a label of &lsquo;NoThanks&rsquo; to every new wine we encountered. This would obviously be a terrible idea, because then we&rsquo;d never get to drink any wine! Thus, in cases where your classes are unevenly distributed, accuracy might not be the best evaluation metric.</p>
+
+<p>AUC isn&rsquo;t affected by class imbalances, because it considers both True Positives and False Positives. The True Positive Rate (TPR) captures all the instances in which our model said &lsquo;Drink this wine&rsquo; and it was in fact a wine we would want to drink; False Positive Rate (FPR) captures instances in which our model said &lsquo;Drink this Wine&rsquo; but it was actually a wine that we would not want to drink. As we have obtain more TPRs and fewer FPRs, our AUC will move closer to 1, which means our model is improving. Hopefully this clarifies the rationale for using AUC relative to accuracy. Now let&rsquo;s get back to the original question.</p>
+
+<h3 id="adding-irrelevant-predictors">Adding Irrelevant predictors</h3>
+
+<p>Irrelevant predictors will be sampled from a normal distribution with a mean of 0 and a standard deviation of 1. Each iteration will add an additional 100 irrelevant predictors, and we&rsquo;ll run a total of 20 iterations. All of the algorithms will use the default parameters that come with the <code>h2o</code> library.</p>
+
+<pre><code>n_noise_vars = seq(100, 2000, length.out = 20)
+
+for(i in n_noise_vars){
+  print(i)
+  temp_noise_df_train = data.frame(placeholder = rep(NA, nrow(df_split$train)))
+  temp_noise_df_test = data.frame(placeholder = rep(NA, nrow(df_split$test)))
+  
+  # add in i irrelevant predictors to train and test
+  for(j in 1:i){
+    temp_noise_df_train = cbind(temp_noise_df_train, 
+                                data.frame(noise.var = rnorm(nrow(df_split$train), 
+                                                           0, 
+                                                           1)))
+    temp_noise_df_test = cbind(temp_noise_df_test, 
+                               data.frame(noise.var = rnorm(nrow(df_split$test), 
+                                                           0, 
+                                                           1)))
+  }
+  # format names of irrelevant variables
+  temp_noise_df_train = temp_noise_df_train[,2:dim(temp_noise_df_train)[2]]
+  names(temp_noise_df_train) = gsub(&quot;\\.&quot;, &quot;&quot;, names(temp_noise_df_train))
+  temp_noise_df_train = as.h2o(cbind(temp_noise_df_train,
+                              df_split$train))
+  
+  temp_noise_df_test = temp_noise_df_test[,2:dim(temp_noise_df_test)[2]]
+  names(temp_noise_df_test) = gsub(&quot;\\.&quot;, &quot;&quot;, names(temp_noise_df_test))
+  temp_noise_df_test = cbind(temp_noise_df_test,
+                             df_split$test)
+  
+  x_var = setdiff(names(temp_noise_df_train),y_var)
+
+  gbm_fit = h2o.gbm(x = x_var, 
+                    y = y_var,
+                    distribution = &quot;bernoulli&quot;,
+                    training_frame = temp_noise_df_train,
+                    stopping_rounds = 3,
+                    stopping_metric = &quot;AUC&quot;)
+  
+  rf_fit = h2o.randomForest(x = x_var,
+                            y = y_var,
+                            training_frame = temp_noise_df_train,
+                            stopping_rounds = 3,
+                            stopping_metric = &quot;AUC&quot;)
+  
+  nn_fit = h2o.deeplearning(x = x_var,
+                            y = y_var,
+                            training_frame = temp_noise_df_train,
+                            stopping_rounds = 3,
+                            stopping_metric = &quot;AUC&quot;)
+  
+  glm_fit = h2o.glm(x = x_var,
+                    y = y_var,
+                    family = &quot;binomial&quot;,
+                    training_frame = temp_noise_df_train)
+  
+  temp_noise_df_test = as.h2o(temp_noise_df_test)
+  
+  gbm_auc = h2o.auc(h2o.performance(gbm_fit, newdata = temp_noise_df_test))
+  rf_auc = h2o.auc(h2o.performance(rf_fit, newdata = temp_noise_df_test))
+  nn_auc = h2o.auc(h2o.performance(nn_fit, newdata = temp_noise_df_test))
+  glm_auc = h2o.auc(h2o.performance(glm_fit, newdata = temp_noise_df_test))
+  
+  auc_df = rbind(auc_df,
+                                data.frame(n_noise_vars = i,
+                                           method = c('gbm', 'rf', 'nn', 'glm'),
+                                           AUC = c(gbm_auc, rf_auc, nn_auc, glm_auc))) 
+}
+</code></pre>
+
+<p>And now let&rsquo;s plot the results.</p>
+
+<pre><code>ggplot(auc_df, aes(x = n_noise_vars, y = AUC, 
+                                     color = method)) + 
+         geom_point(size = 2) + 
+  stat_smooth(span = 1.75, 
+              se = FALSE, 
+              size = 2) + 
+  theme_monokai_full() + 
+  my_plot_theme() + 
+  ylab(&quot;AUC&quot;) + 
+  xlab(&quot;N Noise Variables&quot;)
+</code></pre>
+
+<p><img src="../feature_selection_images/plot3.png" class="img-responsive" style="display: block; margin: auto;" /></p>
+
+<p>A few initial observations:</p>
+
+<ol>
+<li>AUC for all methods, with the exception of GLM, decreased as the number of irrelevant predictors in the model increased</li>
+<li>GBM is the most robust against the ill-effects of irrelevant predictors, while NN was the most susceptible.</li>
+</ol>
+
+<p>Although we can&rsquo;t generalize these outcomes to every situation, they do align with my experience. In fact, one of the reasons I like GBM is that it tends to ignore irrelevant predictors during modeling. Neural networks are extremely powerful and with the right tuning/regularization will often outperform any of the methods outlined here. However, they are susceptible to overfitting because of their flexibility, which leads to noise being leveraged as signal during the model building process.</p>
+
+<p>OK so classification performance goes down when you add in a lots of irrelevant predictors. But what happens if there are only a few? Let&rsquo;s re-run the above situation, but instead limit the number of irrelevant predictors to a range of 10 - 100 instead of 100 - 2000. We can replace this line and re-run.</p>
+
+<pre><code>auc_df = data.frame(n_noise_vars = rep(0, 4),
+                          method = c('gbm', 'rf', 'nn', 'glm'),
+                           AUC = c(gbm_auc, rf_auc, nn_auc, glm_auc)) %&gt;% 
+                dplyr::arrange(desc(AUC))
+                
+# change number of irrelevant predictors here
+n_noise_vars = seq(10, 100, length.out = 10)
+
+for(i in n_noise_vars){
+  print(i)
+  temp_noise_df_train = data.frame(placeholder = rep(NA, nrow(df_split$train)))
+  temp_noise_df_test = data.frame(placeholder = rep(NA, nrow(df_split$test)))
+  for(j in 1:i){
+    temp_noise_df_train = cbind(temp_noise_df_train, 
+                                data.frame(noise.var = rnorm(nrow(df_split$train), 
+                                                           0, 
+                                                           1)))
+    temp_noise_df_test = cbind(temp_noise_df_test, 
+                               data.frame(noise.var = rnorm(nrow(df_split$test), 
+                                                           0, 
+                                                           1)))
+  }
+  temp_noise_df_train = temp_noise_df_train[,2:dim(temp_noise_df_train)[2]]
+  names(temp_noise_df_train) = gsub(&quot;\\.&quot;, &quot;&quot;, names(temp_noise_df_train))
+  head(temp_noise_df_train)
+  temp_noise_df_train = as.h2o(cbind(temp_noise_df_train,
+                              df_split$train))
+  #
+  temp_noise_df_test = temp_noise_df_test[,2:dim(temp_noise_df_test)[2]]
+  names(temp_noise_df_test) = gsub(&quot;\\.&quot;, &quot;&quot;, names(temp_noise_df_test))
+  temp_noise_df_test = cbind(temp_noise_df_test,
+                             df_split$test)
+  
+  x_var = setdiff(names(temp_noise_df_train),y_var)
+
+  gbm_fit = h2o.gbm(x = x_var, 
+                    y = y_var,
+                    distribution = &quot;bernoulli&quot;,
+                    training_frame = temp_noise_df_train,
+                    stopping_rounds = 3,
+                    stopping_metric = &quot;AUC&quot;)
+  rf_fit = h2o.randomForest(x = x_var,
+                            y = y_var,
+                            training_frame = temp_noise_df_train,
+                            stopping_rounds = 3,
+                            stopping_metric = &quot;AUC&quot;)
+  nn_fit = h2o.deeplearning(x = x_var,
+                            y = y_var,
+                            training_frame = temp_noise_df_train,
+                            stopping_rounds = 3,
+                            stopping_metric = &quot;AUC&quot;)
+  glm_fit = h2o.glm(x = x_var,
+                    y = y_var,
+                    family = &quot;binomial&quot;,
+                    training_frame = temp_noise_df_train)
+  
+  temp_noise_df_test = as.h2o(temp_noise_df_test)
+  #
+  gbm_auc = h2o.auc(h2o.performance(gbm_fit, newdata = temp_noise_df_test))
+  rf_auc = h2o.auc(h2o.performance(rf_fit, newdata = temp_noise_df_test))
+  nn_auc = h2o.auc(h2o.performance(nn_fit, newdata = temp_noise_df_test))
+  glm_auc = h2o.auc(h2o.performance(glm_fit, newdata = temp_noise_df_test))
+  
+  auc_df = rbind(auc_df,
+                                data.frame(n_noise_vars = i,
+                                           method = c('gbm', 'rf', 'nn', 'glm'),
+                                           AUC = c(gbm_auc, rf_auc, nn_auc, glm_auc))) 
+}
+</code></pre>
+
+<pre><code>ggplot(auc_df, aes(x = n_noise_vars, y = AUC, 
+                                     color = method)) + 
+         geom_point(size = 2) + 
+  stat_smooth(span = 1.75, 
+              se = FALSE, 
+              size = 2) + 
+  theme_monokai_full() + 
+  my_plot_theme() + 
+  ylab(&quot;AUC&quot;) + 
+  xlab(&quot;N Noise Variables&quot;)
+</code></pre>
+
+<p><img src="../feature_selection_images/plot4.png" class="img-responsive" style="display: block; margin: auto;" /></p>
+
+<p>So a few irrelevant features (i.e., 10 - 100) has a neglible impact on modeling performance, at least with the current use case. This goes to show that pre-processing and feature selection is an important part of the model building process if you are dealing with lots of potential features. Beyond reducing the training time, pruning irrelevant features can vastly improve model performance. As illustrated above, including irrelevant features can wreak havoc on your model when using methods with lots of flexible parameters. It would be interesting to see how these results change if we added in some regularization measures to protect against overfitting. For example, one way to reduce overfitting with Random Forest is to limit the maximum depth of a tree (i.e., each tree can only have a single split instead of multiple splits). Or for Neural Networks L2 regularization can be used, which discourages weight vectors in the network from becoming too large. If you try any of these approaches, I&rsquo;d love to hear how it goes!</p>
+         
+      </div>
+    </div>
+  </div>
+</div>
+
+          </div>
+      </div>
+  </div>
+  <script src="https://markleboeuf.github.io/js/jquery.min.js"></script>
+<script src="https://markleboeuf.github.io/js/bootstrap.min.js"></script>
+<script src="https://markleboeuf.github.io/js/jquery.cookie.js"> </script>
+<script src="https://markleboeuf.github.io/js/ekko-lightbox.js"></script>
+<script src="https://markleboeuf.github.io/js/jquery.scrollTo.min.js"></script>
+<script src="https://markleboeuf.github.io/js/masonry.pkgd.min.js"></script>
+<script src="https://markleboeuf.github.io/js/imagesloaded.pkgd.min.js"></script>
+<script src="https://markleboeuf.github.io/js/owl.carousel.min.js"></script>
+<script src="https://markleboeuf.github.io/js/front.js"></script>
+
+</body>
+</html>

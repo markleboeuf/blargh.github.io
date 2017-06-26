@@ -44,6 +44,17 @@
     </item>
     
     <item>
+      <title>Feature Selection for the Wine Connoisseur</title>
+      <link>https://markleboeuf.github.io/portfolio/feature_selection/</link>
+      <pubDate>Mon, 01 May 2017 19:41:01 +0530</pubDate>
+      
+      <guid>https://markleboeuf.github.io/portfolio/feature_selection/</guid>
+      <description>&lt;p&gt;Feature selection is an integral part of machine learning, and this post explores what happens when lots of irrelevant features are added into the modeling process. We&amp;rsquo;ll also identify which algorithms are affected the most by such features. These questions will be addressed as we build a classifier and try to predict which wines we&amp;rsquo;ll like based on their chemical properties. So pour yourself a glass of Pinot Noir and fire up your R terminal!&lt;/p&gt;
+
+&lt;p&gt;&lt;/p&gt;</description>
+    </item>
+    
+    <item>
       <title>Monte Carlo Power Calculations for Mixed Effects Models</title>
       <link>https://markleboeuf.github.io/portfolio/monte_carlo_mixed_effects/</link>
       <pubDate>Thu, 12 Jan 2017 19:41:01 +0530</pubDate>
@@ -54,7 +65,7 @@
     </item>
     
     <item>
-      <title>Keras CNN Walkthrough</title>
+      <title>Early Trend Detection</title>
       <link>https://markleboeuf.github.io/portfolio/early_trend_detection/</link>
       <pubDate>Mon, 01 May 2017 19:41:01 +0530</pubDate>
       
