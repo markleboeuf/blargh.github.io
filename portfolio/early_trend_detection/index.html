@@ -7,18 +7,18 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="all,follow">
 <meta name="googlebot" content="index,follow,snippet,archive">
-<link rel="stylesheet" href="/css/bootstrap.min.css">
+<link rel="stylesheet" href="https://markleboeuf.github.io/css/bootstrap.min.css">
 <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Roboto:400,300,700,400italic">
-<link rel="stylesheet" href="/css/font-awesome.min.css">
-<link rel="stylesheet" href="/css/owl.carousel.css">
-<link rel="stylesheet" href="/css/owl.theme.css">
+<link rel="stylesheet" href="https://markleboeuf.github.io/css/font-awesome.min.css">
+<link rel="stylesheet" href="https://markleboeuf.github.io/css/owl.carousel.css">
+<link rel="stylesheet" href="https://markleboeuf.github.io/css/owl.theme.css">
 
 
-  <link href="/css/style.red.css" rel="stylesheet" id="theme-stylesheet">
+  <link href="https://markleboeuf.github.io/css/style.red.css" rel="stylesheet" id="theme-stylesheet">
 
 
-<link href="/css/custom.css" rel="stylesheet">
-<link rel="shortcut icon" href="/img/favicon.png">
+<link href="https://markleboeuf.github.io/css/custom.css" rel="stylesheet">
+<link rel="shortcut icon" href="https://markleboeuf.github.io/img/favicon.png">
 
 
 </head>
@@ -35,9 +35,9 @@
     <ul class="sidebar-menu">
       
       
-        <li><a href="/">Home</a></li>
+        <li><a href="https://markleboeuf.github.io/">Home</a></li>
       
-        <li><a href="/about/">About</a></li>
+        <li><a href="https://markleboeuf.github.io/about/">About</a></li>
       
     </ul>
     <p class="social">
@@ -85,68 +85,585 @@
     <div class="col-lg-8">
       <div class="content-column-content">
          <h1>Early Trend Detection</h1>
-         <p></p>
+         <p>Identifying a trend before it starts is a major area of focus in the analytics realm, because it can inform key business decisions yet remains extremely difficult. This post outlines one trend-detection method in an effort to predict where a stock&rsquo;s price will go in the future.</p>
 
-<p><img src="../counterfactual_prediction_images/counterfactual_example.png" class="img-responsive" style="display: block; margin: auto;" /></p>
+<p></p>
+
+<p><img src="../early_trend_detection_images/stock_exchange.jpg" class="img-responsive" style="display: block; margin: auto;" /></p>
 
 <ul>
 <li><a href="#overview">Overview</a></li>
-<li><a href="#souvenir-sales-+-sign-spinning-+-australia">Souvenir Sales + Sign Spinning + Australia</a></li>
-<li><a href="#creating-the-synthetic-data-set">Creating the Synthetic Data Set</a></li>
-<li><a href="#selecting-a-control-time-series-with-dynamic-time-warping">Selecting a Control Time Series with Dynamic Time Warping</a></li>
-<li><a href="#generating-counterfactual-predictions">Generating Counterfactual Predictions</a></li>
+<li><a href="#non-parametric-approach-to-trend-detection">Non-Parametric Approach to Trend Detection</a></li>
+<li><a href="#predicting-stocks">Predicting Stocks</a></li>
+<li><a href="#defining-a-trend">Defining a Trend</a></li>
+<li><a href="#trend-detection-performance">Trend Detection Performance</a></li>
 </ul>
 
-<h2 id="overview">Overview</h2>
+<h3 id="overview">Overview</h3>
 
-<p>There are some really cool posts on this topic (see here and here to name a few).</p>
+<p>Trend detection is way to to anticipate where something will likely go in the future. The logic underlying the inference is simple: Are there particular patterns of activity that precede an upward or downward trend? For example, a fashion trend might start in a big city like New York, London, or Paris. The emergence of the trend might then occur at a later date in smaller nearby cities. Thus, if you were charged with anticipating future demand for the trending product, you could use the early signal from the big cities to anticipate demand in the smaller cities. This information could inform everything from design to demand planning (i.e., getting the right amount of product in the right place). This is often referred to as a <strong>leading indicator</strong>.</p>
 
-<h3 id="predicting-stocks">Predicting Stocks</h3>
+<p>For this approach to be effective, there needs to be a &ldquo;common way&rdquo; in which a product trends. Maybe it&rsquo;s a gradual increase over the first 5 days, followed by a rapid increase over the next 10 days. Or maybe you just need the first 3 days to make an accurate prediction of a positive trend when the change in demand is very rapid. There are many ways in which something can trend, but the pattern of demand, tweets, views, purchases, likes, etc. for a positive trend has to be different from a negative, flat, or random trend.</p>
 
-<p>Let&rsquo;s get one thing out of the way: This method cannot reliably predict whether a stock will trend upwards or downwards. If it could, I would be not writing this post. In fact, I would&rsquo;ve moved to Connecticut, opened a hedge fund, made a bunch of money, and then went directly to Dairy Queen and purchased every flavor of ice cream cake. Because that&rsquo;s what we&rsquo;d all do following a major cash windfall &ndash; buy/eat all the ice cream.</p>
+<p>This post outlines an approach used to parse out and seperate the signatures associated with different types of trends. We&rsquo;ll use actual stock data from Fortune 500 companies as our analytical dataset to answer the following question: Can we predict whether a stock&rsquo;s price will trend positively based on its closing price over the first 30 days in January and February of 2015? Before jumping into the example, though, I&rsquo;ll briefly introduce the technique with a smaller dataset.</p>
 
-<p>However, for certain series that exhibit a detectable pattern prior to trending up (down), methods like the one discussed herein can produce some pretty solid results in terms of classifying where a series will likely go in the future.</p>
+<h3 id="non-parametric-approach-to-trend-detection">Non-Parametric Approach to Trend Detection</h3>
 
-<h3 id="collecting-stocks-data">Collecting Stocks data</h3>
+<p>We&rsquo;ll use a K Nearest-Neighbor (KNN) approach for classifying where a stock&rsquo;s price is likely to go in the future (i.e., up or flat/down). KNN is non-parametric, which means we don&rsquo;t make any assumptions about our data. There is also no &lsquo;model&rsquo;; we simply let the data make the classification or prediction. Without generalizing too much, I&rsquo;ve always liked KNN when my feature set is small and consists mostly of continuous variables. It is easy to explain and surprisingly effective relative to more complicated, parametric models. All we have to do is find the right &ldquo;K&rdquo;, which is the number of neighbors we use to make our prediction/classification. &ldquo;K&rdquo; is often determined through cross-validation, where we try several values for &ldquo;K&rdquo; and see which gives us the best results.</p>
 
-<p>The data we&rsquo;ll use is the historical daily closing prices for the stocks&rsquo; of all Fortune 500 companies. Let&rsquo;s load up all the libraries and then pull down the list of companies from wikipedia.</p>
+<p>So how do we determine our neighbors? There are many distance metrics used to define &ldquo;similarity&rdquo;, the most common being Euclidean Distance. The main drawback to this approach is that it cannot account for forward or backward shifts between series, which is an issue when dealing with sequential data. Thus we&rsquo;ll use <strong>Dynamic Time Warping</strong>, which can account for temporary shifts, leads, or lags.</p>
 
-<pre><code class="language-r">library(BatchGetSymbols)
-library(rvest)
-library(Kendall)
-library(broom)
-library(MarketMatching)
+<p>We&rsquo;ll use 10 fictitious stocks in our initial example. Five will trend positively after their first 50 days while the remaining 5 will trend negatively over the same time period. These stocks will serve as our &ldquo;training set&rdquo;. We&rsquo;ll then take a new stock for which we only have the first 50 days and classify it as either a &ldquo;positive&rdquo; or &ldquo;negative&rdquo; trending stock. This prediction is where we think the stock will go relative to its position at day 50.</p>
 
+<p>Let&rsquo;s get started and generate the initial 50 days for our 10 stocks.</p>
+
+<pre><code>libs = c('BatchGetSymbols', 'rvest', 'Kendall', 'openair', 'broom',
+'artyfarty', 'MarketMatching', 'ggplot2', 'knitr')
+lapply(libs, require, character.only = TRUE)
+set.seed(123)
+pre_date_range = seq.Date(as.Date(&quot;2016-01-01&quot;), by = &quot;day&quot;, length = 100) 
+pre_period = 50
+trend_patterns = data.frame()
+for(i in 1:5){
+
+# generate pattern for stocks that trend negatively from days 51-100
+neg_trend_pre = cos(seq(0, 10, 0.1))[1:pre_period] + rnorm(pre_period, 0, 0.7)
+trend_patterns = rbind(trend_patterns,
+data.frame(date = pre_date_range[1:pre_period],
+value = neg_trend_pre,
+class = paste0('negative_', i)))
+
+# generate pattern for stocks that trend positively from days 51-100
+pos_trend_pre = cos(seq(0, 10, 0.1))[(pre_period + 1):100] + rnorm(pre_period, 0, 0.7)
+trend_patterns = rbind(trend_patterns,
+data.frame(date = pre_date_range[1:pre_period],
+                  value = pos_trend_pre,
+                  class = paste0(&quot;positive_&quot;, i)))
+}
+</code></pre>
+
+<p>Now let&rsquo;s add in our positive and negative trends.</p>
+
+<pre><code>generate_trend = function(trend_length, increment, sd, base_value){
+    trend_vector = c()
+    for(j in 1:trend_length){
+        trend_vector = c(trend_vector, rnorm(1, base_value, sd = sd))
+        base_value = base_value + increment
+    }
+    return(trend_vector)
+}
+
+increment = 0.03
+standard_dev = 0.08
+trend_patterns_future = data.frame(NULL)
+
+for(temp_trend in unique(trend_patterns$class)){
+
+    temp_ts = trend_patterns %&gt;% 
+              dplyr::filter(class == temp_trend)
+
+    # extend date 50 days forward
+    future_dates = pre_date_range[51:length(pre_date_range)]
+    base_value = temp_ts$value[length(temp_ts$value)]
+    future_trend = generate_trend(length(future_dates), increment, standard_dev, base_value)
+    if(strsplit(temp_trend, &quot;_&quot;)[[1]][1] == 'negative'){
+        future_trend = future_trend * -1
+        }
+    trend_patterns_future = rbind(trend_patterns_future,
+                                  data.frame(date = future_dates,
+                                             value = future_trend,
+                                             class = temp_trend)
+                                  )
+}
+trend_patterns_ex = dplyr::bind_rows(trend_patterns, 
+                                     trend_patterns_future) %&gt;% 
+                                     dplyr::arrange(class, date)
+</code></pre>
+
+<p>And finally we&rsquo;ll set up our plotting functions and plot the 5 positive and 5 negative trends.</p>
+
+<pre><code>my_plot_theme = function(){
+    font_family = &quot;Helvetica&quot;
+    font_face = &quot;bold&quot;
+    return(theme(
+    axis.text.x = element_text(size = 18, face = font_face, family = font_family),
+    axis.text.y = element_text(size = 18, face = font_face, family = font_family),
+    axis.title.x = element_text(size = 20, face = font_face, family = font_family),
+    axis.title.y = element_text(size = 20, face = font_face, family = font_family),
+    strip.text.y = element_text(size = 18, face = font_face, family = font_family),
+    strip.text.x = element_text(size = 18, face = font_face, family = font_family),
+    plot.title = element_text(size = 18, face = font_face, family = font_family),
+    legend.position = &quot;top&quot;,
+    legend.title = element_text(colour = &quot;white&quot;, size = 16,
+    face = font_face,
+    family = font_family),
+    legend.text = element_text(colour = &quot;white&quot;, size = 14,
+    face = font_face,
+    family = font_family)
+    ))
+}
+pc = c(&quot;#33FFFB&quot;,
+&quot;#FF3371&quot;,
+&quot;#33EAFF&quot;, &quot;#FF335C&quot;,
+&quot;#33D6FF&quot;, &quot;#FF334C&quot;,
+&quot;#33BDFF&quot;, &quot;#FF4833&quot;,
+&quot;#3388FF&quot;,
+&quot;#FF5833&quot;)
+
+ggplot(trend_patterns_ex, aes(x = date, y = value, color = class)) + 
+    geom_point(alpha = 0.1) + stat_smooth(se = FALSE) + 
+    scale_color_manual(values = pc) + theme_monokai_full() + 
+    my_plot_theme() + 
+    geom_vline(xintercept = as.numeric(as.Date(&quot;2016-02-19&quot;)),
+    color = &quot;white&quot;, size = 2, lty = 2) + 
+    ylab(&quot;Stock Price&quot;)
+</code></pre>
+
+<p><img src="../early_trend_detection_images/plot1.png" class="img-responsive" style="display: block; margin: auto;" /></p>
+
+<p>Next let&rsquo;s just look at the first 50 days to see if there is a pattern associated with positve/negative trends. The dotted white line indicates the point at which we make our prediction regarding where we think the stock will go.</p>
+
+<pre><code>ggplot(trend_patterns, aes(x = date, y = value, color = class)) +
+    geom_point(alpha = 0.1) + stat_smooth(se = FALSE) +
+    scale_color_manual(values = pc) + theme_monokai_full() +
+    my_plot_theme() + ylab(&quot;Stock Price&quot;)
+</code></pre>
+
+<p><img src="../early_trend_detection_images/plot2.png" class="img-responsive" style="display: block; margin: auto;" /></p>
+
+<p>In this case, stocks that initially go up, drift down, and then flatten out all trend positively. In contrast, stocks that have declined and then increased from days 30-50 trend downward from days 51-100. Thus there appears to be a common pattern that precedes an sustained increase or decrease in price. Based on this information, let&rsquo;s introduce our new stock &ndash; the &ldquo;target trend&rdquo; &ndash; that we only have pricing information for days 1-50.</p>
+
+<pre><code>sample_trend_pre = rbind(data.frame(date = pre_date_range[1:pre_period],
+value = cos(seq(0, 10, 0.1))[(pre_period + 1):100] + rnorm(pre_period, 0, 0.7),
+class = &quot;target_trend&quot;),
+data.frame(date = rep(NA, 50),
+value = rep(NA, 50),
+class = &quot;target_trend&quot;))
+trend_patterns_ex = rbind(sample_trend_pre, trend_patterns_ex)             
+pc = c(&quot;white&quot;, pc)
+
+ggplot(trend_patterns_ex, aes(x = date, y = value, color = class)) + 
+    geom_point(alpha = 0.1) + geom_line(stat = &quot;smooth&quot;,
+    method = &quot;gam&quot;,
+    formula = y ~ s(x),
+    size = 2,
+    alpha = 0.2
+    ) + 
+    scale_color_manual(values = pc) + theme_monokai_full() + 
+    my_plot_theme() + 
+    geom_vline(xintercept = as.numeric(as.Date(&quot;2016-02-19&quot;)),
+    color = &quot;white&quot;, size = 2, lty = 2) + 
+    stat_smooth(data = sample_trend_pre, aes(x = date, y = value), color = &quot;white&quot;,
+    se = FALSE, size = 3, lty = 4) + 
+    theme(legend.position = &quot;none&quot;) + 
+    ylab(&quot;Stock Price&quot;)
+</code></pre>
+
+<p><img src="../early_trend_detection_images/plot3.png" class="img-responsive" style="display: block; margin: auto;" /></p>
+
+<p>Let&rsquo;s filter our dataset to days 1-50 and see how many of the nearest neighbors for our target trend are positive/negative. In this case K is set to 5.</p>
+
+<pre><code>trend_patterns_test_time = trend_patterns_ex %&gt;% 
+                           dplyr::filter(date &lt;= as.Date(&quot;2016-02-19&quot;)) %&gt;% 
+                           dplyr::mutate(class = as.character(class))
+
+trend_pattern_matches = MarketMatching::best_matches(data = trend_patterns_test_time,
+                                                     id_variable = &quot;class&quot;,
+                                                     date_variable = &quot;date&quot;,
+                                                     matching_variable = &quot;value&quot;,
+                                                     parallel = TRUE,
+                                                     warping_limit = 3,
+                                                     matches = 5,
+                                                     start_match_period = min(trend_patterns_test_time$date),
+                                                     end_match_period = max(trend_patterns_test_time$date)
+)
+
+best_matches = trend_pattern_matches$BestMatches %&gt;% 
+               dplyr::filter(class == 'target_trend')
+
+print(best_matches)
+</code></pre>
+
+<p><img src="../early_trend_detection_images/plot4.png" class="img-responsive" style="display: block; margin: auto;" /></p>
+
+<p>Let&rsquo;s focus on the <strong>BestControl</strong> field. All 5 of the most similar time-series to our target time-series have a positive label. Thus we would predict that our target time-series will trend positively from days 51-100, based on its pattern from days 1-50. If all 5 of our best matches were stocks that negatively trended, then we would make the opposite prediction. I told you this method is simple! However, let&rsquo;s see if how we feel the same way after working with real-world stock data, which we&rsquo;ll introduce in the next section.</p>
+
+<h3 id="predicting-stocks">Predicting stocks</h3>
+
+<p>We are trying to answer the following question: Is there a pattern of daily closing prices that precedes a ~90 day increase in the price of a stock? For example, maybe a small increase in the first 30 days is often followed by a big 90 day upward climb. Or maybe stocks that gradually dip for a period of 30 days are more likely to rebound over the subsequent 90 days. In essence, are there a collection of 30 day patterns that come before an upward trend in a stock&rsquo;s price? Trying to formalize such patterns with a set of parameters is difficult, given all of the different patterns that could be associated with a positive trend. This is why we are using the approach outlined above.</p>
+
+<p>Let&rsquo;s collect the stock data. We&rsquo;ll initally scrape the symbols from Wikipedia and then pull the actual closing prices via the <code>BatchGetSymbols</code> package. This may take a few minutes.</p>
+
+<pre><code>
 url = &quot;https://en.wikipedia.org/wiki/List_of_S%26P_500_companies&quot;
 
 data = url %&gt;%
-  read_html() %&gt;%
-  html_nodes(xpath='//*[@id=&quot;mw-content-text&quot;]/table[1]') %&gt;%
-  html_table() %&gt;% 
-  data.frame()
-  
+       read_html() %&gt;%
+       html_nodes(xpath='//*[@id=&quot;mw-content-text&quot;]/div/table[1]') %&gt;%
+       html_table() %&gt;% 
+       data.frame()
+
 tickers = data[,1]
-</code></pre>
 
-<p>Now we have a vector of all 500 companies. This will serve as an input to the next part, which is collecting the historical daily closing prices for all of the stocks. The library to help us do it is <code>BatchGetSymbols</code>. Let&rsquo;s specify a starting and ending date across which we&rsquo;ll collect the closing prices. I picked 2015-01-01 and the 200 days following. One thing to note is that the stock market is closed on weekends and holidays, so it&rsquo;s OK to have days missing (i.e., less than 200 days).</p>
-
-<pre><code class="language-r">train_period_begin = as.Date(&quot;2015-01-01&quot;)
+train_period_begin = as.Date(&quot;2015-01-01&quot;)
 train_period_end = max(seq(train_period_begin, by = &quot;day&quot;, length.out = 200))
-
 stock_data_train = BatchGetSymbols(tickers = tickers,
-                                   first.date = train_period_begin,
-                                   last.date = train_period_end)
+first.date = train_period_begin,
+last.date = train_period_end)
 </code></pre>
 
-<p>Everything worked. Now that we have our data, let&rsquo;s go into a little more detail around how we&rsquo;ll set this problem up. First, let&rsquo;s revisit the original question: Can we take 30 days of closing prices and classify where the stock will trend (up, neutral|down) over the next 90 days. We&rsquo;ve limited the number of classes in this example to 2 for the sake of simplicity.</p>
+<pre><code>qa_df = stock_data_train$df.control %&gt;% 
+        dplyr::filter(total.obs &gt; 0) %&gt;% 
+        dplyr::select(ticker)
 
-<p>The plots below illustrate what this looks like.</p>
+stock_data_train = stock_data_train$df.tickers %&gt;%
+                   dplyr::select(ticker, ref.date, price.close) %&gt;% 
+                   dplyr::inner_join(qa_df)
+</code></pre>
 
-<h4 id="positive-trend">Positive Trend</h4>
+<p><img src="../early_trend_detection_images/plot5.png" class="img-responsive" style="display: block; margin: auto;" /></p>
 
-<h4 id="neutral-negative-trend">Neutral|Negative Trend</h4>
+<p>Data looks ready to go! Next let&rsquo;s select the stocks that will comprise our training/test sets. We&rsquo;ll do a <sup>90</sup>&frasl;<sub>10</sub> split. Note that the test stocks will be used a little later.</p>
 
-<p>We&rsquo;ll consider this our &lsquo;training&rsquo; data set, even though we aren&rsquo;t actually training a model. Take the first 30 days of each time series, and then add a label to each: <em>postive</em> or <em>neutral|negative</em>.</p>
+<pre><code>n_dates = length(unique(stock_data_train$ref.date))
+n_days_train = 30
+train_dates = unique(stock_data_train$ref.date)[1:n_days_train]
+n_days_label = n_dates - n_days_train
+label_dates = unique(stock_data_train$ref.date)[(n_days_train + 1): n_dates]
+
+set.seed(123)
+pct_stocks_in_test = 0.1
+
+# hold these out 
+test_stock_symbols = sample(tickers, size = floor(length(tickers) * pct_stocks_in_test), replace = FALSE)
+train_stock_symbols = setdiff(tickers, test_stock_symbols)
+stock_data_train_f = stock_data_train[stock_data_train$ticker %in% train_stock_symbols,]
+stock_data_train_30 = stock_data_train_f[stock_data_train_f$ref.date %in% train_dates,]
+stock_data_train_label = stock_data_train_f[stock_data_train_f$ref.date %in% label_dates,]
+</code></pre>
+
+<p>Now that we have our data and it&rsquo;s all cleaned up, let&rsquo;s discuss how we&rsquo;ll determine the labels for our &ldquo;positive&rdquo; and &ldquo;flat|negative&rdquo; time series.</p>
+
+<h3 id="defining-a-trend">Defining a trend</h3>
+
+<p>We could plot out every time series and label them by hand but <a href="https://www.youtube.com/watch?v=KwEdu1mTMlc">aint nobody got time for that</a>. Instead, we&rsquo;ll use two automated approaches:</p>
+
+<ol>
+<li>Linear Regression (LR)</li>
+<li>Mann-Kendall test (MK)</li>
+</ol>
+
+<p>The input for both methods will be an index from 31-120. We are interested in whether the coefficient for this index is significant as well as its overall direction. LR takes the average slope, while the MK approach takes the median slope. Note that we might be violating the assumption that our data points are uncorrelated with one another. There are ways around this (e.g., block bootstrapping), but for the sake of simplicity we&rsquo;ll assume an absence of serial correlation. Let&rsquo;s run both tests and gather the results.</p>
+
+<pre><code># 1. use mann-kendall to determine class 
+trend_df_mk = stock_data_train_label %&gt;% 
+              dplyr::group_by(ticker) %&gt;% 
+              dplyr::do(trend_data = MannKendall(ts(.$price.close))) %&gt;% 
+              data.frame()
+
+trend_df_mk$tau = unlist(lapply(trend_df_mk$trend_data, function(x) x[[1]][1]))
+trend_df_mk$p_value = unlist(lapply(trend_df_mk$trend_data, function(x) x[[2]][1]))
+
+# add class according to p-value &amp; tau coefficient
+trend_df_mk_class = trend_df_mk %&gt;% 
+                    dplyr::select(ticker, tau, p_value) %&gt;% 
+                    dplyr::mutate(trend_class_mk = ifelse(p_value &lt; 0.05 &amp; tau &gt; 0, &quot;positive&quot;, &quot;neutral|negative&quot;)) %&gt;% 
+                    dplyr::select(ticker, trend_class_mk)
+
+# 2. use linear model to determine class
+
+trend_df_lm = stock_data_train_label %&gt;% 
+              dplyr::group_by(ticker) %&gt;% 
+              dplyr::mutate(day_index = row_number()) %&gt;% 
+              dplyr::do(tidy(lm(price.close ~ day_index, data = .))) %&gt;% 
+              data.frame()
+              
+# add class according to p-value &amp; beta coefficient
+trend_df_lm_class = trend_df_lm %&gt;% 
+                    dplyr::filter(term == 'day_index') %&gt;% 
+                    dplyr::mutate(trend_class_lm = ifelse(p.value &lt; 0.05 &amp; estimate &gt; 0, 
+                    &quot;positive&quot;, &quot;neutral|negative&quot;)) %&gt;% 
+                    dplyr::select(ticker, trend_class_lm)
+
+final_trend_df_class = dplyr::inner_join(trend_df_mk_class, trend_df_lm_class)
+</code></pre>
+
+<p><img src="../early_trend_detection_images/plot6.png" class="img-responsive" style="display: block; margin: auto;" /></p>
+
+<p>The two methods produced the same classification for most of the stocks. However, let&rsquo;s examine a few cases where they differ.</p>
+
+<pre><code>diff_trend_class = final_trend_df_class %&gt;% 
+dplyr::filter(trend_class_mk != trend_class_lm)
+
+cvs_stock = stock_data_train_label %&gt;% 
+dplyr::filter(ticker == 'CVS')
+
+color_values = c(&quot;#D9D9D9&quot;, &quot;#33C5F3&quot;, &quot;#F16C62&quot;, &quot;#A8CE38&quot;, &quot;#FCB51E&quot;, &quot;#F92672&quot;)
+
+ggplot(cvs_stock, aes(x = ref.date, y = price.close)) + 
+        geom_point(size = 2, color = color_values[1]) + 
+        geom_line(size = 2, color = color_values[1]) + 
+        theme_monokai_full() + 
+        my_plot_theme() + 
+        ylab(&quot;Closing Price&quot;) + xlab(&quot;Date&quot;)
+</code></pre>
+
+<p><img src="../early_trend_detection_images/plot7.png" class="img-responsive" style="display: block; margin: auto;" /></p>
+
+<p>The price for this stock goes down but then trends upward. The LR indicates a positive trend while the MK test indicates a neutral|negative. The LR is taking the average, and the average is positive overall, given that the stock ended up higher than when it started. In contrast, the MK tests whether there is a monotonically increasing or decreasing trend over time. It is considering the ratio of positve and negative differences across time. Since we went down and then back up, there will be a similiar number of positive/negative differences, hence the neutral|negative classification.</p>
+
+<p>Let&rsquo;s consider a seperate example.</p>
+
+<pre><code>ni_stock = stock_data_train_label %&gt;% 
+           dplyr::filter(ticker == 'NI')
+
+ggplot(ni_stock, aes(x = ref.date, y = price.close)) + 
+    geom_point(size = 2, color = color_values[1]) + 
+    geom_line(size = 2, color = color_values[1]) + 
+    theme_monokai_full() + 
+    my_plot_theme() + 
+    ylab(&quot;Closing Price&quot;) + xlab(&quot;Date&quot;)
+</code></pre>
+
+<p><img src="../early_trend_detection_images/plot8.png" class="img-responsive" style="display: block; margin: auto;" /></p>
+
+<p>This time series produced the exact oppositive pattern: The MK test classified the trend as positive, while the LR produced a neutral|negative classification. This stock trended upward for most of the time-period, and then crashed the last few days in July. Those final few points have a lot of leverage on the coefficient in the linear model, while the MK test is relativley unaffected. In this case I&rsquo;d say it&rsquo;s a negatively trending stock, but arguments for either classification could be made.</p>
+
+<p>Stocks such as these are why we are evaluating 2 seperate viewpoints. We want to make sure that the trend is somewhat definitive. If there is disagreement amongst the methods, we are going to place a stock in the &ldquo;neutral|negative&rdquo; class. In a more formal analytical setting, we would spend more time testing whether this approach is valid. However, for the sake of illustration, we&rsquo;re going to use a simple, heuristic based approach, such that any classification disagreements amongst the 2 methods will result in a &ldquo;neutral|negative&rdquo; classification. Let&rsquo;s update all of the instances where a disagreement occurred.</p>
+
+<pre><code>final_trend_df_class = final_trend_df_class %&gt;% 
+                        dplyr::mutate(final_class = ifelse(trend_class_mk != trend_class_lm, 'neutral|negative',
+                        trend_class_mk)) %&gt;% 
+                        dplyr::select(ticker, final_class)
+</code></pre>
+
+<p>Finally let&rsquo;s examine the distribution of our classes.</p>
+
+<pre><code>print(table(final_trend_df_class$final_class))
+print(&quot;----------------------------------&quot;)
+print(paste0(&quot;PERCENT OF STOCKS POSITIVE: &quot;,
+      round(table(final_trend_df_class$final_class)[[2]]/nrow(final_trend_df_class) * 100, 0),
+      &quot;%&quot;)
+      )
+## 
+## neutral|negative         positive 
+##              279              167
+
+## [1] &quot;PERCENT OF STOCKS POSITIVE: 37%&quot;
+</code></pre>
+
+<p>There are about twice as many time series in the negative|neutral class relative to the positive class. This isn&rsquo;t a huge imbalance, but it might skew our classifications toward the neutral|negative class. Let&rsquo;s downsample our neutral|negative stocks so we have an equal number of positive and neutral|negative classes in the training set.</p>
+
+<pre><code>set.seed(123)
+final_trend_df_class = final_trend_df_class %&gt;% 
+                       dplyr::filter(final_class == 'neutral|negative') %&gt;% 
+                       dplyr::sample_n(167) %&gt;% 
+                       dplyr::bind_rows(
+                       final_trend_df_class %&gt;% 
+                       dplyr::filter(final_class == 'positive'))
+                       
+print(table(final_trend_df_class$final_class))
+print(&quot;----------------------------------&quot;)
+print(paste0(&quot;PERCENT OF STOCKS POSITIVE: &quot;,round(table(final_trend_df_class$final_class)[[2]]/nrow(final_trend_df_class) * 100, 0), &quot;%&quot;))
+## 
+## neutral|negative         positive 
+##              167              167
+
+## [1] &quot;PERCENT OF STOCKS POSITIVE: 50%&quot;
+</code></pre>
+
+<p>Perfect. Now we have even numbers.</p>
+
+<p>I&rsquo;m going to pull out 5 stocks at random that positively trended to illustrate what our data set looks like.</p>
+
+<pre><code>stock_data_train_f = dplyr::inner_join(stock_data_train_f, final_trend_df_class) %&gt;% 
+                     dplyr::filter(ticker %in% final_trend_df_class$ticker)
+
+positive_ex = stock_data_train_f %&gt;% 
+              dplyr::filter(final_class == 'positive')
+
+pos_5_stocks = sample(unique(positive_ex$ticker), 5)
+
+positive_ex1 = positive_ex[positive_ex$ticker %in% pos_5_stocks,]
+positive_ex1$time.period = ifelse(positive_ex1$ref.date %in% train_dates, &quot;pre&quot;, &quot;post&quot;)
+
+ggplot(positive_ex1, aes(x = ref.date, y = price.close, color = time.period)) + 
+    geom_point(alpha = 0.2) + stat_smooth(se = FALSE, size = 2) + 
+    facet_grid(. ~ ticker) + 
+    theme_monokai_full() + 
+    my_plot_theme() + 
+    theme(axis.text.x = element_text(size = 14)) + 
+    xlab(&quot;Date&quot;) + ylab(&quot;Closing Price&quot;) + 
+    scale_color_manual(values = c(color_values[1:2]))
+</code></pre>
+
+<p><img src="../early_trend_detection_images/plot9.png" class="img-responsive" style="display: block; margin: auto;" /></p>
+
+<h3 id="trend-detection-performance">Trend Detection Performance</h3>
+
+<p>Now that we&rsquo;ve assigned a label to each of the stocks in our training set, we&rsquo;ll download the test stocks. These data points will come from the following year during the same time period (i.e., Jan/Feb 2016).</p>
+
+<pre><code>test_period_begin = as.Date(&quot;2016-01-01&quot;)
+
+test_period_end = max(seq(test_period_begin, by = &quot;day&quot;, length.out = 200))
+
+stock_data_test = BatchGetSymbols(tickers = test_stock_symbols,
+                                  first.date = test_period_begin,
+                                  last.date = test_period_end)
+
+stock_data_test_qa = stock_data_test$df.control %&gt;% 
+                     dplyr::filter(total.obs == 135) %&gt;% 
+                     dplyr::select(ticker)
+
+test_30_days = unique(stock_data_test$df.tickers$ref.date)[1:30]
+
+test_df = dplyr::inner_join(stock_data_test$df.tickers, stock_data_test_qa) %&gt;% 
+          dplyr::select(ticker, ref.date, price.close)
+
+test_df_30 = test_df %&gt;% 
+             dplyr::filter(ref.date %in% test_30_days) %&gt;% 
+             dplyr::mutate(ticker_class = 'testing',
+                           final_class = 'unknown')
+</code></pre>
+
+<p>Next we&rsquo;ll union our test and training datasets together. We&rsquo;ll also change the time-stamps in our testing data set, despite the fact that our training data is from 2015 and our testing data is from 2016. We are going to initially set K to 10. The reason why we&rsquo;re using such a high number is that some of the test stocks will match with other test stocks. Obviously these wont have labels, so we only want to consider matches with training stocks. This section will take a few minutes to run, so now would be a good time to heat up a hot pocket if you&rsquo;re hungry.</p>
+
+<pre><code># change the dates to match with those in the reference df
+test_df_30$ref.date = rep(train_dates, length(unique(test_df_30$ticker)))
+
+# first 30 days with class
+train_test_df_30 = stock_data_train_f %&gt;% 
+                   dplyr::filter(ref.date %in% train_dates) %&gt;% 
+                   dplyr::mutate(ticker_class = 'training') %&gt;% 
+                   dplyr::bind_rows(test_df_30)
+
+max_matches = 10
+
+ticker_matches = MarketMatching::best_matches(data = train_test_df_30,
+                                              id_variable = &quot;ticker&quot;,
+                                              date_variable = &quot;ref.date&quot;,
+                                              matching_variable = &quot;price.close&quot;,
+                                              parallel = TRUE,
+                                              warping_limit = 3,
+                                              matches = max_matches,
+                                              start_match_period = min(train_test_df_30$ref.date),
+                                              end_match_period = max(train_test_df_30$ref.date)
+)
+
+top_10_matches = ticker_matches$BestMatches
+
+# remove any stocks whose matches are in the test group
+n_matches = 5
+
+test_stock_matches = top_10_matches %&gt;%
+                     dplyr::filter(ticker %in% test_stock_symbols) %&gt;%
+                     dplyr::filter(!(BestControl %in% test_stock_symbols)) %&gt;%
+                     dplyr::group_by(ticker) %&gt;%
+                     dplyr::top_n(-n_matches, rank) %&gt;%
+                     data.frame()
+</code></pre>
+
+<p><img src="../early_trend_detection_images/plot10.png" class="img-responsive" style="display: block; margin: auto;" /></p>
+
+<p>This readout has the same interpretation as the initial example. The stocks in our <code>ticker</code> column are in the test set, while those in the <code>BestControl</code> column are in our training set. Given that we are interested in whether a stock is going to trend upward (i.e., is this a stock we should buy?), we&rsquo;re going to focus on our classification rate for positive stocks. We&rsquo;ll use <strong>3</strong> positive matches as our cutoff; that is, if at least 3 of the 5 matches in our training dataset trended positively, then we&rsquo;ll predict an upward trajectory over the next 90 days, otherwise will assign a neutral|negative label.</p>
+
+<pre><code>n_positive = 3
+
+prediction_df = final_trend_df_class %&gt;% 
+                dplyr::rename(BestControl = ticker) %&gt;% 
+                dplyr::inner_join(test_stock_matches %&gt;% 
+                dplyr::select(ticker, BestControl)) %&gt;% 
+                dplyr::rename(test_ticker = ticker,
+                              best_control_class = final_class) %&gt;% 
+                dplyr::arrange(test_ticker) %&gt;% 
+                dplyr::mutate(class_numeric = ifelse(best_control_class == 'positive', 1, 0))
+
+final_pred = prediction_df %&gt;% 
+             dplyr::group_by(test_ticker) %&gt;% 
+             dplyr::summarise(n_pos = sum(class_numeric)) %&gt;% 
+             data.frame() %&gt;% 
+             dplyr::mutate(predicted_class = ifelse(n_pos &gt;= n_positive, 'positive',
+                                                                 'neutral|negative'))
+</code></pre>
+
+<p>We have now generated our predictions. Since we already know what happened over those 90 days, let&rsquo;s consider the number of time series we correctly classified as positive.</p>
+
+<pre><code>test_class_days = unique(stock_data_test$df.tickers$ref.date)[31:length(unique(stock_data_test$df.tickers$ref.date))]
+test_df_class = test_df %&gt;% 
+                dplyr::filter(ref.date %in% test_class_days)
+
+trend_df_mk_test = test_df_class %&gt;% 
+                   dplyr::group_by(ticker) %&gt;% 
+                   dplyr::do(trend_data = MannKendall(ts(.$price.close))) %&gt;% 
+                   data.frame()
+#
+#
+trend_df_mk_test$tau = unlist(lapply(trend_df_mk_test$trend_data, function(x) x[[1]][1]))
+trend_df_mk_test$p_value = unlist(lapply(trend_df_mk_test$trend_data, function(x) x[[2]][1]))
+
+trend_df_mk_class = trend_df_mk_test %&gt;% 
+                    dplyr::select(ticker, tau, p_value) %&gt;% 
+                    dplyr::mutate(trend_class_mk = ifelse(p_value &lt; 0.05 &amp; tau &gt; 0, &quot;positive&quot;, &quot;neutral|negative&quot;)) %&gt;% 
+                    dplyr::select(ticker, trend_class_mk)
+# linear model
+
+trend_df_lm_test =  test_df_class %&gt;% 
+                    dplyr::group_by(ticker) %&gt;% 
+                    dplyr::mutate(day_index = row_number()) %&gt;% 
+                    dplyr::do(tidy(lm(price.close ~ day_index, data = .))) %&gt;% 
+                    data.frame()
+
+trend_df_lm_class_test = trend_df_lm_test %&gt;% 
+                         dplyr::filter(term == 'day_index') %&gt;% 
+                         dplyr::mutate(trend_class_lm = ifelse(p.value &lt; 0.05 &amp; estimate &gt; 0, 
+                                                               &quot;positive&quot;, &quot;neutral|negative&quot;)) %&gt;% 
+                         dplyr::select(ticker, trend_class_lm)
+
+
+final_trend_df_class_test = dplyr::inner_join(trend_df_mk_class, trend_df_lm_class_test)
+
+final_trend_df_class_test = final_trend_df_class_test %&gt;% 
+                            dplyr::mutate(final_class = ifelse(trend_class_mk != trend_class_lm, 
+                                          'neutral|negative',
+                                           trend_class_mk)) %&gt;% 
+                            dplyr::select(ticker, final_class)
+
+eval_df = final_trend_df_class_test %&gt;% 
+          dplyr::rename(test_ticker = ticker, 
+                        actual_class = final_class) %&gt;% 
+          dplyr::inner_join(final_pred) %&gt;% 
+          dplyr::select(test_ticker, actual_class, predicted_class, n_pos)
+</code></pre>
+
+<p>Again let&rsquo;s check out the first few rows.</p>
+
+<p><img src="../early_trend_detection_images/plot11.png" class="img-responsive" style="display: block; margin: auto;" /></p>
+
+<p>And drumroll please&hellip;.</p>
+
+<pre><code>pct_pos_crt = eval_df %&gt;% 
+              dplyr::filter(actual_class == 'positive') %&gt;% 
+              dplyr::filter(actual_class == predicted_class) %&gt;% 
+              nrow()/nrow(eval_df)
+
+print(paste0(&quot;PERCENT POSITIVE STOCKS CORRECTLY CLASSIFIED: &quot;, round(pct_pos_crt * 100, 0), &quot;%&quot;))
+
+## [1] &quot;PERCENT POSITIVE STOCKS CORRECTLY CLASSIFIED: 44%&quot;
+</code></pre>
+
+<p>An accuracy rate of 44% is an improvement over chance if we assume an equivalent distribution of positve, negative, and flat trends. There are myriad reasons why the classification accuracy wasn&rsquo;t so hot. Here are a few that come to mind.</p>
+
+<ul>
+<li>A time-period of 30 days was too short</li>
+<li>The dynamics that lead to positive trends in our training set were different than those in our test set</li>
+<li>The assumptions used to classify different stocks weren&rsquo;t valid</li>
+<li>K was too high/low</li>
+<li>This approach just doesn&rsquo;t work with this data.</li>
+</ul>
+
+<p>Indeed, that last point is crucial. There are some things in life that cannot be predicted, as the number of factors that influence the thing we are trying to predict are too great. This is one advantage of using a non-parametric approach, in that you don&rsquo;t have to quantify each of the factors with a parameter &ndash; you just let the data decide. However, the assumption that past patterns and relationships will persist in the future still holds. In our case, if the patterns that precede a positive trend in the past are different than those in the future, then you can&rsquo;t use historical data (like we did here) as a basis for predictions. This assumption is hotly contested in the world of economics when it comes to predicting stocks. Some believe there are cyclical patterns that precede a downward or upward trend in price, while others believe that the stock market is simply a random walk &ndash; it cannot be predicted. I don&rsquo;t have the answer; if I did, I&rsquo;d start a hedge fund, make lots of money, then buy my own soft-serve ice cream machine. I&rsquo;m pretty sure that&rsquo;s what we&rsquo;d all do.</p>
+
+<p>Although the method outlined here didn&rsquo;t fare well in predicting stocks, similar methods have shown promise detecting trends in other areas, such as social media (see <a href="https://snikolov.wordpress.com/2012/11/14/early-detection-of-twitter-trends/">here</a>). I hope you enjoyed reading this post. If you have any suggestions for alternate approaches to trend detection, I&rsquo;d love to hear!</p>
          
       </div>
     </div>
@@ -156,15 +673,15 @@ stock_data_train = BatchGetSymbols(tickers = tickers,
           </div>
       </div>
   </div>
-  <script src="/js/jquery.min.js"></script>
-<script src="/js/bootstrap.min.js"></script>
-<script src="/js/jquery.cookie.js"> </script>
-<script src="/js/ekko-lightbox.js"></script>
-<script src="/js/jquery.scrollTo.min.js"></script>
-<script src="/js/masonry.pkgd.min.js"></script>
-<script src="/js/imagesloaded.pkgd.min.js"></script>
-<script src="/js/owl.carousel.min.js"></script>
-<script src="/js/front.js"></script>
+  <script src="https://markleboeuf.github.io/js/jquery.min.js"></script>
+<script src="https://markleboeuf.github.io/js/bootstrap.min.js"></script>
+<script src="https://markleboeuf.github.io/js/jquery.cookie.js"> </script>
+<script src="https://markleboeuf.github.io/js/ekko-lightbox.js"></script>
+<script src="https://markleboeuf.github.io/js/jquery.scrollTo.min.js"></script>
+<script src="https://markleboeuf.github.io/js/masonry.pkgd.min.js"></script>
+<script src="https://markleboeuf.github.io/js/imagesloaded.pkgd.min.js"></script>
+<script src="https://markleboeuf.github.io/js/owl.carousel.min.js"></script>
+<script src="https://markleboeuf.github.io/js/front.js"></script>
 
 </body>
 </html>

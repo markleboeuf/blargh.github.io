@@ -2,22 +2,22 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Forecasting on Mark LeBoeuf</title>
-    <link>/tags/forecasting/</link>
+    <link>https://markleboeuf.github.io/tags/forecasting/</link>
     <description>Recent content in Forecasting on Mark LeBoeuf</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>&amp;copy;2016 Mark LeBoeuf</copyright>
     <lastBuildDate>Sun, 12 Mar 2017 19:41:01 +0530</lastBuildDate>
     
-	<atom:link href="/tags/forecasting/index.xml" rel="self" type="application/rss+xml" />
+	<atom:link href="https://markleboeuf.github.io/tags/forecasting/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
       <title>Time Series Outlier Detection</title>
-      <link>/portfolio/outlier_detection/</link>
+      <link>https://markleboeuf.github.io/portfolio/outlier_detection/</link>
       <pubDate>Sun, 12 Mar 2017 19:41:01 +0530</pubDate>
       
-      <guid>/portfolio/outlier_detection/</guid>
+      <guid>https://markleboeuf.github.io/portfolio/outlier_detection/</guid>
       <description>&lt;p&gt;This post covers a straightforward approach to detecting and replacing outliers in time series.&lt;/p&gt;
 
 &lt;p&gt;&lt;/p&gt;</description>
@@ -25,19 +25,21 @@
     
     <item>
       <title>Early Trend Detection</title>
-      <link>/portfolio/early_trend_detection/</link>
+      <link>https://markleboeuf.github.io/portfolio/early_trend_detection/</link>
       <pubDate>Mon, 01 May 2017 19:41:01 +0530</pubDate>
       
-      <guid>/portfolio/early_trend_detection/</guid>
-      <description>&lt;p&gt;&lt;/p&gt;</description>
+      <guid>https://markleboeuf.github.io/portfolio/early_trend_detection/</guid>
+      <description>&lt;p&gt;Identifying a trend before it starts is a major area of focus in the analytics realm, because it can inform key business decisions yet remains extremely difficult. This post outlines one trend-detection method in an effort to predict where a stock&amp;rsquo;s price will go in the future.&lt;/p&gt;
+
+&lt;p&gt;&lt;/p&gt;</description>
     </item>
     
     <item>
       <title>Establishing Causality with Counterfactual Prediction</title>
-      <link>/portfolio/counterfactual_prediction/</link>
+      <link>https://markleboeuf.github.io/portfolio/counterfactual_prediction/</link>
       <pubDate>Mon, 01 May 2017 19:41:01 +0530</pubDate>
       
-      <guid>/portfolio/counterfactual_prediction/</guid>
+      <guid>https://markleboeuf.github.io/portfolio/counterfactual_prediction/</guid>
       <description>&lt;p&gt;Sometimes a controlled experiment isn&amp;rsquo;t an option yet you want to establish causality. This post outlines a method for quantifying the effects of an intervention via counterfactual predictions.&lt;/p&gt;
 
 &lt;p&gt;&lt;/p&gt;</description>

@@ -2,22 +2,22 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Multidplyr on Mark LeBoeuf</title>
-    <link>/tags/multidplyr/</link>
+    <link>https://markleboeuf.github.io/tags/multidplyr/</link>
     <description>Recent content in Multidplyr on Mark LeBoeuf</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>&amp;copy;2016 Mark LeBoeuf</copyright>
     <lastBuildDate>Thu, 12 Jan 2017 19:41:01 +0530</lastBuildDate>
     
-	<atom:link href="/tags/multidplyr/index.xml" rel="self" type="application/rss+xml" />
+	<atom:link href="https://markleboeuf.github.io/tags/multidplyr/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
       <title>Two Flavors of Parallel Simulation</title>
-      <link>/portfolio/two_flavors_of_parallelism/</link>
+      <link>https://markleboeuf.github.io/portfolio/two_flavors_of_parallelism/</link>
       <pubDate>Thu, 12 Jan 2017 19:41:01 +0530</pubDate>
       
-      <guid>/portfolio/two_flavors_of_parallelism/</guid>
+      <guid>https://markleboeuf.github.io/portfolio/two_flavors_of_parallelism/</guid>
       <description>&lt;p&gt;Tired of waiting around for your simulations to finish? Run them in parallel! This post covers two seperate ways to add parallelism to your R code.
 &lt;/p&gt;</description>
     </item>

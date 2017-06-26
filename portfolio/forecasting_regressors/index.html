@@ -7,18 +7,18 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="all,follow">
 <meta name="googlebot" content="index,follow,snippet,archive">
-<link rel="stylesheet" href="/css/bootstrap.min.css">
+<link rel="stylesheet" href="https://markleboeuf.github.io/css/bootstrap.min.css">
 <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Roboto:400,300,700,400italic">
-<link rel="stylesheet" href="/css/font-awesome.min.css">
-<link rel="stylesheet" href="/css/owl.carousel.css">
-<link rel="stylesheet" href="/css/owl.theme.css">
+<link rel="stylesheet" href="https://markleboeuf.github.io/css/font-awesome.min.css">
+<link rel="stylesheet" href="https://markleboeuf.github.io/css/owl.carousel.css">
+<link rel="stylesheet" href="https://markleboeuf.github.io/css/owl.theme.css">
 
 
-  <link href="/css/style.red.css" rel="stylesheet" id="theme-stylesheet">
+  <link href="https://markleboeuf.github.io/css/style.red.css" rel="stylesheet" id="theme-stylesheet">
 
 
-<link href="/css/custom.css" rel="stylesheet">
-<link rel="shortcut icon" href="/img/favicon.png">
+<link href="https://markleboeuf.github.io/css/custom.css" rel="stylesheet">
+<link rel="shortcut icon" href="https://markleboeuf.github.io/img/favicon.png">
 
 
 </head>
@@ -35,9 +35,9 @@
     <ul class="sidebar-menu">
       
       
-        <li><a href="/">Home</a></li>
+        <li><a href="https://markleboeuf.github.io/">Home</a></li>
       
-        <li><a href="/about/">About</a></li>
+        <li><a href="https://markleboeuf.github.io/about/">About</a></li>
       
     </ul>
     <p class="social">
@@ -100,9 +100,9 @@
 
 <h2 id="overview">Overview</h2>
 
-<p>Imagine it&rsquo;s January 1st, 2015 and the New England Patriots have made the playoffs yet again (sigh..). You run a webpage dedicated to Tom Brady and want to ensure you have enough servers ready to meet traffic to your website during the playoffs. Based on the past few years, you&rsquo;ve noticed that traffic during January and February increases when the patriots win their playoff games. Thus you need a traffic forecast for these two months in order to get an idea about how many people will visit your site.</p>
+<p>Imagine it&rsquo;s January 1st, 2015 and the New England Patriots have made the playoffs yet again. You run a webpage dedicated to Tom Brady and want to ensure you have enough servers ready to meet traffic to your website during the playoffs. Based on the past few years, you&rsquo;ve noticed that traffic during January and February increases when the patriots win playoff games. Thus you need a traffic forecast for these two months to determine how many people will visit your site.</p>
 
-<p>Additionally, you want quantify the effect of the number of playoff games won on monthly traffic. For example, what happens if the Patriots win two playoff games instead of one? Finally, you want an estimate of the probability of each of these scenarios unfolding&ndash;that is, the chances of winning 0, 1, 2, or all 3 playoff games. To achieve these objectives, we&rsquo;ll rely on several sources of data, incuding:</p>
+<p>Additionally, you want to quantify the effect of the number of playoff games won on monthly traffic. For example, what happens if the Patriots win two playoff games instead of one? Finally, you want an estimate of the probability of each of these scenarios unfolding&ndash;that is, the chances of winning 0, 1, 2, or all 3 playoff games. To achieve these objectives, we&rsquo;ll rely on the following sources of data:</p>
 
 <ul>
 <li>Month Level Internet Traffic</li>
@@ -110,11 +110,11 @@
 <li>Historical Betting Lines</li>
 </ul>
 
-<p>I&rsquo;ll go through the collection process associated with each of these data sets in in turn, and then we&rsquo;ll generate some forecasts!</p>
+<p>I&rsquo;ll go through the collection process associated with each and then we&rsquo;ll generate some forecasts!</p>
 
 <h3 id="collecting-month-level-traffic">Collecting Month Level Traffic</h3>
 
-<p>Let&rsquo;s get started by loading all of the libraries we&rsquo;ll need and setting our working directory.</p>
+<p>Let&rsquo;s start by loading the required libraries and setting our working directory.</p>
 
 <pre><code class="language-r">libs = c('wikipediatrend', 'dplyr', 'data.table', 'rvest', 'forecast', 'artyfarty', 'knitr', 'ggplot2', 'forcats', 'lazyeval')
 lapply(libs, require, character.only = TRUE)
@@ -143,11 +143,12 @@ page_views_clean &lt;- page_views_by_day %&gt;%
 
 <h3 id="collecting-historical-game-data">Collecting Historical Game Data</h3>
 
-<p>Next we&rsquo;ll collect data on how the New England Patriots have historically performed during the playoffs, and then join this with our page views data set. I&rsquo;m using the <code>rvest</code> package to scrape the outcomes (win or lose) of the patriots vs. each of the other 31 NFL teams.</p>
+<p>Next we&rsquo;ll collect data on how the New England Patriots have historically performed during the playoffs, and then join this with our page views data set. I&rsquo;m using the <code>rvest</code> package to scrape the outcomes (win or lose) of the Patriots vs. each of the other 31 NFL teams.</p>
 
 <pre><code class="language-r"> n_teams = 32
  team_name = &quot;new-england-patriots&quot;
  game_data = data.frame(NULL)
+ 
  for(team_number in as.character(seq(1, n_teams))){
    print(paste0(&quot;GATHERING DATA FOR TEAM: &quot;, team_number))
    url = paste0(&quot;http://www.footballdb.com/teams/nfl/&quot;,
@@ -175,7 +176,7 @@ game_data_clean = game_data %&gt;%
 
 <p><img src="../forecasting_regressors_images/table2b.png" class="img-responsive" style="display: block; margin: auto;" /></p>
 
-<p>Overall looks pretty good but we still have some cleaning to do. What we want from this data are the dates of the playoff games and their outcome. Luckily there is an asterik delineating regular season games from playoff games, and we&rsquo;ll use this piece of information to identify the playoff games.</p>
+<p>Overall looks pretty good but we still have some cleaning to do. What we want here are the dates of the playoff games and their outcomes. Luckily there is an asterik delineating regular season games from playoff games, and we&rsquo;ll use this symbol to identify the playoff games.</p>
 
 <pre><code class="language-r">game_data_outcome = game_data_clean %&gt;% 
                     dplyr::mutate(date_length = nchar(
@@ -293,9 +294,9 @@ ggplot(train_df_final, aes(x = month_max_date, y = monthly_page_views/1e3)) +
 
 <p>The above plot suggests that playoff games/wins do relate to page views. Now we&rsquo;ll do some validation work to see if including this information as an external regressor actually improves our forecasts.</p>
 
-<h3 id="model-selection-and-validation">Model Selection And Validation</h3>
+<h3 id="model-selection-and-validation">Model Selection and Validation</h3>
 
-<p>Since the period we want to forecast for is Jan/Feb 2015, we&rsquo;ll hold out the two months of traffic results from Jan/Feb 2014 as a way to identify which inputs will likely yield the most accurate forecasts. We will specify an ARIMA model with a single external regressor (games won and games played), and compare the results on our validation set against an ARIMA model that relies on history alone.</p>
+<p>Since the period we want to forecast is Jan/Feb 2015, we&rsquo;ll hold out the two months of traffic results from Jan/Feb 2014 as a way to identify which inputs will likely yield the most accurate forecasts. We will specify an ARIMA model with a single external regressor (games won and games played), and compare the results on our validation set against an ARIMA model that relies on history alone.</p>
 
 <pre><code class="language-r"># filter data until last year and create training and validation time periods
 
@@ -348,11 +349,11 @@ forecast_df = rbind(arima_no_xreg_f, arima_games_played_f, arima_games_won_f) %&
 
 <p><img src="../forecasting_regressors_images/table4b.png" class="img-responsive" style="display: block; margin: auto;" /></p>
 
-<p>Now we can compare our predictions against what actually happened. There are a number of ways to measure error in forecasting, and in this case we&rsquo;ll use the Mean Average Percent Error (MAPE), which is calculated as follows:</p>
+<p>Now we can compare our predictions against what actually happened. There are a variety of ways to measure error in forecasting, and in this case we&rsquo;ll use the Mean Average Percent Error (MAPE), which is calculated as follows:</p>
 
 <p><img src="../forecasting_regressors_images/mape_equation.png" class="img-responsive" style="display: block; margin: auto;" /></p>
 
-<p>Where e<sub>t</sub> is the difference between the predicted and actual and y<sub>t</sub> is our actual. As with all error metrics, there are pros and cons to quantifying error with MAPE. The main advantage is ease of interpretation. Telling someone &ldquo;our forecasts were off by 50%&rdquo; is easier than saying &ldquo;our forecasts were off by 10,458 units&rdquo;. The main disadvantage is that the scale on which your calculating your error matters. For example, a 10% miss on 10 units (1) is a lot smaller than a 10% MAPE on 100,000 units (10K), yet they are treated the same. Additionally, having a small value in the denominator can make a forecast look much worse than it actually is. So in short, if you are working with small quantities, use a different error metric. The quantities in this example are far from zero, so MAPE serves as a simple way to communicate forecasting error. Let&rsquo;s compare our MAPEs between the forecasting approaches</p>
+<p>Where e<sub>t</sub> is the difference between the predicted and actual and y<sub>t</sub> is our actual. As with all error metrics, there are pros and cons to quantifying error with MAPE. The main advantage is ease of interpretation. Telling someone &ldquo;our forecasts were off by 50%&rdquo; is easier than saying &ldquo;our forecasts were off by 10,458 units&rdquo;. The main disadvantage is that the scale on which your calculating your error matters. For example, a 10% miss on 10 units (1) is a lot smaller than a 10% MAPE on 100,000 units (10K) yet they are treated equally. Additionally, having a small value in the denominator can make a forecast look much worse than it actually is. Therefore, if you are working with small quantities, I&rsquo;d advise using a different error metric. The quantities in this example are far from zero, so MAPE serves as a simple way to convey forecasting error. Let&rsquo;s compare our MAPEs between the different forecasting inputs.</p>
 
 <pre><code class="language-r">calcMape = function(predicted_amt, actual_amt){
                     return(round(mean(abs(predicted_amt - actual_amt)/actual_amt) * 100, 1))
@@ -383,15 +384,15 @@ validation_output = forecast_df %&gt;%
 
 <p><img src="../forecasting_regressors_images/mape_plot.png" class="img-responsive" style="display: block; margin: auto;" /></p>
 
-<p>Based on the results from our validation set, it looks like the model that uses <em>Games Won</em> as an external regressor performed the best with a less than stellar 114 percent MAPE. We could reformulate our external regressor, try a different forecasting approach, or bring in additional covariates to improve our MAPE, but we&rsquo;ll keep it simple and just consider the aforementioned approaches.</p>
+<p>Based on the results from our validation set, the model that uses <em>Games Won</em> as an external regressor performed the best with a less than stellar 114 percent MAPE. We could reformulate our external regressor, try a different forecasting approach, or bring in additional covariates to improve our MAPE, but we&rsquo;ll keep it simple and just consider the aforementioned approaches.</p>
 
-<p>So we figured out which modeling approach works best, and we have all of the data we need to make a traffic forecast. There&rsquo;s only one problem: We won&rsquo;t know how many games the Patriots are going to win during the playoffs. Thus we&rsquo;ll need to first generate a prediction &ndash; 0, 1, 2, or 3 &ndash; for the expected number of games won as well, which will then serve as an input into our final, traffic-forecasting model.</p>
+<p>So we figured out which input works best, and we have all of the data we need to make a traffic forecast. There&rsquo;s only one problem: We won&rsquo;t know how many games the Patriots are going to win during the playoffs. Thus we&rsquo;ll need t generate a prediction &ndash; 0, 1, 2, or 3 &ndash; for the expected number of games won as well, which will then serve as an input into our final, traffic-forecasting model.</p>
 
 <h3 id="collecting-betting-lines">Collecting Betting Lines</h3>
 
 <p>To help us make an informed decision about the number of games the Patriots will win during the playoffs, we can leverage historic NFL betting lines. If you aren&rsquo;t familiar with a betting lines, it&rsquo;s basically a way for odds-makers to encourage an equal number bets for both teams playing in a game.</p>
 
-<p>Previously we used R to scrape data from the web. We&rsquo;ll switch over to Python for a little bit to gather the win probabilities associated with different betting lines. The <code>BeautifulSoup</code> module is awesome for doing webscraping, so that&rsquo;s what we&rsquo;ll use here. If you want to stay in R, that&rsquo;s totally cool &ndash; the data used for this part can easily be copied and pasted into a text file loaded into R (click <a href="https://github.com/markleboeuf/website-hugo/blob/master/data/historic_win_percentages.csv">here</a> to go to the data). If you want to pull this data through Python, though, here&rsquo;s the code:</p>
+<p>Previously we used R to scrape data from the web. We&rsquo;ll switch over to Python for a little bit to gather the win probabilities associated with different betting lines. The <code>BeautifulSoup</code> module is awesome for doing webscraping, so that&rsquo;s what we&rsquo;ll use here.</p>
 
 <pre><code class="language-python">import urllib2
 from bs4 import BeautifulSoup
@@ -425,9 +426,8 @@ historic_odds_df.to_csv(sys.argv[1] + &quot;/historic_win_percentages.csv&quot;,
 <p>And here is how we can execute the spead_scrape.py script from R.</p>
 
 <pre><code class="language-r">python_location = system(&quot;which python&quot;, intern = TRUE)
-exe_py_command = paste0(python_location, &quot; &quot;, wd, &quot;/spread_scrape.py &quot;, wd)
-print(exe_py_command)
 
+exe_py_command = paste0(python_location, &quot; &quot;, wd, &quot;/spread_scrape.py &quot;, wd)
 </code></pre>
 
 <p>If you aren&rsquo;t familiar with executing scripts in other languages from R (or the terminal), we can break this command down into further detail. It&rsquo;s quite simple. There are three components to above command:</p>
@@ -451,6 +451,8 @@ historic_win_percent = data.table::fread(paste0(wd, &quot;/historic_win_percenta
 </code></pre>
 
 <p>Let&rsquo;s look at the first 20 observations.</p>
+
+<p><img src="../forecasting_regressors_images/table5.png" class="img-responsive" style="display: block; margin: auto;" /></p>
 
 <p>Perfect. The interpretation is really simple: A team favored by 12 points has historically won ~78% of their games; bump that spread up to 16 points and there has never been a team favored by 16 points that has lost. Let&rsquo;s see what that looks like starting at a zero-point spread, when both teams are perceived by odds-makers to be an equal match.</p>
 
@@ -486,13 +488,13 @@ ggplot(historic_win_percent_clean, aes(x = favorite, y = win_pct)) +
 
 <p><img src="../forecasting_regressors_images/point_spread.png" class="img-responsive" style="display: block; margin: auto;" /></p>
 
-<p>Since we are in January we only know the spread for Game 1. The patriots are favored by 7, and we know historically that when a team is favored by 7 they win about ~73% of the time. So I&rsquo;m feeling at least 1 win. What about 2? Here we are going to make an educated guess. We can assume that each subsequent game will be more challenging for the Patriots, so we&rsquo;ll make a prediction of a 5-point favorite. Finally, if the Patriots play in the superbowl, let&rsquo;s predict they&rsquo;ll be a 3-point favorite. If we assume that the outcome of each playoff game is independent of the prior game (which, barring a major injury to a key player, is a reasonable assumption) we can calculate the probability of each of these scenarios unfolding:</p>
+<p>We only know the spread for Game 1 because we are generating our forecasts at the beginning of January. The Patriots are favored by 7, and we know historically that when a team is favored by 7 they win about ~73% of the time. So I&rsquo;m feeling at least 1 win. What about 2? Here we are going to make an educated guess. We can assume that each subsequent game will be more challenging for the Patriots, so we&rsquo;ll make a prediction of a 5-point favorite. Finally, if the Patriots play in the Superbowl, let&rsquo;s predict they&rsquo;ll be a 3-point favorite. If we assume that the outcome of each playoff game is independent of the prior game (which, barring a major injury to a key player, is a reasonable assumption) we can calculate the probability of each of these scenarios unfolding:</p>
 
 <p><img src="../forecasting_regressors_images/win_prob.png" class="img-responsive" style="display: block; margin: auto;" /></p>
 
 <h3 id="seasonal-arimax-model">Seasonal ARIMAX Model</h3>
 
-<p>Now that we’ve trained our model let’s actually see what it looks like.</p>
+<p>Now that we’ve trained our model let’s see what it looks like.</p>
 
 <pre><code class="language-r">## Series: page_views_train_final 
 ## ARIMA(1,1,1)(0,1,1)[12]                    
@@ -516,7 +518,7 @@ ggplot(historic_win_percent_clean, aes(x = favorite, y = win_pct)) +
 ## Training set -0.01938565
 </code></pre>
 
-<p>We haven&rsquo;t covered what&rsquo;s going on under the hood, so we&rsquo;ll go into a little detail on how to interpret the output. The great thing about the &lsquo;auto.arima&rsquo; function is that it does the hard work of identifying the best model specification for our training data. While this is a huge time-saver, it helps to understand how and why certain parameters were selected. If you happen to be a forecasting expert and just want to know how to implement the model, feel free to skip this next section.</p>
+<p>We haven&rsquo;t covered what&rsquo;s going on under the hood, so we&rsquo;ll go into detail on how to interpret the output. The great thing about the <code>auto.arima</code> function is that it does the hard work of identifying the best model specification from our training data. While this is a huge time-saver, it helps to understand how and why certain parameters were selected. If you happen to be a forecasting expert and just want to know how to implement the model, feel free to skip this next section.</p>
 
 <p>Our model is <code>ARIMA(1,1,1)(0,1,1)[12]</code>. Let&rsquo;s focus on the first part  <code>ARIMA(1,1,1)</code></p>
 
@@ -524,13 +526,13 @@ ggplot(historic_win_percent_clean, aes(x = favorite, y = win_pct)) +
 
 <p>Next the <strong>Auto-Regressive</strong> or (AR(1)) part. Auto-regressive roughly translates to &lsquo;regressed on itself&rsquo;, and implies that we can learn something about Y~t+1~ from Y~t~. Said differently, prior values (in this case from 1 prior time-step) are good indicators of subsequent future values, so we capture this with an auto-regressive term.</p>
 
-<p>Finally the <strong>Moving Average</strong> or (MA(1)) part. Moving-average is similar to the A part, in that we use prior values to inform our prediction of future values, but instead of focusing on the actual values we focus instead on the prior errors, specifically our forecasting errors. These errors are computed as we fit the model, and like many things in life, we use our past errors to inform our future predictions.</p>
+<p>Finally the <strong>Moving Average</strong> or (MA(1)) part. Moving-average is similar to the A part, in that we use prior values to inform our prediction of future values, but instead of focusing on the actual values we focus instead on prior errors, specifically our forecasting errors. These errors are computed as we fit the model, and like many things in life, we use our past errors to inform our future predictions.</p>
 
 <p>Now let&rsquo;s discuss the second part: <code>(0,1,1)[12]</code>. This is the seasonality portion of our model and can be interpreted similarly to the first part. The model is determining the difference in each month&rsquo;s number of views across time, so Jan. 2015 - Jan. 2014 - Jan 2013&hellip;you get the point. That&rsquo;s the integrated part. The model also calculates a historical moving average with exponential weighting. The amount of weighting (or smoothing) is determined by the <code>sma1</code> coefficient contained in the above model. Coefficients that are closer to 1 indicate that more months (across history) are being used to determine how much future months will differ from the average of previous months.</p>
 
 <p>Finally the coefficient for our external regressor &ndash; number of post-season games won &ndash; has a value of 296550. This coefficient is interpreted just like a linear regression model; for each additional Patriot&rsquo;s post-season win, we expect ~296K more visits to Tom Brady&rsquo;s page.</p>
 
-<p>If that all makes sense, let&rsquo;s test our model on the final data, with our external variable set to 2 playoff games, and see how our prediction of Tom Brady&rsquo;s page views compared to what actually happened.</p>
+<p>If that all makes sense, let&rsquo;s test our model on the final data, with our external variable set to 2 playoff games, and see how our prediction of Tom Brady&rsquo;s page views compared to what actually happened. In essence, we are saying &ldquo;The Patriots will make the superbowl but wont win.&rdquo; It turns out betting against the Patriots in the superbowl can be a bad move, something I&rsquo;ve experienced firsthard.</p>
 
 <pre><code class="language-r">test_df_final = train_test_df %&gt;% 
 dplyr::filter(train_test_flag == 'test') %&gt;% 
@@ -544,7 +546,7 @@ print(test_df_final)
 print(calcMape(test_df_final$predicted_monthly_views, test_df_final$monthly_page_views))
 </code></pre>
 
-<p>Our MAPE is about 35%, which is considerably better than the MAPE on our holdout set. However, our prediction of the Patriots only winning 2 games was wrong. The patriots won 3 post season games and beat the Seattle Seahawks 28-24 to win the superbowl. So what would&rsquo;ve happened if our external regressor was correct (i.e., 3 instead of 2)? Or maybe we were too conservative and only predicted 1 win. How would each of these scenarios affected our forecasting accuracy? Let&rsquo;s find out.</p>
+<p>Our MAPE is about 35%, which is considerably better than the MAPE on our holdout set. However, our prediction of the Patriots only winning 2 games was wrong. The patriots won 3 post season games and beat the Seattle Seahawks 28-24 to win the superbowl. So what would&rsquo;ve happened if the value of our external regressor was correct (i.e., 3 instead of 2)? Or maybe we were too conservative and only predicted 1 win. How would each of these scenarios affected our forecasting accuracy? Let&rsquo;s find out.</p>
 
 <pre><code class="language-r">what_if_df = data.frame(year = rep(test_df_final$year, 3),
                         month = rep(test_df_final$month, 3),
@@ -601,15 +603,15 @@ geom_label(label.size = 1, size = 10, color = &quot;white&quot;)
           </div>
       </div>
   </div>
-  <script src="/js/jquery.min.js"></script>
-<script src="/js/bootstrap.min.js"></script>
-<script src="/js/jquery.cookie.js"> </script>
-<script src="/js/ekko-lightbox.js"></script>
-<script src="/js/jquery.scrollTo.min.js"></script>
-<script src="/js/masonry.pkgd.min.js"></script>
-<script src="/js/imagesloaded.pkgd.min.js"></script>
-<script src="/js/owl.carousel.min.js"></script>
-<script src="/js/front.js"></script>
+  <script src="https://markleboeuf.github.io/js/jquery.min.js"></script>
+<script src="https://markleboeuf.github.io/js/bootstrap.min.js"></script>
+<script src="https://markleboeuf.github.io/js/jquery.cookie.js"> </script>
+<script src="https://markleboeuf.github.io/js/ekko-lightbox.js"></script>
+<script src="https://markleboeuf.github.io/js/jquery.scrollTo.min.js"></script>
+<script src="https://markleboeuf.github.io/js/masonry.pkgd.min.js"></script>
+<script src="https://markleboeuf.github.io/js/imagesloaded.pkgd.min.js"></script>
+<script src="https://markleboeuf.github.io/js/owl.carousel.min.js"></script>
+<script src="https://markleboeuf.github.io/js/front.js"></script>
 
 </body>
 </html>

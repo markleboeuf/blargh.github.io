@@ -2,22 +2,22 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Seasonal Decomposition on Mark LeBoeuf</title>
-    <link>/tags/seasonal-decomposition/</link>
+    <link>https://markleboeuf.github.io/tags/seasonal-decomposition/</link>
     <description>Recent content in Seasonal Decomposition on Mark LeBoeuf</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>&amp;copy;2016 Mark LeBoeuf</copyright>
     <lastBuildDate>Sun, 12 Mar 2017 19:41:01 +0530</lastBuildDate>
     
-	<atom:link href="/tags/seasonal-decomposition/index.xml" rel="self" type="application/rss+xml" />
+	<atom:link href="https://markleboeuf.github.io/tags/seasonal-decomposition/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
       <title>Time Series Outlier Detection</title>
-      <link>/portfolio/outlier_detection/</link>
+      <link>https://markleboeuf.github.io/portfolio/outlier_detection/</link>
       <pubDate>Sun, 12 Mar 2017 19:41:01 +0530</pubDate>
       
-      <guid>/portfolio/outlier_detection/</guid>
+      <guid>https://markleboeuf.github.io/portfolio/outlier_detection/</guid>
       <description>&lt;p&gt;This post covers a straightforward approach to detecting and replacing outliers in time series.&lt;/p&gt;
 
 &lt;p&gt;&lt;/p&gt;</description>
