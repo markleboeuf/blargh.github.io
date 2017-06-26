@@ -2,22 +2,22 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Counterfactual Prediction on Mark LeBoeuf</title>
-    <link>https://markleboeuf.github.io/tags/counterfactual-prediction/</link>
+    <link>/tags/counterfactual-prediction/</link>
     <description>Recent content in Counterfactual Prediction on Mark LeBoeuf</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>&amp;copy;2016 Mark LeBoeuf</copyright>
     <lastBuildDate>Mon, 01 May 2017 19:41:01 +0530</lastBuildDate>
     
-	<atom:link href="https://markleboeuf.github.io/tags/counterfactual-prediction/index.xml" rel="self" type="application/rss+xml" />
+	<atom:link href="/tags/counterfactual-prediction/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
       <title>Establishing Causality with Counterfactual Prediction</title>
-      <link>https://markleboeuf.github.io/portfolio/counterfactual_prediction/</link>
+      <link>/portfolio/counterfactual_prediction/</link>
       <pubDate>Mon, 01 May 2017 19:41:01 +0530</pubDate>
       
-      <guid>https://markleboeuf.github.io/portfolio/counterfactual_prediction/</guid>
+      <guid>/portfolio/counterfactual_prediction/</guid>
       <description>&lt;p&gt;Sometimes a controlled experiment isn&amp;rsquo;t an option yet you want to establish causality. This post outlines a method for quantifying the effects of an intervention via counterfactual predictions.&lt;/p&gt;
 
 &lt;p&gt;&lt;/p&gt;</description>
