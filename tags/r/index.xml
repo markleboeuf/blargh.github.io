@@ -2,42 +2,42 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>R on Mark LeBoeuf</title>
-    <link>/tags/r/</link>
+    <link>https://markleboeuf.github.io/tags/r/</link>
     <description>Recent content in R on Mark LeBoeuf</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>&amp;copy;2017 Mark LeBoeuf</copyright>
     <lastBuildDate>Sat, 05 Nov 2016 19:41:01 +0530</lastBuildDate>
     
-	<atom:link href="/tags/r/index.xml" rel="self" type="application/rss+xml" />
+	<atom:link href="https://markleboeuf.github.io/tags/r/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
       <title>Forecasting with External Regressors</title>
-      <link>/portfolio/forecasting_regressors/</link>
+      <link>https://markleboeuf.github.io/portfolio/forecasting_regressors/</link>
       <pubDate>Sat, 05 Nov 2016 19:41:01 +0530</pubDate>
       
-      <guid>/portfolio/forecasting_regressors/</guid>
+      <guid>https://markleboeuf.github.io/portfolio/forecasting_regressors/</guid>
       <description>&lt;p&gt;This post focuses on some of my favorite things &amp;ndash; data, sports, and forecasting &amp;ndash; and will outline how to leverage external regressors when creating forecasts. We&amp;rsquo;ll do some webscraping in R and Python to create our dataset, and then forecast how many people will visit Tom Brady&amp;rsquo;s wikipedia page.
 &lt;/p&gt;</description>
     </item>
     
     <item>
       <title>Two Flavors of Parallel Simulation</title>
-      <link>/portfolio/two_flavors_of_parallelism/</link>
+      <link>https://markleboeuf.github.io/portfolio/two_flavors_of_parallelism/</link>
       <pubDate>Thu, 12 Jan 2017 19:41:01 +0530</pubDate>
       
-      <guid>/portfolio/two_flavors_of_parallelism/</guid>
+      <guid>https://markleboeuf.github.io/portfolio/two_flavors_of_parallelism/</guid>
       <description>&lt;p&gt;Tired of waiting around for your simulations to finish? Run them in parallel! This post covers two seperate ways to add parallelism to your R code.
 &lt;/p&gt;</description>
     </item>
     
     <item>
       <title>Time Series Outlier Detection</title>
-      <link>/portfolio/outlier_detection/</link>
+      <link>https://markleboeuf.github.io/portfolio/outlier_detection/</link>
       <pubDate>Sun, 12 Mar 2017 19:41:01 +0530</pubDate>
       
-      <guid>/portfolio/outlier_detection/</guid>
+      <guid>https://markleboeuf.github.io/portfolio/outlier_detection/</guid>
       <description>&lt;p&gt;This post covers a straightforward approach to detecting and replacing outliers in time series.&lt;/p&gt;
 
 &lt;p&gt;&lt;/p&gt;</description>
@@ -45,10 +45,10 @@
     
     <item>
       <title>Feature Selection for the Wine Connoisseur</title>
-      <link>/portfolio/feature_selection/</link>
+      <link>https://markleboeuf.github.io/portfolio/feature_selection/</link>
       <pubDate>Mon, 01 May 2017 19:41:01 +0530</pubDate>
       
-      <guid>/portfolio/feature_selection/</guid>
+      <guid>https://markleboeuf.github.io/portfolio/feature_selection/</guid>
       <description>&lt;p&gt;Feature selection is an integral part of machine learning, and this post explores what happens when lots of irrelevant features are added into the modeling process. We&amp;rsquo;ll also identify which algorithms are affected the most by such features. These questions will be addressed as we build a classifier and try to predict which wines we&amp;rsquo;ll like based on their chemical properties. So pour yourself a glass of Pinot Noir and fire up your R terminal!&lt;/p&gt;
 
 &lt;p&gt;&lt;/p&gt;</description>
@@ -56,20 +56,20 @@
     
     <item>
       <title>Monte Carlo Power Calculations for Mixed Effects Models</title>
-      <link>/portfolio/monte_carlo_mixed_effects/</link>
+      <link>https://markleboeuf.github.io/portfolio/monte_carlo_mixed_effects/</link>
       <pubDate>Thu, 12 Jan 2017 19:41:01 +0530</pubDate>
       
-      <guid>/portfolio/monte_carlo_mixed_effects/</guid>
+      <guid>https://markleboeuf.github.io/portfolio/monte_carlo_mixed_effects/</guid>
       <description>&lt;p&gt;That&amp;rsquo;s a dense title &amp;ndash; Monte Carlo Simulation, Power, Mixed-Effect models. Each of these topics could be their own post. However, I&amp;rsquo;m going to discuss their interrelations in the context of experimental power and keep everything high-level. The goal is to get an intuitive idea of how we can leverage simulation to provide sample size estimates for experiments with nested data.&lt;br /&gt;
 &lt;/p&gt;</description>
     </item>
     
     <item>
       <title>Early Trend Detection</title>
-      <link>/portfolio/early_trend_detection/</link>
+      <link>https://markleboeuf.github.io/portfolio/early_trend_detection/</link>
       <pubDate>Mon, 01 May 2017 19:41:01 +0530</pubDate>
       
-      <guid>/portfolio/early_trend_detection/</guid>
+      <guid>https://markleboeuf.github.io/portfolio/early_trend_detection/</guid>
       <description>&lt;p&gt;Identifying a trend before it starts is a major area of focus in the analytics realm, because it can inform key business decisions yet remains extremely difficult. This post outlines one trend-detection method in an effort to predict where a stock&amp;rsquo;s price will go in the future.&lt;/p&gt;
 
 &lt;p&gt;&lt;/p&gt;</description>
@@ -77,10 +77,10 @@
     
     <item>
       <title>Random Forest Prediction Intervals</title>
-      <link>/portfolio/random_forest_prediction_intervals/</link>
+      <link>https://markleboeuf.github.io/portfolio/random_forest_prediction_intervals/</link>
       <pubDate>Sun, 12 Feb 2017 19:41:01 +0530</pubDate>
       
-      <guid>/portfolio/random_forest_prediction_intervals/</guid>
+      <guid>https://markleboeuf.github.io/portfolio/random_forest_prediction_intervals/</guid>
       <description>&lt;p&gt;Take a stroll through the random forest to learn how to quantify uncertainty in your predictions with one of the more popular applied machine learning algorithms.&lt;/p&gt;
 
 &lt;p&gt;&lt;/p&gt;</description>
@@ -88,20 +88,20 @@
     
     <item>
       <title>Pyspark Tutorial</title>
-      <link>/portfolio/pyspark_tutorial/</link>
+      <link>https://markleboeuf.github.io/portfolio/pyspark_tutorial/</link>
       <pubDate>Thu, 12 Jan 2017 19:41:01 +0530</pubDate>
       
-      <guid>/portfolio/pyspark_tutorial/</guid>
+      <guid>https://markleboeuf.github.io/portfolio/pyspark_tutorial/</guid>
       <description>&lt;p&gt;Running Spark locally is a great place to start when initially learning. However, it&amp;rsquo;s more realistic to and actually using it can be challenging. This post will show you how to set up an Amazon EC2 instance and run Pyspark. We&amp;rsquo;ll do some analysis on historic flights data to see which carriers tend to be the most delayed.
 &lt;/p&gt;</description>
     </item>
     
     <item>
       <title>Establishing Causality with Counterfactual Prediction</title>
-      <link>/portfolio/counterfactual_prediction/</link>
+      <link>https://markleboeuf.github.io/portfolio/counterfactual_prediction/</link>
       <pubDate>Mon, 01 May 2017 19:41:01 +0530</pubDate>
       
-      <guid>/portfolio/counterfactual_prediction/</guid>
+      <guid>https://markleboeuf.github.io/portfolio/counterfactual_prediction/</guid>
       <description>&lt;p&gt;Sometimes a controlled experiment isn&amp;rsquo;t an option yet you want to establish causality. This post outlines a method for quantifying the effects of an intervention via counterfactual predictions.&lt;/p&gt;
 
 &lt;p&gt;&lt;/p&gt;</description>
