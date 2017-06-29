@@ -2,22 +2,22 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Keras on Mark LeBoeuf</title>
-    <link>https://markleboeuf.github.io/tags/keras/</link>
+    <link>/tags/keras/</link>
     <description>Recent content in Keras on Mark LeBoeuf</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>&amp;copy;2017 Mark LeBoeuf</copyright>
     <lastBuildDate>Mon, 01 May 2017 19:41:01 +0530</lastBuildDate>
     
-	<atom:link href="https://markleboeuf.github.io/tags/keras/index.xml" rel="self" type="application/rss+xml" />
+	<atom:link href="/tags/keras/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
       <title>Keras End-to-End Tutorial</title>
-      <link>https://markleboeuf.github.io/portfolio/keras_walk_through_end_to_end/</link>
+      <link>/portfolio/keras_walk_through_end_to_end/</link>
       <pubDate>Mon, 01 May 2017 19:41:01 +0530</pubDate>
       
-      <guid>https://markleboeuf.github.io/portfolio/keras_walk_through_end_to_end/</guid>
+      <guid>/portfolio/keras_walk_through_end_to_end/</guid>
       <description>&lt;p&gt;Most Keras tutorials I&amp;rsquo;ve come across outline the process of creating a Convolutional Neural Network (CNN) with built-in datasets. While this is a great place to begin, there&amp;rsquo;s a bit more involved in terms of pre-processing when starting out with just a bunch of pictures. This post provides a quick, end-to-end walkthrough of how to implement a CNN with Keras in Python from scratch.&lt;/p&gt;
 
 &lt;p&gt;&lt;/p&gt;</description>

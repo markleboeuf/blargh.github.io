@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<title>Pyspark Tutorial</title>
+<meta name="description" content="Code and Stuff">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="all,follow">
+<meta name="googlebot" content="index,follow,snippet,archive">
+<link rel="stylesheet" href="/css/bootstrap.min.css">
+<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Roboto:400,300,700,400italic">
+<link rel="stylesheet" href="/css/font-awesome.min.css">
+<link rel="stylesheet" href="/css/owl.carousel.css">
+<link rel="stylesheet" href="/css/owl.theme.css">
+
+
+  <link href="/css/style.red.css" rel="stylesheet" id="theme-stylesheet">
+
+
+<link href="/css/custom.css" rel="stylesheet">
+<link rel="shortcut icon" href="/img/favicon.png">
+
+
+</head>
+<body>
+  <div id="all">
+      <div class="container-fluid">
+          <div class="row row-offcanvas row-offcanvas-left">
+              <div id="sidebar" class="col-xs-6 col-sm-4 col-md-3 sidebar-offcanvas">
+  <div class="sidebar-content">
+    <h1 class="sidebar-heading"><a href="/">Mark LeBoeuf</a></h1>
+    
+      <p class="sidebar-p">I am a Data Scientist currently based in Portland, OR.</p>
+    
+    <ul class="sidebar-menu">
+      
+      
+        <li><a href="/">Home</a></li>
+      
+        <li><a href="/about/">About</a></li>
+      
+    </ul>
+    <p class="social">
+  
+  
+  
+  
+  
+  
+  <a href="https://www.linkedin.com/in/markleboeuf/" data-animate-hover="pulse">
+    <i class="fa fa-linkedin"></i>
+  </a>
+  
+  
+  
+  <a href="https://github.com/markleboeuf/markleboeuf.github.io" data-animate-hover="pulse">
+    <i class="fa fa-github"></i>
+  </a>
+  
+</p>
+
+
+    <div class="copyright">
+      <p class="credit">
+        
+          &copy;2017 Mark LeBoeuf
+        
+        | Template by <a href="https://bootstrapious.com/free-templates" class="external">Bootstrapious.com</a>
+
+&amp; ported to Hugo by <a href="https://github.com/kishaningithub">Kishan B</a>
+
+      </p>
+    </div>
+  </div>
+</div>
+
+              
+<div class="col-xs-12 col-sm-8 col-md-9 content-column white-background">
+  <div class="small-navbar visible-xs">
+  <button type="button" data-toggle="offcanvas" class="btn btn-ghost pull-left"> <i class="fa fa-align-left"> </i>Menu</button>
+  <h1 class="small-navbar-heading"><a href="/">Mark LeBoeuf</a></h1>
+</div>
+
+  <div class="row">
+    <div class="col-lg-8">
+      <div class="content-column-content">
+         <h1>Pyspark Tutorial</h1>
+         <p>Running Spark locally is a great place to start when initially learning. However, it&rsquo;s more realistic to and actually using it can be challenging. This post will show you how to set up an Amazon EC2 instance and run Pyspark. We&rsquo;ll do some analysis on historic flights data to see which carriers tend to be the most delayed.
+</p>
+
+<h3 id="storing-and-accessing-data-in-s3">Storing and Accessing Data in S3</h3>
+
+<p>Let&rsquo;s briefly go over the data we&rsquo;ll be working with before diving into the S3 plumbing. We&rsquo;ll use the <code>nycflights13::flights</code> dataset, which can be exported from R via:</p>
+
+<pre><code>library(nycflights13)
+
+write.csv(nycflights13::flights, 
+          'flights_df.csv', 
+          row.names = FALSE)
+</code></pre>
+
+<p>Next we&rsquo;ll take this data set and store in Amazon S3. For those unfamiliar with S3, it&rsquo;s a place to store data via key-value pairs in something called a &ldquo;bucket&rdquo;. You can create buckets and upload/download files from S3 via an AWS console, but in most real-world situations you&rsquo;ll want to do these steps programatically. If you don&rsquo;t have an amazon account, sign-up for one and then create an S3 bucket (I&rsquo;ve titled mine &lsquo;pyspark.practice&rsquo;). This bucket will hold the data we&rsquo;ll eventually access via EC2.</p>
+
+<p>We have our bucket and next we&rsquo;ll need our security credentials, which include a <strong>AWS_ACCESS_KEY_ID</strong> and <strong>AWS_SECRET_ACCESS_KEY</strong>. You&rsquo;ll need both to progromatically access your bucket. If you click on your username, go to <strong>My Security Credentials</strong>, then <strong>Access Keys</strong>, you&rsquo;ll be able to generate and download both keys. Store these in a safe place.</p>
+
+<p>Now that we have our bucket and keys, we will upload the flights data to our S3 bucket via the following Python Script. Note that in this script we&rsquo;ve hardcoded the keys. This is not good practice, and the keys should be imported via an environmental variable or stored in your profile. However, for the sake of simplicity (and the fact that we aren&rsquo;t working with sensitive or private data), we&rsquo;ll include them in the script for the moment.</p>
+
+<pre><code>import boto
+import boto.s3
+from boto.s3.connection import S3Connection
+from boto.s3.key import Key
+import sys
+
+# Use this function to keep track of the upload progress
+def percent_complete(complete, total):
+    sys.stdout.write('*')
+    sys.stdout.flush()
+
+AWS_ACCESS_KEY_ID = '&lt;your access key&gt;'
+AWS_SECRET_ACCESS_KEY = '&lt;your secret key&gt;'
+
+conn = boto.connect_s3(AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY)
+
+bucket_name = 'pyspark-practice'
+
+# path to where the flights data is stored locally
+data_path = 'path/to/flights/data'
+
+# This is where the bucket will be created in S3
+my_bucket = conn.create_bucket(bucket_name,
+    location=boto.s3.connection.Location.DEFAULT)
+
+# Create a key that will be used to Identify the data    
+k = Key(bucket)
+k.key = 'flights-data'
+
+# Upload to S3 bucket 
+k.set_contents_from_filename(data_path,
+    cb=percent_complete, num_cb=5)    
+    
+</code></pre>
+
+<p>Just to make sure our data is there, we can use the following to print out all of the keys for files stored within our &lsquo;pyspark-practice&rsquo; bucket.</p>
+
+<pre><code>my_bucket = conn.get_bucket(bucket_name)
+
+for file_name in my_bucket.get_all_keys():
+    print file_name.key
+</code></pre>
+
+<p><img src="../pyspark_tutorial_images/s3_pyspark.png" class="img-responsive" style="display: block; margin: auto;" /></p>
+
+<h3 id="logging-into-the-ec2-instance">Logging into the EC2 instance</h3>
+
+<pre><code>ssh -i &lt;path_to_.pem file&gt; ubuntu@&lt;Public DNS Key&gt;
+</code></pre>
+
+<p>The <strong>Public DNS Key</strong> will become available when you launch your EC2 instance. Here&rsquo;s where you can find it:</p>
+
+<p><img src="../pyspark_tutorial_images/dns_key.png" class="img-responsive" style="display: block; margin: auto;" /></p>
+
+<p>Below you would change the 1 to a much larger number in the real-world.</p>
+
+<p><img src="../pyspark_tutorial_images/config_details.png" class="img-responsive" style="display: block; margin: auto;" /></p>
+
+<p>move .pem key to a good location. Then type the following command.</p>
+
+<pre><code>chmod 400 marks_spark_instance.pem
+</code></pre>
+
+<p>Now lets login to our instance. Take that DNS.</p>
+
+<pre><code>ssh -i marks_spark_instance.pem ubuntu@ec2-34-210-39-42.us-west-2.compute.amazonaws.com
+</code></pre>
+
+<p>EC2 instance is just a fancy term for &lsquo;a remote computer&rsquo;.</p>
+
+<p>First let&rsquo;s install python3</p>
+
+<pre><code>sudo apt install python3
+</code></pre>
+
+<p>When it comes to processing lots of data, Spark is quickly becoming the go-to solution. While &ldquo;lots of data&rdquo; means very different things to different people, I usually think of it as data that is too large to  fit on my computer&rsquo;s hard drive.</p>
+
+<p>It has APIs in several languages, including Scala, Python, and more recently R, and greatly simplifies the steps required for distributed data processing.</p>
+
+<p>First step is create an EC2 (Elastic Cloud Compute) instance on Amazon Web Services. EC2</p>
+
+<h3 id="setting-up-spark-jupyter">Setting up Spark, Jupyter</h3>
+
+<pre><code>sudo apt-get update
+</code></pre>
+
+<p>installs pip3, which is what we use to install python packages.</p>
+
+<pre><code>sudo apt install python3-pip
+</code></pre>
+
+<p>we&rsquo;ll then use <code>pip</code> to install jupyter</p>
+
+<pre><code>pip3 install jupyter
+</code></pre>
+
+<p>We&rsquo;ll install Spark</p>
+
+<p>Then install Java.</p>
+
+<pre><code>sudo apt-get install default-jre
+</code></pre>
+
+<p>It can be helpful know which version of your java is installed on your machine. Use <code>java -version</code> command to find out.</p>
+
+<pre><code>openjdk version &quot;1.8.0_131&quot;
+OpenJDK Runtime Environment (build 1.8.0_131-8u131-b11-0ubuntu1.16.04.2-b11)
+OpenJDK 64-Bit Server VM (build 25.131-b11, mixed mode)
+</code></pre>
+
+<p>Install scala next.</p>
+
+<pre><code>sudo apt-get install scala
+</code></pre>
+
+<p>Install <code>py4j</code> package, which allows python to connect to Java.</p>
+
+<pre><code>pip3 install py4j
+</code></pre>
+
+<p>Next we&rsquo;ll download the spark.</p>
+
+<pre><code>wget http://archive.apache.org/dist/spark/spark-2.1.1/spark-2.1.1-bin-hadoop2.7.tgz
+</code></pre>
+
+<p>Spark-2.1.1 is the most current version as of the time of this post. You can go <a href="http://archive.apache.org/dist/spark/">here</a> to determine if any updates have been made. All you have to do is change the version in the url.</p>
+
+<p>Now we&rsquo;ll unzip the file via the following command:</p>
+
+<pre><code>sudo tar -zxvf spark-2.1.1-bin-hadoop2.7.tgz
+</code></pre>
+
+<p>We just installed spark and hadoop. Pretty easy, eh? Lastly we&rsquo;ll install a super helpful python module called <code>findspark</code>. This module does exactly what it says: it helps python find the location of Spark. While this may seem trivial, it can be pain when you are just getting started to have Spark and Python work together.</p>
+
+<pre><code>pip3 install findspark
+</code></pre>
+
+<p>And now generate config file</p>
+
+<pre><code>jupyter notebook --generate-config
+</code></pre>
+
+<p>You should receive the following prompt:
+<em>Writing default config to: /home/ubuntu/.jupyter/jupyter_notebook_config.py</em></p>
+
+<p>Next we&rsquo;re going to create a directory to hold our &ldquo;certifications&rdquo; and then change from our main directory into our newly created directory.</p>
+
+<pre><code>mkdir certifications
+cd certifications
+</code></pre>
+
+<p>Create certifications here.</p>
+
+<pre><code>sudo openssl req -x509 -nodes -days 365 -newkey rsa:1024 -keyout mycert.pem -out mycert.pem
+</code></pre>
+
+<p>Let&rsquo;s go back to our main directory and list all of the files we have so far.</p>
+
+<pre><code>ls -a
+</code></pre>
+
+<p>And you should see something similar to below:</p>
+
+<p><img src="../pyspark_tutorial_images/dir_image.png" class="img-responsive" style="display: block; margin: auto;" /></p>
+
+<p>We&rsquo;ll switch into the <code>.jupyter</code> directory and open up a text editor to make some changes to the configuration file.</p>
+
+<pre><code>cd .jupyter
+vi jupyter_notebook_config.py 
+</code></pre>
+
+<p>If you are in the text editor you should see a screen like this</p>
+
+<p><img src="../pyspark_tutorial_images/config_image.png" class="img-responsive" style="display: block; margin: auto;" /></p>
+
+<p>You&rsquo;ll add the following at the top of the configuration file by hitting the &lsquo;i&rsquo; key, which allows you to edit the file.</p>
+
+<pre><code>c = get_config()
+c.NotebookApp.certfile = u'/home/ubuntu/certs/mycert.pem'
+c.NotebookApp.ip = '*'
+c.NotebookApp.open_browser = False
+c.NotebookApp.port = 8888
+</code></pre>
+
+<p>Now hit the <code>esc</code> to end the editing process, followed by the &lsquo;shift-colon&rsquo; then type &lsquo;wq!&rsquo; followed by &lsquo;enter&rsquo; to write the changes, quit, and source or execute the file (i.e., wq = write-quit).
+Finall go back to the main directory and create a new directory and call it &ldquo;practice_data&rdquo;. This is where we&rsquo;ll store our practice dataset.</p>
+
+<pre><code>cd
+mkdir practice_data
+</code></pre>
+
+<h3 id="moving-files-from-your-machine-to-aws">Moving files from your machine to AWS</h3>
+
+<p>In your command line type &lsquo;R&rsquo;. This will start up R on your local machine, and then we&rsquo;ll write the <code>nycflights13::flights</code> dataset to the directory where the .pem file is located.</p>
+
+<p>In the terminal, use the following command to move the flights data from your local machine to the remote machine. Here&rsquo;s how we&rsquo;ll copy it to our EC2 instance. Note you&rsquo;ll replace &ldquo;marks_spark_instance.pem&rdquo; with the location and name of your key, and you&rsquo;ll replace &ldquo;ec2-34-210-39-42.us-west-2.compute.amazonaws.com&rdquo; with your DNS key.</p>
+
+<pre><code>scp -i /Users/markleboeuf/Desktop/Start/pyspark/marks_spark_instance.pem /Users/markleboeuf/Desktop/Start/pyspark/flights_df.csv  ubuntu@ec2-34-210-39-42.us-west-2.compute.amazonaws.com:~/practice_data
+</code></pre>
+
+<h3 id="using-spark">Using spark</h3>
+
+<p><img src="../pyspark_tutorial_images/ip_location.png" class="img-responsive" style="display: block; margin: auto;" /></p>
+
+<p>Here is the address:</p>
+
+<p><a href="https://localhost:8888/?token=66d92b401e6eeefd0f33ca42ecbf334076ab0e0af8016b7c">https://localhost:8888/?token=66d92b401e6eeefd0f33ca42ecbf334076ab0e0af8016b7c</a></p>
+
+<p>Let&rsquo;s replace &ldquo;localhost&rdquo; with our DNS. Here&rsquo;s what mine looks like.</p>
+
+<p><a href="https://ec2-34-210-39-42.us-west-2.compute.amazonaws.com:8888/?token=3e8842edd3d35ed49a14a7c39c97f52b40592112aabb6d78">https://ec2-34-210-39-42.us-west-2.compute.amazonaws.com:8888/?token=3e8842edd3d35ed49a14a7c39c97f52b40592112aabb6d78</a></p>
+
+<p>Copy this address and paste into your browser, and you should see this screen</p>
+
+<p><img src="../pyspark_tutorial_images/private_warning.png" class="img-responsive" style="display: block; margin: auto;" /></p>
+
+<p>Start up a jupyter notebook and create a block. This should get your up and running below:</p>
+
+<pre><code>import findspark
+spark_v = '2.1.1'
+hadoop_v = '2.7'
+v_path= &quot;/home/ubuntu/spark-{spark_v}-bin-hadoop{hadoop_v}&quot;.format(
+                                                    spark_v = spark_v,
+                                                    hadoop_v = hadoop_v)
+findspark.init(v_path)
+</code></pre>
+
+<pre><code>import pyspark
+</code></pre>
+
+<p>Assuming no error messages with this part, let&rsquo;s finally get started.</p>
+         <div id="disqus_thread"></div>
+<script type="text/javascript">
+    var disqus_shortname = 'https-markleboeuf-github-io';
+    var disqus_identifier = '\/portfolio\/pyspark_tutorial\/';
+    var disqus_title = 'Pyspark Tutorial';
+    var disqus_url = '\/portfolio\/pyspark_tutorial\/';
+
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+      </div>
+    </div>
+  </div>
+</div>
+
+          </div>
+      </div>
+  </div>
+  <script src="/js/jquery.min.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+<script src="/js/jquery.cookie.js"> </script>
+<script src="/js/ekko-lightbox.js"></script>
+<script src="/js/jquery.scrollTo.min.js"></script>
+<script src="/js/masonry.pkgd.min.js"></script>
+<script src="/js/imagesloaded.pkgd.min.js"></script>
+<script src="/js/owl.carousel.min.js"></script>
+<script src="/js/front.js"></script>
+
+</body>
+</html>
