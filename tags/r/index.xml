@@ -87,16 +87,6 @@
     </item>
     
     <item>
-      <title>Pyspark Tutorial</title>
-      <link>https://markleboeuf.github.io/portfolio/pyspark_tutorial/</link>
-      <pubDate>Thu, 12 Jan 2017 19:41:01 +0530</pubDate>
-      
-      <guid>https://markleboeuf.github.io/portfolio/pyspark_tutorial/</guid>
-      <description>&lt;p&gt;Running Spark locally is a great place to start when initially learning. However, it&amp;rsquo;s more realistic to and actually using it can be challenging. This post will show you how to set up an Amazon EC2 instance and run Pyspark. We&amp;rsquo;ll do some analysis on historic flights data to see which carriers tend to be the most delayed.
-&lt;/p&gt;</description>
-    </item>
-    
-    <item>
       <title>Establishing Causality with Counterfactual Prediction</title>
       <link>https://markleboeuf.github.io/portfolio/counterfactual_prediction/</link>
       <pubDate>Mon, 01 May 2017 19:41:01 +0530</pubDate>
