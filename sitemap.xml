@@ -42,6 +42,11 @@
   </url>
   
   <url>
+    <loc>https://markleboeuf.github.io/portfolio/exception_handling/</loc>
+    <lastmod>2017-01-12T19:41:01+05:30</lastmod>
+  </url>
+  
+  <url>
     <loc>https://markleboeuf.github.io/portfolio/counterfactual_prediction/</loc>
     <lastmod>2017-05-01T19:41:01+05:30</lastmod>
   </url>
@@ -87,6 +92,18 @@
   <url>
     <loc>https://markleboeuf.github.io/tags/dtw/</loc>
     <lastmod>2017-05-01T19:41:01+05:30</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://markleboeuf.github.io/tags/error-handling/</loc>
+    <lastmod>2017-01-12T19:41:01+05:30</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://markleboeuf.github.io/tags/exceptions/</loc>
+    <lastmod>2017-01-12T19:41:01+05:30</lastmod>
     <priority>0</priority>
   </url>
   

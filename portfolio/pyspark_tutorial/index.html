@@ -7,18 +7,18 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="all,follow">
 <meta name="googlebot" content="index,follow,snippet,archive">
-<link rel="stylesheet" href="https://markleboeuf.github.io/css/bootstrap.min.css">
+<link rel="stylesheet" href="/css/bootstrap.min.css">
 <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Roboto:400,300,700,400italic">
-<link rel="stylesheet" href="https://markleboeuf.github.io/css/font-awesome.min.css">
-<link rel="stylesheet" href="https://markleboeuf.github.io/css/owl.carousel.css">
-<link rel="stylesheet" href="https://markleboeuf.github.io/css/owl.theme.css">
+<link rel="stylesheet" href="/css/font-awesome.min.css">
+<link rel="stylesheet" href="/css/owl.carousel.css">
+<link rel="stylesheet" href="/css/owl.theme.css">
 
 
-  <link href="https://markleboeuf.github.io/css/style.red.css" rel="stylesheet" id="theme-stylesheet">
+  <link href="/css/style.red.css" rel="stylesheet" id="theme-stylesheet">
 
 
-<link href="https://markleboeuf.github.io/css/custom.css" rel="stylesheet">
-<link rel="shortcut icon" href="https://markleboeuf.github.io/img/favicon.png">
+<link href="/css/custom.css" rel="stylesheet">
+<link rel="shortcut icon" href="/img/favicon.png">
 
 
 <script>
@@ -42,9 +42,9 @@ ga('send', 'pageview');
     <ul class="sidebar-menu">
       
       
-        <li><a href="https://markleboeuf.github.io/">Home</a></li>
+        <li><a href="/">Home</a></li>
       
-        <li><a href="https://markleboeuf.github.io/about/">About</a></li>
+        <li><a href="/about/">About</a></li>
       
     </ul>
     <p class="social">
@@ -95,6 +95,29 @@ ga('send', 'pageview');
          <p>Running Spark locally is a great place to start when initially learning. However, it&rsquo;s more realistic to and actually using it can be challenging. This post will show you how to set up an Amazon EC2 instance and run Pyspark. We&rsquo;ll do some analysis on historic flights data to see which carriers tend to be the most delayed.
 </p>
 
+<p>We&rsquo;ll approach the set up as if you aren&rsquo;t the only person working in the environment. It&rsquo;s very common for a team of data scientists, analysts, and engineers to all share the same AWS environment.</p>
+
+<h3 id="creating-a-group">Creating a group</h3>
+
+<p>First Create New Group. I typically use the following policies:
+* arn:aws:iam::aws:policy/AmazonS3FullAccess
+* arn:aws:iam::aws:policy/AmazonEC2FullAccess</p>
+
+<p>This gives people complete access to both storage and compute.</p>
+
+<h3 id="adding-users">Adding Users</h3>
+
+<p>I&rsquo;ll add myself as a user. Select programattic access. One person should only have
+Then you&rsquo;ll add the user to group, which gives them all of the permissions set at the group level.</p>
+
+<h3 id="setting-up-credentials-on-aws">Setting up Credentials on AWS</h3>
+
+<p>As of writing this post (07/01/2017), Amazon changed the way in which keys could be managed.</p>
+
+<p>*1. Create a group
+*2. Add user to the group
+*3. Save the Access key ID &amp; Secret Key somewhere safe</p>
+
 <h3 id="storing-and-accessing-data-in-s3">Storing and Accessing Data in S3</h3>
 
 <p>Let&rsquo;s briefly go over the data we&rsquo;ll be working with before diving into the S3 plumbing. We&rsquo;ll use the <code>nycflights13::flights</code> dataset, which can be exported from R via:</p>
@@ -108,7 +131,7 @@ write.csv(nycflights13::flights,
 
 <p>Next we&rsquo;ll take this data set and store in Amazon S3. For those unfamiliar with S3, it&rsquo;s a place to store data via key-value pairs in something called a &ldquo;bucket&rdquo;. You can create buckets and upload/download files from S3 via an AWS console, but in most real-world situations you&rsquo;ll want to do these steps programatically. If you don&rsquo;t have an amazon account, sign-up for one and then create an S3 bucket (I&rsquo;ve titled mine &lsquo;pyspark.practice&rsquo;). This bucket will hold the data we&rsquo;ll eventually access via EC2.</p>
 
-<p>We have our bucket and next we&rsquo;ll need our security credentials, which include a <strong>AWS_ACCESS_KEY_ID</strong> and <strong>AWS_SECRET_ACCESS_KEY</strong>. You&rsquo;ll need both to progromatically access your bucket. If you click on your username, go to <strong>My Security Credentials</strong>, then <strong>Access Keys</strong>, you&rsquo;ll be able to generate and download both keys. Store these in a safe place.</p>
+<p>We have our bucket and next we&rsquo;ll need our security credentials, which include a <strong>AWS_ACCESS_KEY_ID</strong> and <strong>AWS_SECRET_ACCESS_KEY</strong>. You&rsquo;ll need both to programatically access your bucket. If you click your username, go to <strong>My Security Credentials</strong>, then <strong>Access Keys</strong>, and you&rsquo;ll be able to generate and download both keys. Store these in a safe place.</p>
 
 <p>Now that we have our bucket and keys, we will upload the flights data to our S3 bucket via the following Python Script. Note that in this script we&rsquo;ve hardcoded the keys. This is not good practice, and the keys should be imported via an environmental variable or stored in your profile. However, for the sake of simplicity (and the fact that we aren&rsquo;t working with sensitive or private data), we&rsquo;ll include them in the script for the moment.</p>
 
@@ -177,17 +200,22 @@ for file_name in my_bucket.get_all_keys():
 
 <p>Now lets login to our instance. Take that DNS.</p>
 
-<pre><code>ssh -i marks_spark_instance.pem ubuntu@ec2-34-210-39-42.us-west-2.compute.amazonaws.com
+<pre><code>ssh -i marks_spark_instance.pem ubuntu@ec2-35-167-252-227.us-west-2.compute.amazonaws.com
 </code></pre>
 
 <p>EC2 instance is just a fancy term for &lsquo;a remote computer&rsquo;.</p>
 
-<p>First let&rsquo;s install python3</p>
+<p>First let&rsquo;s install pip</p>
+
+<pre><code>sudo apt-get install python-pip
+</code></pre>
+
+<p>Then install python3</p>
 
 <pre><code>sudo apt install python3
 </code></pre>
 
-<p>When it comes to processing lots of data, Spark is quickly becoming the go-to solution. While &ldquo;lots of data&rdquo; means very different things to different people, I usually think of it as data that is too large to  fit on my computer&rsquo;s hard drive.</p>
+<p>When it comes to processing lots of data, Spark is quickly becoming the go-to solution. While &ldquo;lots of data&rdquo; means very different things to different people, I usually think of it as data that is too large to fit on my computer&rsquo;s hard drive.</p>
 
 <p>It has APIs in several languages, including Scala, Python, and more recently R, and greatly simplifies the steps required for distributed data processing.</p>
 
@@ -343,12 +371,21 @@ findspark.init(v_path)
 </code></pre>
 
 <p>Assuming no error messages with this part, let&rsquo;s finally get started.</p>
+
+<h3 id="moving-data-from-s3-to-ec2">Moving data from S3 to EC2</h3>
+
+<h3 id="installing-r-r-studio">Installing R &amp; R Studio</h3>
+
+<p>You have can&rsquo;t a full fledged data-science ecosystem without R, in my highly biased opinion. Here are the steps:</p>
+
+<pre><code>http://amunategui.github.io/EC2-RStudioServer/
+</code></pre>
          <div id="disqus_thread"></div>
 <script type="text/javascript">
     var disqus_shortname = 'https-markleboeuf-github-io';
-    var disqus_identifier = 'https:\/\/markleboeuf.github.io\/portfolio\/pyspark_tutorial\/';
+    var disqus_identifier = '\/portfolio\/pyspark_tutorial\/';
     var disqus_title = 'Pyspark Tutorial';
-    var disqus_url = 'https:\/\/markleboeuf.github.io\/portfolio\/pyspark_tutorial\/';
+    var disqus_url = '\/portfolio\/pyspark_tutorial\/';
 
     (function() {
         var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
@@ -366,15 +403,15 @@ findspark.init(v_path)
           </div>
       </div>
   </div>
-  <script src="https://markleboeuf.github.io/js/jquery.min.js"></script>
-<script src="https://markleboeuf.github.io/js/bootstrap.min.js"></script>
-<script src="https://markleboeuf.github.io/js/jquery.cookie.js"> </script>
-<script src="https://markleboeuf.github.io/js/ekko-lightbox.js"></script>
-<script src="https://markleboeuf.github.io/js/jquery.scrollTo.min.js"></script>
-<script src="https://markleboeuf.github.io/js/masonry.pkgd.min.js"></script>
-<script src="https://markleboeuf.github.io/js/imagesloaded.pkgd.min.js"></script>
-<script src="https://markleboeuf.github.io/js/owl.carousel.min.js"></script>
-<script src="https://markleboeuf.github.io/js/front.js"></script>
+  <script src="/js/jquery.min.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+<script src="/js/jquery.cookie.js"> </script>
+<script src="/js/ekko-lightbox.js"></script>
+<script src="/js/jquery.scrollTo.min.js"></script>
+<script src="/js/masonry.pkgd.min.js"></script>
+<script src="/js/imagesloaded.pkgd.min.js"></script>
+<script src="/js/owl.carousel.min.js"></script>
+<script src="/js/front.js"></script>
 
 </body>
 </html>

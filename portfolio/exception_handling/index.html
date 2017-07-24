@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<title>R Exception Handling</title>
+<meta name="description" content="Code and Stuff">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="all,follow">
+<meta name="googlebot" content="index,follow,snippet,archive">
+<link rel="stylesheet" href="https://markleboeuf.github.io/css/bootstrap.min.css">
+<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Roboto:400,300,700,400italic">
+<link rel="stylesheet" href="https://markleboeuf.github.io/css/font-awesome.min.css">
+<link rel="stylesheet" href="https://markleboeuf.github.io/css/owl.carousel.css">
+<link rel="stylesheet" href="https://markleboeuf.github.io/css/owl.theme.css">
+
+
+  <link href="https://markleboeuf.github.io/css/style.red.css" rel="stylesheet" id="theme-stylesheet">
+
+
+<link href="https://markleboeuf.github.io/css/custom.css" rel="stylesheet">
+<link rel="shortcut icon" href="https://markleboeuf.github.io/img/favicon.png">
+
+
+<script>
+window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+ga('create', 'UA-101855339-1', 'auto');
+ga('send', 'pageview');
+</script>
+<script async src='//www.google-analytics.com/analytics.js'></script>
+
+</head>
+<body>
+  <div id="all">
+      <div class="container-fluid">
+          <div class="row row-offcanvas row-offcanvas-left">
+              <div id="sidebar" class="col-xs-6 col-sm-4 col-md-3 sidebar-offcanvas">
+  <div class="sidebar-content">
+    <h1 class="sidebar-heading"><a href="/">Mark LeBoeuf</a></h1>
+    
+      <p class="sidebar-p">I am a Data Scientist currently based in Portland, OR.</p>
+    
+    <ul class="sidebar-menu">
+      
+      
+        <li><a href="https://markleboeuf.github.io/">Home</a></li>
+      
+        <li><a href="https://markleboeuf.github.io/about/">About</a></li>
+      
+    </ul>
+    <p class="social">
+  
+  
+  
+  
+  
+  
+  <a href="https://www.linkedin.com/in/markleboeuf/" data-animate-hover="pulse">
+    <i class="fa fa-linkedin"></i>
+  </a>
+  
+  
+  
+  <a href="https://github.com/markleboeuf/markleboeuf.github.io" data-animate-hover="pulse">
+    <i class="fa fa-github"></i>
+  </a>
+  
+</p>
+
+
+    <div class="copyright">
+      <p class="credit">
+        
+          &copy;2017 Mark LeBoeuf
+        
+        | Template by <a href="https://bootstrapious.com/free-templates" class="external">Bootstrapious.com</a>
+
+&amp; ported to Hugo by <a href="https://github.com/kishaningithub">Kishan B</a>
+
+      </p>
+    </div>
+  </div>
+</div>
+
+              
+<div class="col-xs-12 col-sm-8 col-md-9 content-column white-background">
+  <div class="small-navbar visible-xs">
+  <button type="button" data-toggle="offcanvas" class="btn btn-ghost pull-left"> <i class="fa fa-align-left"> </i>Menu</button>
+  <h1 class="small-navbar-heading"><a href="/">Mark LeBoeuf</a></h1>
+</div>
+
+  <div class="row">
+    <div class="col-lg-8">
+      <div class="content-column-content">
+         <h1>R Exception Handling</h1>
+         <p>Exception handling is a critical component of any data science workflow. You write code. It breaks. You build logic to deal exceptions. Repeat. From my experience, a point of confusion for new R users is how to handle exceptions, which I believe is more intuitive in Python (at least initially). This post provides a practical overview of how to handle exceptions in R by first illustrating the concept in Python.
+</p>
+
+<h3 id="overview">Overview</h3>
+
+<p>R and Python have their own ways of dealing with exceptions. Coming from Python, I found the R approach to be less intuitive initially.  However, once you get the gist of doing it in R, it&rsquo;s quite straightforward. If you are solely interested in the R approach &ndash; and want to skip the Python intro&ndash; click [here]. Otherwise we&rsquo;ll first go through the Python approach followed by R.</p>
+
+<h3 id="exception-handling-in-python">Exception Handling in Python</h3>
+
+<p>I&rsquo;ve listed some of my favorite Ron Burgundy vocal warm-up phrases below. As a side note, all are excellent for preparing your speaking voice before a big speech.
+<img src="../exception_handling_images/burgundy_1.jpg" class="img-responsive" style="display: block; margin: auto;" /></p>
+
+<p><img src="../exception_handling_images/burgundy_3.jpg" class="img-responsive" style="display: block; margin: auto;" /></p>
+
+<p><img src="../exception_handling_images/burgundy_4.jpg" class="img-responsive" style="display: block; margin: auto;" /></p>
+
+<p><img src="../exception_handling_images/burgundy_5.jpg" class="img-responsive" style="display: block; margin: auto;" /></p>
+
+<pre><code>strings = [&quot;how now brown cow&quot;, 
+          &quot;a tarantula enjoys a fine piece of chewing gum&quot;, 
+          &quot;the human torch was denied a bank loan&quot;,
+          &quot;the arsonist has oddly shaped feet&quot;]
+</code></pre>
+
+<p>Our goal is to extract the 5th element from each phrase. We&rsquo;ll use a <code>list comprehension</code>, which maps or applies a function to each element in a <code>list</code>. The <code>extract_element</code> function below takes 3 arguments:</p>
+
+<ul>
+<li>strings - the string we want to split</li>
+<li>split_character - the character we want to split our strings on (in this case a space &ldquo; &ldquo;)</li>
+<li>element_index - the index of the element we want to extract after spliting the string</li>
+</ul>
+
+<pre><code>def extract_element(strings, split_character, element_index):
+  return(strings.split(split_character)[element_index])
+</code></pre>
+
+<p>Here&rsquo;s what we&rsquo;ll get if we want only the first word:</p>
+
+<pre><code class="language-python">print([extract_element(x, &quot; &quot;, 0) for x in strings])
+</code></pre>
+
+<pre><code class="language-r">#['how', 'a', 'the', 'the']
+</code></pre>
+
+<p>Great! Let&rsquo;s extract the fifth word.</p>
+
+<pre><code class="language-python">print([extract_element(x, &quot; &quot;, 4) for x in strings])
+#---------------------------------------------------------------------------
+#IndexError: list index out of range
+#
+</code></pre>
+
+<p>Uh oh. This error message indicates that we tried an index value that was out of range, which makes sense: &ldquo;how now brown cow&rdquo; only has 4 words. In order to address this we need to add two key words to our function &ndash; <code>try</code> and <code>except</code>. Just like it sounds, the function will first try to execute the top code block. If an exception occurs, the function will pass control to the bottom code block. Let&rsquo;s update the above function with our new, exception-handling logic and try again.</p>
+
+<pre><code class="language-python">def extract_element_tc(strings, split_character, element_index):
+    try:
+        return(strings.split(split_character)[element_index])
+    except IndexError:
+        return(&quot;NO STRING HERE&quot;)
+        
+print([extract_element_tc(x, &quot; &quot;, 4) for x in strings])
+</code></pre>
+
+<pre><code class="language-r">#['NO STRING HERE', 'fine', 'denied', 'shaped']
+</code></pre>
+
+<p>This time it worked without an issue. We simply said &ldquo;if there isn&rsquo;t an element at this index, give me back a &lsquo;NO STRING HERE&rsquo; label&rdquo;. Now let&rsquo;s achieve the same result in R.</p>
+
+<h3 id="exception-handling-in-r">Exception Handling in R</h3>
+
+<p>As I mentioned in the intro, dealing with exceptions in R can be a bit tricky at first. Let&rsquo;s set up the previous task in R.</p>
+
+<pre><code class="language-r">library(purrr)
+strings = c(&quot;how now brown cow&quot;, 
+          &quot;a tarantula enjoys a fine piece of chewing gum&quot;, 
+          &quot;the human torch was denied a bank loan&quot;,
+          &quot;the arsonist has oddly shaped feet&quot;)
+
+extract_element = function(strings, split_character, element_index){
+  string_out = purrr::map_chr(strsplit(strings, split_character),
+                              element_index
+                              )
+  return(string_out)
+}
+</code></pre>
+
+<p>We&rsquo;ll approach this via the <code>sapply</code> function, which maps or applies a function to each element of a list or vector. We&rsquo;ll also wrap the output of <code>sapply</code> with the <code>unname</code> function, which converts our list into a vector by removing the labels associated with each parsed string.</p>
+
+<pre><code class="language-r">print(unname(sapply(strings, extract_element, &quot; &quot;, 1)))
+# [1] &quot;how&quot; &quot;a&quot;   &quot;the&quot; &quot;the&quot;
+</code></pre>
+
+<p>I think we know what happens next&hellip;</p>
+
+<pre><code class="language-r">print(unname(sapply(strings, extract_element, &quot; &quot;, 5)))
+# Error: Result 1 is not a length 1 atomic vector 
+</code></pre>
+
+<p>Ok. So how do we replicate the <code>try-except</code> control flow in R? Via the <code>tryCatch</code> function. Let&rsquo;s examine the complete function &ndash; <code>extract_element_tc</code> &ndash; in order to deal with the problem stated above.</p>
+
+<pre><code class="language-r">extract_element_tc = function(strings_vector, split_character, element_index){
+  string_out = tryCatch({
+    return(purrr::map_chr(strsplit(strings_vector, split_character), 
+                          element_index
+                          )
+          )
+  },
+  error = function(cond){
+    return(&quot;NO STRING HERE&quot;)
+  })
+}
+
+print(unname(sapply(strings, extract_element_tc, &quot; &quot;, 5)))
+</code></pre>
+
+<pre><code># [1] &quot;NO STRING HERE&quot; &quot;fine&quot;           &quot;denied&quot;         &quot;shaped&quot; 
+</code></pre>
+
+<p>Boom. No errors this time. R is different in that <code>tryCatch</code> will have seperate functions, referred to as <strong>handlers</strong>, that get called depending on the condition that occurs. In this case, we have 2 conditions&ndash; our desired condition, and the error condition. There are additional conditions that can be handled  (see <a href="http://adv-r.had.co.nz/Exceptions-Debugging.html">here</a> for more detail). For example, you can also include a handler for <code>warnings</code> as well, which can be extremely helpful for finding exceptions that don&rsquo;t break your code but instead give you undesired results.</p>
+         <div id="disqus_thread"></div>
+<script type="text/javascript">
+    var disqus_shortname = 'https-markleboeuf-github-io';
+    var disqus_identifier = 'https:\/\/markleboeuf.github.io\/portfolio\/exception_handling\/';
+    var disqus_title = 'R Exception Handling';
+    var disqus_url = 'https:\/\/markleboeuf.github.io\/portfolio\/exception_handling\/';
+
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+      </div>
+    </div>
+  </div>
+</div>
+
+          </div>
+      </div>
+  </div>
+  <script src="https://markleboeuf.github.io/js/jquery.min.js"></script>
+<script src="https://markleboeuf.github.io/js/bootstrap.min.js"></script>
+<script src="https://markleboeuf.github.io/js/jquery.cookie.js"> </script>
+<script src="https://markleboeuf.github.io/js/ekko-lightbox.js"></script>
+<script src="https://markleboeuf.github.io/js/jquery.scrollTo.min.js"></script>
+<script src="https://markleboeuf.github.io/js/masonry.pkgd.min.js"></script>
+<script src="https://markleboeuf.github.io/js/imagesloaded.pkgd.min.js"></script>
+<script src="https://markleboeuf.github.io/js/owl.carousel.min.js"></script>
+<script src="https://markleboeuf.github.io/js/front.js"></script>
+
+</body>
+</html>

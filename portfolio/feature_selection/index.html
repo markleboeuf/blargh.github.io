@@ -127,7 +127,7 @@ ga('send', 'pageview');
 lapply(libs, require, character.only = TRUE)
 
 # link: https://archive.ics.uci.edu/ml/machine-learning-databases/wine-quality/
-working_directory = &quot;/Users/mlebo1/Desktop/spost/feature_selection&quot;
+working_directory = &quot;&lt;your_working_directory&gt;&quot;
 setwd(working_directory)
 red_wine = read.csv('winequality-white.csv', sep = &quot;;&quot;) %&gt;% 
            dplyr::mutate(wine.type = &quot;red&quot;)

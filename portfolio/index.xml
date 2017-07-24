@@ -98,6 +98,16 @@
     </item>
     
     <item>
+      <title>R Exception Handling</title>
+      <link>https://markleboeuf.github.io/portfolio/exception_handling/</link>
+      <pubDate>Thu, 12 Jan 2017 19:41:01 +0530</pubDate>
+      
+      <guid>https://markleboeuf.github.io/portfolio/exception_handling/</guid>
+      <description>&lt;p&gt;Exception handling is a critical component of any data science workflow. You write code. It breaks. You build logic to deal exceptions. Repeat. From my experience, a point of confusion for new R users is how to handle exceptions, which I believe is more intuitive in Python (at least initially). This post provides a practical overview of how to handle exceptions in R by first illustrating the concept in Python.
+&lt;/p&gt;</description>
+    </item>
+    
+    <item>
       <title>Establishing Causality with Counterfactual Prediction</title>
       <link>https://markleboeuf.github.io/portfolio/counterfactual_prediction/</link>
       <pubDate>Mon, 01 May 2017 19:41:01 +0530</pubDate>
