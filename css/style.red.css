@@ -522,7 +522,7 @@ SIDEBAR + RIGHT COLUMN
 }
 .content-column-content p,
 .content-column-content li {
-  color: #999999;
+  color: #000000;
 }
 .content-column-content ul li {
   list-style-type: none;
@@ -994,7 +994,7 @@ a:active {
 }
 .box-masonry .box-masonry-text p {
   color: #000000;
-  font-size: 15px;
+  font-size: 14px;
 }
 .box-masonry .box-masonry-hover-text-header {
   position: absolute;
