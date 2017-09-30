@@ -2,22 +2,22 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Prediction Interval on Mark LeBoeuf</title>
-    <link>https://markleboeuf.github.io/tags/prediction-interval/</link>
+    <link>/tags/prediction-interval/</link>
     <description>Recent content in Prediction Interval on Mark LeBoeuf</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>&amp;copy;2017 Mark LeBoeuf</copyright>
     <lastBuildDate>Sun, 12 Feb 2017 19:41:01 +0530</lastBuildDate>
     
-	<atom:link href="https://markleboeuf.github.io/tags/prediction-interval/index.xml" rel="self" type="application/rss+xml" />
+	<atom:link href="/tags/prediction-interval/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
       <title>Random Forest Prediction Intervals</title>
-      <link>https://markleboeuf.github.io/portfolio/random_forest_prediction_intervals/</link>
+      <link>/portfolio/random_forest_prediction_intervals/</link>
       <pubDate>Sun, 12 Feb 2017 19:41:01 +0530</pubDate>
       
-      <guid>https://markleboeuf.github.io/portfolio/random_forest_prediction_intervals/</guid>
+      <guid>/portfolio/random_forest_prediction_intervals/</guid>
       <description>&lt;p&gt;Take a stroll through the random forest to learn how to quantify uncertainty in your predictions with one of the more popular applied machine learning algorithms.&lt;/p&gt;
 
 &lt;p&gt;&lt;/p&gt;</description>

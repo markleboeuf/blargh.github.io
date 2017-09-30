@@ -2,22 +2,22 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Dtw on Mark LeBoeuf</title>
-    <link>https://markleboeuf.github.io/tags/dtw/</link>
+    <link>/tags/dtw/</link>
     <description>Recent content in Dtw on Mark LeBoeuf</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>&amp;copy;2017 Mark LeBoeuf</copyright>
     <lastBuildDate>Mon, 01 May 2017 19:41:01 +0530</lastBuildDate>
     
-	<atom:link href="https://markleboeuf.github.io/tags/dtw/index.xml" rel="self" type="application/rss+xml" />
+	<atom:link href="/tags/dtw/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
       <title>Early Trend Detection</title>
-      <link>https://markleboeuf.github.io/portfolio/early_trend_detection/</link>
+      <link>/portfolio/early_trend_detection/</link>
       <pubDate>Mon, 01 May 2017 19:41:01 +0530</pubDate>
       
-      <guid>https://markleboeuf.github.io/portfolio/early_trend_detection/</guid>
+      <guid>/portfolio/early_trend_detection/</guid>
       <description>&lt;p&gt;Identifying a trend before it starts is a major area of focus in the analytics realm, because it can inform key business decisions yet remains extremely difficult. This post outlines one trend-detection method in an effort to predict where a stock&amp;rsquo;s price will go in the future.&lt;/p&gt;
 
 &lt;p&gt;&lt;/p&gt;</description>

@@ -2,22 +2,22 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Exceptions on Mark LeBoeuf</title>
-    <link>https://markleboeuf.github.io/tags/exceptions/</link>
+    <link>/tags/exceptions/</link>
     <description>Recent content in Exceptions on Mark LeBoeuf</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>&amp;copy;2017 Mark LeBoeuf</copyright>
     <lastBuildDate>Thu, 12 Jan 2017 19:41:01 +0530</lastBuildDate>
     
-	<atom:link href="https://markleboeuf.github.io/tags/exceptions/index.xml" rel="self" type="application/rss+xml" />
+	<atom:link href="/tags/exceptions/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
       <title>R Exception Handling</title>
-      <link>https://markleboeuf.github.io/portfolio/exception_handling/</link>
+      <link>/portfolio/exception_handling/</link>
       <pubDate>Thu, 12 Jan 2017 19:41:01 +0530</pubDate>
       
-      <guid>https://markleboeuf.github.io/portfolio/exception_handling/</guid>
+      <guid>/portfolio/exception_handling/</guid>
       <description>&lt;p&gt;Exception handling is a critical component of any data science workflow. You write code. It breaks. You create exceptions. Repeat. From my experience, a point of confusion for new R users is how to handle exceptions, which I believe is more intuitive in Python (at least initially). This post provides a practical overview of how to handle exceptions in R by first illustrating the concept in Python.
 &lt;/p&gt;</description>
     </item>
