@@ -2,22 +2,22 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Webscraping on Mark LeBoeuf</title>
-    <link>/tags/webscraping/</link>
+    <link>https://markleboeuf.github.io/tags/webscraping/</link>
     <description>Recent content in Webscraping on Mark LeBoeuf</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>&amp;copy;2017 Mark LeBoeuf</copyright>
     <lastBuildDate>Sat, 05 Nov 2016 19:41:01 +0530</lastBuildDate>
     
-	<atom:link href="/tags/webscraping/index.xml" rel="self" type="application/rss+xml" />
+	<atom:link href="https://markleboeuf.github.io/tags/webscraping/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
       <title>Forecasting with External Regressors</title>
-      <link>/portfolio/forecasting_regressors/</link>
+      <link>https://markleboeuf.github.io/portfolio/forecasting_regressors/</link>
       <pubDate>Sat, 05 Nov 2016 19:41:01 +0530</pubDate>
       
-      <guid>/portfolio/forecasting_regressors/</guid>
+      <guid>https://markleboeuf.github.io/portfolio/forecasting_regressors/</guid>
       <description>&lt;p&gt;This post focuses on some of my favorite things &amp;ndash; data, sports, and forecasting &amp;ndash; and will outline how to leverage external regressors when creating forecasts. We&amp;rsquo;ll do some webscraping in R and Python to create our dataset, and then forecast how many people will visit Tom Brady&amp;rsquo;s wikipedia page.
 &lt;/p&gt;</description>
     </item>

@@ -2,263 +2,263 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
-    <loc>/portfolio/forecasting_regressors/</loc>
+    <loc>https://markleboeuf.github.io/portfolio/forecasting_regressors/</loc>
     <lastmod>2016-11-05T19:41:01+05:30</lastmod>
   </url>
   
   <url>
-    <loc>/portfolio/keras_walk_through_end_to_end/</loc>
+    <loc>https://markleboeuf.github.io/portfolio/keras_walk_through_end_to_end/</loc>
     <lastmod>2017-05-01T19:41:01+05:30</lastmod>
   </url>
   
   <url>
-    <loc>/portfolio/two_flavors_of_parallelism/</loc>
+    <loc>https://markleboeuf.github.io/portfolio/two_flavors_of_parallelism/</loc>
     <lastmod>2017-01-12T19:41:01+05:30</lastmod>
   </url>
   
   <url>
-    <loc>/portfolio/outlier_detection/</loc>
+    <loc>https://markleboeuf.github.io/portfolio/outlier_detection/</loc>
     <lastmod>2017-03-12T19:41:01+05:30</lastmod>
   </url>
   
   <url>
-    <loc>/portfolio/feature_selection/</loc>
+    <loc>https://markleboeuf.github.io/portfolio/feature_selection/</loc>
     <lastmod>2017-05-01T19:41:01+05:30</lastmod>
   </url>
   
   <url>
-    <loc>/portfolio/monte_carlo_mixed_effects/</loc>
+    <loc>https://markleboeuf.github.io/portfolio/monte_carlo_mixed_effects/</loc>
     <lastmod>2017-01-12T19:41:01+05:30</lastmod>
   </url>
   
   <url>
-    <loc>/portfolio/early_trend_detection/</loc>
+    <loc>https://markleboeuf.github.io/portfolio/early_trend_detection/</loc>
     <lastmod>2017-05-01T19:41:01+05:30</lastmod>
   </url>
   
   <url>
-    <loc>/portfolio/random_forest_prediction_intervals/</loc>
+    <loc>https://markleboeuf.github.io/portfolio/random_forest_prediction_intervals/</loc>
     <lastmod>2017-02-12T19:41:01+05:30</lastmod>
   </url>
   
   <url>
-    <loc>/portfolio/exception_handling/</loc>
+    <loc>https://markleboeuf.github.io/portfolio/exception_handling/</loc>
     <lastmod>2017-01-12T19:41:01+05:30</lastmod>
   </url>
   
   <url>
-    <loc>/portfolio/counterfactual_prediction/</loc>
+    <loc>https://markleboeuf.github.io/portfolio/counterfactual_prediction/</loc>
     <lastmod>2017-05-01T19:41:01+05:30</lastmod>
   </url>
   
   <url>
-    <loc>/contact/</loc>
+    <loc>https://markleboeuf.github.io/contact/</loc>
     <lastmod>2016-11-06T13:00:25+05:30</lastmod>
   </url>
   
   <url>
-    <loc>/about/</loc>
+    <loc>https://markleboeuf.github.io/about/</loc>
     <lastmod>2016-11-05T21:05:33+05:30</lastmod>
   </url>
   
   <url>
-    <loc>/post/2015-07-23-r-rmarkdown/</loc>
+    <loc>https://markleboeuf.github.io/post/2015-07-23-r-rmarkdown/</loc>
     <lastmod>2015-07-23T21:13:14-05:00</lastmod>
   </url>
   
   <url>
-    <loc>/categories/</loc>
+    <loc>https://markleboeuf.github.io/categories/</loc>
     <priority>0</priority>
   </url>
   
   <url>
-    <loc>/tags/causality/</loc>
+    <loc>https://markleboeuf.github.io/tags/causality/</loc>
     <lastmod>2017-05-01T19:41:01+05:30</lastmod>
     <priority>0</priority>
   </url>
   
   <url>
-    <loc>/tags/cnn/</loc>
+    <loc>https://markleboeuf.github.io/tags/cnn/</loc>
     <lastmod>2017-05-01T19:41:01+05:30</lastmod>
     <priority>0</priority>
   </url>
   
   <url>
-    <loc>/tags/counterfactual-prediction/</loc>
+    <loc>https://markleboeuf.github.io/tags/counterfactual-prediction/</loc>
     <lastmod>2017-05-01T19:41:01+05:30</lastmod>
     <priority>0</priority>
   </url>
   
   <url>
-    <loc>/tags/dtw/</loc>
+    <loc>https://markleboeuf.github.io/tags/dtw/</loc>
     <lastmod>2017-05-01T19:41:01+05:30</lastmod>
     <priority>0</priority>
   </url>
   
   <url>
-    <loc>/tags/error-handling/</loc>
+    <loc>https://markleboeuf.github.io/tags/error-handling/</loc>
     <lastmod>2017-01-12T19:41:01+05:30</lastmod>
     <priority>0</priority>
   </url>
   
   <url>
-    <loc>/tags/exceptions/</loc>
+    <loc>https://markleboeuf.github.io/tags/exceptions/</loc>
     <lastmod>2017-01-12T19:41:01+05:30</lastmod>
     <priority>0</priority>
   </url>
   
   <url>
-    <loc>/tags/feature-selection/</loc>
+    <loc>https://markleboeuf.github.io/tags/feature-selection/</loc>
     <lastmod>2017-05-01T19:41:01+05:30</lastmod>
     <priority>0</priority>
   </url>
   
   <url>
-    <loc>/tags/foreach/</loc>
+    <loc>https://markleboeuf.github.io/tags/foreach/</loc>
     <lastmod>2017-01-12T19:41:01+05:30</lastmod>
     <priority>0</priority>
   </url>
   
   <url>
-    <loc>/tags/forecasting/</loc>
+    <loc>https://markleboeuf.github.io/tags/forecasting/</loc>
     <lastmod>2017-03-12T19:41:01+05:30</lastmod>
     <priority>0</priority>
   </url>
   
   <url>
-    <loc>/tags/keras/</loc>
+    <loc>https://markleboeuf.github.io/tags/keras/</loc>
     <lastmod>2017-05-01T19:41:01+05:30</lastmod>
     <priority>0</priority>
   </url>
   
   <url>
-    <loc>/</loc>
+    <loc>https://markleboeuf.github.io/</loc>
     <lastmod>2016-11-05T19:41:01+05:30</lastmod>
     <priority>0</priority>
   </url>
   
   <url>
-    <loc>/tags/mixed-effects/</loc>
+    <loc>https://markleboeuf.github.io/tags/mixed-effects/</loc>
     <lastmod>2017-01-12T19:41:01+05:30</lastmod>
     <priority>0</priority>
   </url>
   
   <url>
-    <loc>/tags/multidplyr/</loc>
+    <loc>https://markleboeuf.github.io/tags/multidplyr/</loc>
     <lastmod>2017-01-12T19:41:01+05:30</lastmod>
     <priority>0</priority>
   </url>
   
   <url>
-    <loc>/tags/outlier-detection/</loc>
+    <loc>https://markleboeuf.github.io/tags/outlier-detection/</loc>
     <lastmod>2017-03-12T19:41:01+05:30</lastmod>
     <priority>0</priority>
   </url>
   
   <url>
-    <loc>/tags/parallel/</loc>
+    <loc>https://markleboeuf.github.io/tags/parallel/</loc>
     <lastmod>2017-01-12T19:41:01+05:30</lastmod>
     <priority>0</priority>
   </url>
   
   <url>
-    <loc>/tags/plot/</loc>
+    <loc>https://markleboeuf.github.io/tags/plot/</loc>
     <lastmod>2015-07-23T21:13:14-05:00</lastmod>
     <priority>0</priority>
   </url>
   
   <url>
-    <loc>/portfolio/</loc>
+    <loc>https://markleboeuf.github.io/portfolio/</loc>
     <lastmod>2016-11-05T19:41:01+05:30</lastmod>
     <priority>0</priority>
   </url>
   
   <url>
-    <loc>/post/</loc>
+    <loc>https://markleboeuf.github.io/post/</loc>
     <lastmod>2015-07-23T21:13:14-05:00</lastmod>
     <priority>0</priority>
   </url>
   
   <url>
-    <loc>/tags/power/</loc>
+    <loc>https://markleboeuf.github.io/tags/power/</loc>
     <lastmod>2017-01-12T19:41:01+05:30</lastmod>
     <priority>0</priority>
   </url>
   
   <url>
-    <loc>/tags/prediction-interval/</loc>
+    <loc>https://markleboeuf.github.io/tags/prediction-interval/</loc>
     <lastmod>2017-02-12T19:41:01+05:30</lastmod>
     <priority>0</priority>
   </url>
   
   <url>
-    <loc>/tags/python/</loc>
+    <loc>https://markleboeuf.github.io/tags/python/</loc>
     <lastmod>2016-11-05T19:41:01+05:30</lastmod>
     <priority>0</priority>
   </url>
   
   <url>
-    <loc>/tags/r/</loc>
+    <loc>https://markleboeuf.github.io/categories/r/</loc>
+    <lastmod>2015-07-23T21:13:14-05:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://markleboeuf.github.io/tags/r/</loc>
     <lastmod>2016-11-05T19:41:01+05:30</lastmod>
     <priority>0</priority>
   </url>
   
   <url>
-    <loc>/categories/r/</loc>
+    <loc>https://markleboeuf.github.io/tags/r-markdown/</loc>
     <lastmod>2015-07-23T21:13:14-05:00</lastmod>
     <priority>0</priority>
   </url>
   
   <url>
-    <loc>/tags/r-markdown/</loc>
-    <lastmod>2015-07-23T21:13:14-05:00</lastmod>
-    <priority>0</priority>
-  </url>
-  
-  <url>
-    <loc>/tags/random-forest/</loc>
+    <loc>https://markleboeuf.github.io/tags/random-forest/</loc>
     <lastmod>2017-02-12T19:41:01+05:30</lastmod>
     <priority>0</priority>
   </url>
   
   <url>
-    <loc>/tags/regression/</loc>
+    <loc>https://markleboeuf.github.io/tags/regression/</loc>
     <lastmod>2015-07-23T21:13:14-05:00</lastmod>
     <priority>0</priority>
   </url>
   
   <url>
-    <loc>/tags/sarimax/</loc>
+    <loc>https://markleboeuf.github.io/tags/sarimax/</loc>
     <lastmod>2016-11-05T19:41:01+05:30</lastmod>
     <priority>0</priority>
   </url>
   
   <url>
-    <loc>/tags/seasonal-decomposition/</loc>
+    <loc>https://markleboeuf.github.io/tags/seasonal-decomposition/</loc>
     <lastmod>2017-03-12T19:41:01+05:30</lastmod>
     <priority>0</priority>
   </url>
   
   <url>
-    <loc>/tags/simulation/</loc>
+    <loc>https://markleboeuf.github.io/tags/simulation/</loc>
     <lastmod>2017-01-12T19:41:01+05:30</lastmod>
     <priority>0</priority>
   </url>
   
   <url>
-    <loc>/tags/</loc>
+    <loc>https://markleboeuf.github.io/tags/</loc>
     <lastmod>2017-05-01T19:41:01+05:30</lastmod>
     <priority>0</priority>
   </url>
   
   <url>
-    <loc>/tags/trend-detection/</loc>
+    <loc>https://markleboeuf.github.io/tags/trend-detection/</loc>
     <lastmod>2017-05-01T19:41:01+05:30</lastmod>
     <priority>0</priority>
   </url>
   
   <url>
-    <loc>/tags/webscraping/</loc>
+    <loc>https://markleboeuf.github.io/tags/webscraping/</loc>
     <lastmod>2016-11-05T19:41:01+05:30</lastmod>
     <priority>0</priority>
   </url>
