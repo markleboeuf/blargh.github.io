@@ -7,18 +7,18 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="all,follow">
 <meta name="googlebot" content="index,follow,snippet,archive">
-<link rel="stylesheet" href="https://markleboeuf.github.io/css/bootstrap.min.css">
+<link rel="stylesheet" href="/css/bootstrap.min.css">
 <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Roboto:400,300,700,400italic">
-<link rel="stylesheet" href="https://markleboeuf.github.io/css/font-awesome.min.css">
-<link rel="stylesheet" href="https://markleboeuf.github.io/css/owl.carousel.css">
-<link rel="stylesheet" href="https://markleboeuf.github.io/css/owl.theme.css">
+<link rel="stylesheet" href="/css/font-awesome.min.css">
+<link rel="stylesheet" href="/css/owl.carousel.css">
+<link rel="stylesheet" href="/css/owl.theme.css">
 
 
-  <link href="https://markleboeuf.github.io/css/style.red.css" rel="stylesheet" id="theme-stylesheet">
+  <link href="/css/style.red.css" rel="stylesheet" id="theme-stylesheet">
 
 
-<link href="https://markleboeuf.github.io/css/custom.css" rel="stylesheet">
-<link rel="shortcut icon" href="https://markleboeuf.github.io/img/favicon.png">
+<link href="/css/custom.css" rel="stylesheet">
+<link rel="shortcut icon" href="/img/favicon.png">
 
 
 <script>
@@ -42,9 +42,9 @@ ga('send', 'pageview');
     <ul class="sidebar-menu">
       
       
-        <li><a href="https://markleboeuf.github.io/">Home</a></li>
+        <li><a href="/">Home</a></li>
       
-        <li><a href="https://markleboeuf.github.io/about/">About</a></li>
+        <li><a href="/about/">About</a></li>
       
     </ul>
     <p class="social">
@@ -134,22 +134,18 @@ trend_patterns = data.frame()
 for(i in 1:5){
 
 # generate pattern for stocks that trend negatively from days 51-100
-
 neg_trend_pre = cos(seq(0, 10, 0.1))[1:pre_period] + rnorm(pre_period, 0, 0.7)
-
 trend_patterns = rbind(trend_patterns,
                        data.frame(date = pre_date_range[1:pre_period],
                                   value = neg_trend_pre,
                                   class = paste0('negative_', i)))
 
 # generate pattern for stocks that trend positively from days 51-100
-
 pos_trend_pre = cos(seq(0, 10, 0.1))[(pre_period + 1):100] + rnorm(pre_period, 0, 0.7)
-
 trend_patterns = rbind(trend_patterns,
-                      data.frame(date = pre_date_range[1:pre_period],
-                                 value = pos_trend_pre,
-                                 class = paste0(&quot;positive_&quot;, i)))
+data.frame(date = pre_date_range[1:pre_period],
+                  value = pos_trend_pre,
+                  class = paste0(&quot;positive_&quot;, i)))
 }
 </code></pre>
 
@@ -165,9 +161,7 @@ trend_patterns = rbind(trend_patterns,
 }
 
 increment = 0.03
-
 standard_dev = 0.08
-
 trend_patterns_future = data.frame(NULL)
 
 for(temp_trend in unique(trend_patterns$class)){
@@ -176,13 +170,9 @@ for(temp_trend in unique(trend_patterns$class)){
               filter(class == temp_trend)
 
     # extend date 50 days forward
-
     future_dates = pre_date_range[51:length(pre_date_range)]
-
     base_value = temp_ts$value[length(temp_ts$value)]
-
     future_trend = generate_trend(length(future_dates), increment, standard_dev, base_value)
-
     if(strsplit(temp_trend, &quot;_&quot;)[[1]][1] == 'negative'){
         future_trend = future_trend * -1
         }
@@ -193,28 +183,103 @@ for(temp_trend in unique(trend_patterns$class)){
                                   )
 }
 trend_patterns_ex = bind_rows(trend_patterns, 
-                                     trend_patterns_future) %&gt;% 
-                                     arrange(class, date)
+                              trend_patterns_future) %&gt;% 
+                              arrange(class, date)
 </code></pre>
 
 <p>And finally we&rsquo;ll set up our plotting functions and plot the 5 positive and 5 negative trends.</p>
 
+<pre><code>my_plot_theme = function(){
+    font_family = &quot;Helvetica&quot;
+    font_face = &quot;bold&quot;
+    return(theme(
+    axis.text.x = element_text(size = 18, 
+                               face = font_face, 
+                               family = font_family),
+    axis.text.y = element_text(size = 18, 
+                               face = font_face, 
+                               family = font_family),
+    axis.title.x = element_text(size = 20, 
+                                face = font_face, 
+                                family = font_family),
+    axis.title.y = element_text(size = 20, 
+                                face = font_face, 
+                                family = font_family),
+    strip.text.y = element_text(size = 18, 
+                                face = font_face, 
+                                family = font_family),
+    strip.text.x = element_text(size = 18, 
+                                face = font_face, 
+                                family = font_family),
+    plot.title = element_text(size = 18, 
+                                face = font_face, 
+                                family = font_family),
+    legend.position = &quot;top&quot;,
+    legend.title = element_text(colour = &quot;white&quot;, 
+                                size = 16,
+                                face = font_face,
+                                family = font_family),
+    legend.text = element_text(colour = &quot;white&quot;, 
+                               size = 14,
+                               face = font_face,
+                               family = font_family)
+    ))
+}
+pc = c(&quot;#33FFFB&quot;,
+&quot;#FF3371&quot;,
+&quot;#33EAFF&quot;, &quot;#FF335C&quot;,
+&quot;#33D6FF&quot;, &quot;#FF334C&quot;,
+&quot;#33BDFF&quot;, &quot;#FF4833&quot;,
+&quot;#3388FF&quot;,
+&quot;#FF5833&quot;)
+
+ggplot(trend_patterns_ex, aes(x = date, y = value, color = class)) + 
+    geom_point(alpha = 0.1) + stat_smooth(se = FALSE) + 
+    scale_color_manual(values = pc) + theme_monokai_full() + 
+    my_plot_theme() + 
+    geom_vline(xintercept = as.numeric(as.Date(&quot;2016-02-19&quot;)),
+    color = &quot;white&quot;, size = 2, lty = 2) + 
+    ylab(&quot;Stock Price&quot;)
+</code></pre>
+
 <p><img src="../early_trend_detection_images/plot1.png" class="img-responsive" style="display: block; margin: auto;" /></p>
 
 <p>Next let&rsquo;s look at the first 50 days to see if there is a pattern associated with positve/negative trends. The dotted white line indicates the point at which we make our prediction regarding where we think the stock will go.</p>
+
+<pre><code>ggplot(trend_patterns, aes(x = date, y = value, color = class)) +
+    geom_point(alpha = 0.1) + stat_smooth(se = FALSE) +
+    scale_color_manual(values = pc) + theme_monokai_full() +
+    my_plot_theme() + ylab(&quot;Stock Price&quot;)
+</code></pre>
 
 <p><img src="../early_trend_detection_images/plot2.png" class="img-responsive" style="display: block; margin: auto;" /></p>
 
 <p>In this case, stocks that initially go up, drift down, then flatten out all trend positively. In contrast, stocks that decline and then increase from days 30-50 trend downward from days 51-100. Thus there appears to be a common pattern that precedes a sustained increase or decrease in price. Based on this information, let&rsquo;s introduce our new stock &ndash; the &ldquo;target trend&rdquo; &ndash; that we only have pricing information for days 1-50.</p>
 
 <pre><code>sample_trend_pre = rbind(data.frame(date = pre_date_range[1:pre_period],
-                                    value = cos(seq(0, 10, 0.1))[(pre_period + 1):100] + rnorm(pre_period, 0, 0.7),
-                                    class = &quot;target_trend&quot;),
-                         data.frame(date = rep(NA, 50),
-                                    value = rep(NA, 50),
-                                    class = &quot;target_trend&quot;))
-
+value = cos(seq(0, 10, 0.1))[(pre_period + 1):100] + rnorm(pre_period, 0, 0.7),
+class = &quot;target_trend&quot;),
+data.frame(date = rep(NA, 50),
+value = rep(NA, 50),
+class = &quot;target_trend&quot;))
 trend_patterns_ex = rbind(sample_trend_pre, trend_patterns_ex)             
+pc = c(&quot;white&quot;, pc)
+
+ggplot(trend_patterns_ex, aes(x = date, y = value, color = class)) + 
+    geom_point(alpha = 0.1) + geom_line(stat = &quot;smooth&quot;,
+                                        method = &quot;gam&quot;,
+                                        formula = y ~ s(x),
+                                        size = 2,
+                                        alpha = 0.2
+                                        ) + 
+    scale_color_manual(values = pc) + theme_monokai_full() + 
+    my_plot_theme() + 
+    geom_vline(xintercept = as.numeric(as.Date(&quot;2016-02-19&quot;)),
+    color = &quot;white&quot;, size = 2, lty = 2) + 
+    stat_smooth(data = sample_trend_pre, aes(x = date, y = value), color = &quot;white&quot;,
+    se = FALSE, size = 3, lty = 4) + 
+    theme(legend.position = &quot;none&quot;) + 
+    ylab(&quot;Stock Price&quot;)
 </code></pre>
 
 <p><img src="../early_trend_detection_images/plot3.png" class="img-responsive" style="display: block; margin: auto;" /></p>
@@ -225,15 +290,15 @@ trend_patterns_ex = rbind(sample_trend_pre, trend_patterns_ex)
                            filter(date &lt;= as.Date(&quot;2016-02-19&quot;)) %&gt;% 
                            mutate(class = as.character(class))
 
-trend_pattern_matches = MarketMatching::best_matches(data = trend_patterns_test_time,
-                                                     id_variable = &quot;class&quot;,
-                                                     date_variable = &quot;date&quot;,
-                                                     matching_variable = &quot;value&quot;,
-                                                     parallel = TRUE,
-                                                     warping_limit = 3,
-                                                     matches = 5,
-                                                     start_match_period = min(trend_patterns_test_time$date),
-                                                     end_match_period = max(trend_patterns_test_time$date)
+trend_pattern_matches = best_matches(data = trend_patterns_test_time,
+                                     id_variable = &quot;class&quot;,
+                                     date_variable = &quot;date&quot;,
+                                     matching_variable = &quot;value&quot;,
+                                     parallel = TRUE,
+                                     warping_limit = 3,
+                                     matches = 5,
+                                     start_match_period = min(trend_patterns_test_time$date),
+                                     end_match_period = max(trend_patterns_test_time$date)
 )
 
 best_matches = trend_pattern_matches$BestMatches %&gt;% 
@@ -284,27 +349,19 @@ stock_data_train = stock_data_train$df.tickers %&gt;%
 <p>Data looks ready to go! Let&rsquo;s select the stocks that will comprise our training/test sets. We&rsquo;ll do a <sup>90</sup>&frasl;<sub>10</sub> split. Note that the test stocks will be used a little later.</p>
 
 <pre><code>n_dates = length(unique(stock_data_train$ref.date))
-
 n_days_train = 30
-
 train_dates = unique(stock_data_train$ref.date)[1:n_days_train]
-
 n_days_label = n_dates - n_days_train
-
 label_dates = unique(stock_data_train$ref.date)[(n_days_train + 1): n_dates]
 
 set.seed(123)
 pct_stocks_in_test = 0.1
 
 # hold these out 
-test_stock_symbols = sample(tickers, size = floor(length(tickers) * pct_stocks_in_test), 
-                                                  replace = FALSE)
+test_stock_symbols = sample(tickers, size = floor(length(tickers) * pct_stocks_in_test), replace = FALSE)
 train_stock_symbols = setdiff(tickers, test_stock_symbols)
-
 stock_data_train_f = stock_data_train[stock_data_train$ticker %in% train_stock_symbols,]
-
 stock_data_train_30 = stock_data_train_f[stock_data_train_f$ref.date %in% train_dates,]
-
 stock_data_train_label = stock_data_train_f[stock_data_train_f$ref.date %in% label_dates,]
 </code></pre>
 
@@ -322,7 +379,6 @@ stock_data_train_label = stock_data_train_f[stock_data_train_f$ref.date %in% lab
 <p>The input for both methods will be an index from 31-120. We are interested in whether the coefficient for this index is significant as well as its overall direction. LR takes the average slope, while the MK approach takes the median slope. Note that we might be violating the assumption that our data points are uncorrelated with one another. There are ways around this (e.g., block bootstrapping), but for the sake of simplicity we&rsquo;ll assume an absence of serial correlation. Let&rsquo;s run both tests and gather the results.</p>
 
 <pre><code># 1. use mann-kendall to determine class 
-
 trend_df_mk = stock_data_train_label %&gt;% 
               group_by(ticker) %&gt;% 
               do(trend_data = MannKendall(ts(.$price.close))) %&gt;% 
@@ -332,12 +388,9 @@ trend_df_mk$tau = unlist(lapply(trend_df_mk$trend_data, function(x) x[[1]][1]))
 trend_df_mk$p_value = unlist(lapply(trend_df_mk$trend_data, function(x) x[[2]][1]))
 
 # add class according to p-value &amp; tau coefficient
-
 trend_df_mk_class = trend_df_mk %&gt;% 
                     select(ticker, tau, p_value) %&gt;% 
-                    mutate(trend_class_mk = ifelse(p_value &lt; 0.05 &amp; tau &gt; 0, 
-                                                                 &quot;positive&quot;, 
-                                                         &quot;neutral|negative&quot;)) %&gt;% 
+                    mutate(trend_class_mk = ifelse(p_value &lt; 0.05 &amp; tau &gt; 0, &quot;positive&quot;, &quot;neutral|negative&quot;)) %&gt;% 
                     select(ticker, trend_class_mk)
 
 # 2. use linear model to determine class
@@ -352,11 +405,11 @@ trend_df_lm = stock_data_train_label %&gt;%
 trend_df_lm_class = trend_df_lm %&gt;% 
                     filter(term == 'day_index') %&gt;% 
                     mutate(trend_class_lm = ifelse(p.value &lt; 0.05 &amp; estimate &gt; 0, 
-                                                                      &quot;positive&quot;, 
-                                                             &quot;neutral|negative&quot;)) %&gt;% 
+                                                  &quot;positive&quot;, &quot;neutral|negative&quot;)) %&gt;% 
                     select(ticker, trend_class_lm)
 
-final_trend_df_class = inner_join(trend_df_mk_class, trend_df_lm_class)
+final_trend_df_class = inner_join(trend_df_mk_class, 
+                                  trend_df_lm_class)
 </code></pre>
 
 <p><img src="../early_trend_detection_images/plot6.png" class="img-responsive" style="display: block; margin: auto;" /></p>
@@ -369,6 +422,15 @@ final_trend_df_class = inner_join(trend_df_mk_class, trend_df_lm_class)
 cvs_stock = stock_data_train_label %&gt;% 
             filter(ticker == 'CVS')
 
+color_values = c(&quot;#D9D9D9&quot;, &quot;#33C5F3&quot;, &quot;#F16C62&quot;, &quot;#A8CE38&quot;, &quot;#FCB51E&quot;, &quot;#F92672&quot;)
+
+ggplot(cvs_stock, aes(x = ref.date, y = price.close)) + 
+        geom_point(size = 2, color = color_values[1]) + 
+        geom_line(size = 2, color = color_values[1]) + 
+        theme_monokai_full() + 
+        my_plot_theme() + 
+        ylab(&quot;Closing Price&quot;) + 
+        xlab(&quot;Date&quot;)
 </code></pre>
 
 <p><img src="../early_trend_detection_images/plot7.png" class="img-responsive" style="display: block; margin: auto;" /></p>
@@ -379,6 +441,14 @@ cvs_stock = stock_data_train_label %&gt;%
 
 <pre><code>ni_stock = stock_data_train_label %&gt;% 
            filter(ticker == 'NI')
+
+ggplot(ni_stock, aes(x = ref.date, y = price.close)) + 
+    geom_point(size = 2, color = color_values[1]) + 
+    geom_line(size = 2, color = color_values[1]) + 
+    theme_monokai_full() + 
+    my_plot_theme() + 
+    ylab(&quot;Closing Price&quot;) + 
+    xlab(&quot;Date&quot;)
 </code></pre>
 
 <p><img src="../early_trend_detection_images/plot8.png" class="img-responsive" style="display: block; margin: auto;" /></p>
@@ -388,9 +458,8 @@ cvs_stock = stock_data_train_label %&gt;%
 <p>Stocks such as these are why we are evaluating 2 seperate viewpoints. We want to ensure that the trend is somewhat definitive. If there is disagreement amongst the methods, we are going to place a stock in the &ldquo;neutral|negative&rdquo; class. In a more formal analytical setting, we would spend more time testing whether this labeling approach is valid. However, for the sake of illustration, we&rsquo;re going to use a simple, heuristic based approach, such that any classification disagreements amongst the 2 methods will result in a &ldquo;neutral|negative&rdquo; classification. Let&rsquo;s update all of the instances where a disagreement occurred.</p>
 
 <pre><code>final_trend_df_class = final_trend_df_class %&gt;% 
-                       mutate(final_class = ifelse(trend_class_mk != trend_class_lm, 
-                                                                 'neutral|negative',
-                                                                    trend_class_mk)) %&gt;% 
+                       mutate(final_class = ifelse(trend_class_mk != trend_class_lm, 'neutral|negative',
+                                                                                      trend_class_mk)) %&gt;% 
                        select(ticker, final_class)
 </code></pre>
 
@@ -419,7 +488,8 @@ final_trend_df_class = final_trend_df_class %&gt;%
                        sample_n(167) %&gt;% 
                        bind_rows(
                        final_trend_df_class %&gt;% 
-                       filter(final_class == 'positive'))
+                       filter(final_class == 'positive')
+                                 )
                        
 print(table(final_trend_df_class$final_class))
 print(&quot;----------------------------------&quot;)
@@ -446,10 +516,18 @@ positive_ex = stock_data_train_f %&gt;%
 pos_5_stocks = sample(unique(positive_ex$ticker), 5)
 
 positive_ex1 = positive_ex[positive_ex$ticker %in% pos_5_stocks,]
-positive_ex1$time.period = ifelse(positive_ex1$ref.date %in% train_dates, 
-                                                                   &quot;pre&quot;, 
-                                                                   &quot;post&quot;)
+positive_ex1$time.period = ifelse(positive_ex1$ref.date %in% train_dates, &quot;pre&quot;, &quot;post&quot;)
 
+ggplot(positive_ex1, aes(x = ref.date, y = price.close, color = time.period)) + 
+    geom_point(alpha = 0.2) + 
+    stat_smooth(se = FALSE, size = 2) + 
+    facet_grid(. ~ ticker) + 
+    theme_monokai_full() + 
+    my_plot_theme() + 
+    theme(axis.text.x = element_text(size = 14)) + 
+    xlab(&quot;Date&quot;) + 
+    ylab(&quot;Closing Price&quot;) + 
+    scale_color_manual(values = c(color_values[1:2]))
 </code></pre>
 
 <p><img src="../early_trend_detection_images/plot9.png" class="img-responsive" style="display: block; margin: auto;" /></p>
@@ -472,13 +550,14 @@ stock_data_test_qa = stock_data_test$df.control %&gt;%
 
 test_30_days = unique(stock_data_test$df.tickers$ref.date)[1:30]
 
-test_df = inner_join(stock_data_test$df.tickers, stock_data_test_qa) %&gt;% 
+test_df = inner_join(stock_data_test$df.tickers, 
+                     stock_data_test_qa) %&gt;% 
           select(ticker, ref.date, price.close)
 
 test_df_30 = test_df %&gt;% 
              filter(ref.date %in% test_30_days) %&gt;% 
              mutate(ticker_class = 'testing',
-                    final_class = 'unknown')
+                           final_class = 'unknown')
 </code></pre>
 
 <p>Next we&rsquo;ll union our test and training datasets together. We&rsquo;ll also change the time-stamps in our testing data set, despite the fact that our training data is from 2015 and our testing data is from 2016. We are going to initially set K to 10. The reason why we&rsquo;re using such a high number is that some of the test stocks will match with other test stocks. Obviously these wont have labels, so we only want to consider matches with training stocks. This section will take a few minutes to run.</p>
@@ -502,8 +581,7 @@ ticker_matches = best_matches(data = train_test_df_30,
                                      warping_limit = 3,
                                      matches = max_matches,
                                      start_match_period = min(train_test_df_30$ref.date),
-                                     end_match_period = max(train_test_df_30$ref.date)
-)
+                                     end_match_period = max(train_test_df_30$ref.date))
 
 top_10_matches = ticker_matches$BestMatches
 
@@ -525,69 +603,73 @@ test_stock_matches = top_10_matches %&gt;%
 <pre><code>n_positive = 3
 
 prediction_df = final_trend_df_class %&gt;% 
-                dplyr::rename(BestControl = ticker) %&gt;% 
-                dplyr::inner_join(test_stock_matches %&gt;% 
-                dplyr::select(ticker, BestControl)) %&gt;% 
-                dplyr::rename(test_ticker = ticker,
-                              best_control_class = final_class) %&gt;% 
-                dplyr::arrange(test_ticker) %&gt;% 
-                dplyr::mutate(class_numeric = ifelse(best_control_class == 'positive', 1, 0))
+                rename(BestControl = ticker) %&gt;% 
+                inner_join(test_stock_matches %&gt;% 
+                select(ticker, BestControl)) %&gt;% 
+                rename(test_ticker = ticker,
+                       best_control_class = final_class) %&gt;% 
+                arrange(test_ticker) %&gt;% 
+                mutate(class_numeric = ifelse(best_control_class == 'positive', 1, 0))
 
 final_pred = prediction_df %&gt;% 
-             dplyr::group_by(test_ticker) %&gt;% 
-             dplyr::summarise(n_pos = sum(class_numeric)) %&gt;% 
+             group_by(test_ticker) %&gt;% 
+             summarise(n_pos = sum(class_numeric)) %&gt;% 
              data.frame() %&gt;% 
-             dplyr::mutate(predicted_class = ifelse(n_pos &gt;= n_positive, 'positive',
-                                                                 'neutral|negative'))
+             mutate(predicted_class = ifelse(n_pos &gt;= n_positive, 'positive',
+                                                                  'neutral|negative'))
 </code></pre>
 
 <p>We have generated our predictions. Since we already know what happened over those 90 days, let&rsquo;s consider the number of time series we correctly classified as positive.</p>
 
 <pre><code>test_class_days = unique(stock_data_test$df.tickers$ref.date)[31:length(unique(stock_data_test$df.tickers$ref.date))]
 test_df_class = test_df %&gt;% 
-                dplyr::filter(ref.date %in% test_class_days)
+                filter(ref.date %in% test_class_days)
 
 trend_df_mk_test = test_df_class %&gt;% 
-                   dplyr::group_by(ticker) %&gt;% 
-                   dplyr::do(trend_data = MannKendall(ts(.$price.close))) %&gt;% 
+                   group_by(ticker) %&gt;% 
+                   do(trend_data = MannKendall(ts(.$price.close))) %&gt;% 
                    data.frame()
 #
 #
-trend_df_mk_test$tau = unlist(lapply(trend_df_mk_test$trend_data, function(x) x[[1]][1]))
-trend_df_mk_test$p_value = unlist(lapply(trend_df_mk_test$trend_data, function(x) x[[2]][1]))
+trend_df_mk_test$tau = unlist(lapply(trend_df_mk_test$trend_data, 
+                                         function(x) x[[1]][1]))
+trend_df_mk_test$p_value = unlist(lapply(trend_df_mk_test$trend_data, 
+                                         function(x) x[[2]][1]))
 
 trend_df_mk_class = trend_df_mk_test %&gt;% 
-                    dplyr::select(ticker, tau, p_value) %&gt;% 
-                    dplyr::mutate(trend_class_mk = ifelse(p_value &lt; 0.05 &amp; tau &gt; 0, &quot;positive&quot;, &quot;neutral|negative&quot;)) %&gt;% 
-                    dplyr::select(ticker, trend_class_mk)
+                    select(ticker, tau, p_value) %&gt;% 
+                    mutate(trend_class_mk = ifelse(p_value &lt; 0.05 &amp; tau &gt; 0, &quot;positive&quot;, 
+                                                                             &quot;neutral|negative&quot;)) %&gt;% 
+                    select(ticker, trend_class_mk)
 # linear model
 
 trend_df_lm_test =  test_df_class %&gt;% 
-                    dplyr::group_by(ticker) %&gt;% 
-                    dplyr::mutate(day_index = row_number()) %&gt;% 
-                    dplyr::do(tidy(lm(price.close ~ day_index, data = .))) %&gt;% 
+                    group_by(ticker) %&gt;% 
+                    mutate(day_index = row_number()) %&gt;% 
+                    do(tidy(lm(price.close ~ day_index, data = .))) %&gt;% 
                     data.frame()
 
 trend_df_lm_class_test = trend_df_lm_test %&gt;% 
-                         dplyr::filter(term == 'day_index') %&gt;% 
-                         dplyr::mutate(trend_class_lm = ifelse(p.value &lt; 0.05 &amp; estimate &gt; 0, 
+                         filter(term == 'day_index') %&gt;% 
+                         mutate(trend_class_lm = ifelse(p.value &lt; 0.05 &amp; estimate &gt; 0, 
                                                                &quot;positive&quot;, &quot;neutral|negative&quot;)) %&gt;% 
-                         dplyr::select(ticker, trend_class_lm)
+                         select(ticker, trend_class_lm)
 
 
-final_trend_df_class_test = dplyr::inner_join(trend_df_mk_class, trend_df_lm_class_test)
+final_trend_df_class_test = inner_join(trend_df_mk_class, 
+                                       trend_df_lm_class_test)
 
 final_trend_df_class_test = final_trend_df_class_test %&gt;% 
-                            dplyr::mutate(final_class = ifelse(trend_class_mk != trend_class_lm, 
+                            utate(final_class = ifelse(trend_class_mk != trend_class_lm, 
                                           'neutral|negative',
                                            trend_class_mk)) %&gt;% 
-                            dplyr::select(ticker, final_class)
+                            select(ticker, final_class)
 
 eval_df = final_trend_df_class_test %&gt;% 
           dplyr::rename(test_ticker = ticker, 
                         actual_class = final_class) %&gt;% 
-          dplyr::inner_join(final_pred) %&gt;% 
-          dplyr::select(test_ticker, actual_class, predicted_class, n_pos)
+          inner_join(final_pred) %&gt;% 
+          select(test_ticker, actual_class, predicted_class, n_pos)
 </code></pre>
 
 <p>Again let&rsquo;s check out the first few rows.</p>
@@ -597,8 +679,8 @@ eval_df = final_trend_df_class_test %&gt;%
 <p>And drumroll please&hellip;.</p>
 
 <pre><code>pct_pos_crt = eval_df %&gt;% 
-              dplyr::filter(actual_class == 'positive') %&gt;% 
-              dplyr::filter(actual_class == predicted_class) %&gt;% 
+              filter(actual_class == 'positive') %&gt;% 
+              filter(actual_class == predicted_class) %&gt;% 
               nrow()/nrow(eval_df)
 
 print(paste0(&quot;PERCENT POSITIVE STOCKS CORRECTLY CLASSIFIED: &quot;, round(pct_pos_crt * 100, 0), &quot;%&quot;))
@@ -622,9 +704,9 @@ print(paste0(&quot;PERCENT POSITIVE STOCKS CORRECTLY CLASSIFIED: &quot;, round(p
          <div id="disqus_thread"></div>
 <script type="text/javascript">
     var disqus_shortname = 'https-markleboeuf-github-io\/';
-    var disqus_identifier = 'https:\/\/markleboeuf.github.io\/portfolio\/early_trend_detection\/';
+    var disqus_identifier = '\/portfolio\/early_trend_detection\/';
     var disqus_title = 'Early Trend Detection';
-    var disqus_url = 'https:\/\/markleboeuf.github.io\/portfolio\/early_trend_detection\/';
+    var disqus_url = '\/portfolio\/early_trend_detection\/';
 
     (function() {
         var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
@@ -642,15 +724,15 @@ print(paste0(&quot;PERCENT POSITIVE STOCKS CORRECTLY CLASSIFIED: &quot;, round(p
           </div>
       </div>
   </div>
-  <script src="https://markleboeuf.github.io/js/jquery.min.js"></script>
-<script src="https://markleboeuf.github.io/js/bootstrap.min.js"></script>
-<script src="https://markleboeuf.github.io/js/jquery.cookie.js"> </script>
-<script src="https://markleboeuf.github.io/js/ekko-lightbox.js"></script>
-<script src="https://markleboeuf.github.io/js/jquery.scrollTo.min.js"></script>
-<script src="https://markleboeuf.github.io/js/masonry.pkgd.min.js"></script>
-<script src="https://markleboeuf.github.io/js/imagesloaded.pkgd.min.js"></script>
-<script src="https://markleboeuf.github.io/js/owl.carousel.min.js"></script>
-<script src="https://markleboeuf.github.io/js/front.js"></script>
+  <script src="/js/jquery.min.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+<script src="/js/jquery.cookie.js"> </script>
+<script src="/js/ekko-lightbox.js"></script>
+<script src="/js/jquery.scrollTo.min.js"></script>
+<script src="/js/masonry.pkgd.min.js"></script>
+<script src="/js/imagesloaded.pkgd.min.js"></script>
+<script src="/js/owl.carousel.min.js"></script>
+<script src="/js/front.js"></script>
 
 </body>
 </html>

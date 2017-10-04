@@ -522,7 +522,7 @@ SIDEBAR + RIGHT COLUMN
 }
 .content-column-content p,
 .content-column-content li {
-  color: #000000;
+  color: #999999;
 }
 .content-column-content ul li {
   list-style-type: none;

@@ -7,18 +7,18 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="all,follow">
 <meta name="googlebot" content="index,follow,snippet,archive">
-<link rel="stylesheet" href="https://markleboeuf.github.io/css/bootstrap.min.css">
+<link rel="stylesheet" href="/css/bootstrap.min.css">
 <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Roboto:400,300,700,400italic">
-<link rel="stylesheet" href="https://markleboeuf.github.io/css/font-awesome.min.css">
-<link rel="stylesheet" href="https://markleboeuf.github.io/css/owl.carousel.css">
-<link rel="stylesheet" href="https://markleboeuf.github.io/css/owl.theme.css">
+<link rel="stylesheet" href="/css/font-awesome.min.css">
+<link rel="stylesheet" href="/css/owl.carousel.css">
+<link rel="stylesheet" href="/css/owl.theme.css">
 
 
-  <link href="https://markleboeuf.github.io/css/style.red.css" rel="stylesheet" id="theme-stylesheet">
+  <link href="/css/style.red.css" rel="stylesheet" id="theme-stylesheet">
 
 
-<link href="https://markleboeuf.github.io/css/custom.css" rel="stylesheet">
-<link rel="shortcut icon" href="https://markleboeuf.github.io/img/favicon.png">
+<link href="/css/custom.css" rel="stylesheet">
+<link rel="shortcut icon" href="/img/favicon.png">
 
 
 <script>
@@ -42,9 +42,9 @@ ga('send', 'pageview');
     <ul class="sidebar-menu">
       
       
-        <li><a href="https://markleboeuf.github.io/">Home</a></li>
+        <li><a href="/">Home</a></li>
       
-        <li><a href="https://markleboeuf.github.io/about/">About</a></li>
+        <li><a href="/about/">About</a></li>
       
     </ul>
     <p class="social">
@@ -186,8 +186,8 @@ ggplot(df, aes(x = Month, y = Milk_Production)) +
 
 <pre><code>ts_decomposition = data.frame(stl(ts(df$Milk_Production, frequency = 12), 
                                      s.window = &quot;periodic&quot;)$time.series) %&gt;% 
-                             reshape::melt() %&gt;% 
-                             dplyr::mutate(Month = rep(df$Month, 3)) %&gt;% 
+                             melt() %&gt;% 
+                             mutate(Month = rep(df$Month, 3)) %&gt;% 
                              dplyr::rename(component = variable)
 </code></pre>
 
@@ -209,12 +209,12 @@ ggplot(df, aes(x = Month, y = Milk_Production)) +
 
 <pre><code># +- 3 SD approach
 remainder = ts_decomposition %&gt;% 
-            dplyr::filter(component == 'remainder')
+            filter(component == 'remainder')
 sd_remainder = sd(remainder$value)          
 anomaly_boundary = c(-sd_remainder * 3, sd_remainder * 3)
 
 remainder_sd = remainder %&gt;% 
-               dplyr::mutate(is_anomaly = ifelse(value &gt; anomaly_boundary[2] | 
+               mutate(is_anomaly = ifelse(value &gt; anomaly_boundary[2] | 
                              value &lt; anomaly_boundary[1], &quot;yes&quot;, &quot;no&quot;))
 </code></pre>
 
@@ -293,12 +293,12 @@ forecast_df = data.frame(anom_method = c(rep(&quot;IQR&quot;, n_holdout),
 </code></pre>
 
 <pre><code class="language-r">forecast_df = forecast_df %&gt;% 
-              dplyr::mutate(residual_squared = (actual_amt - forecasted_amt)^2) %&gt;% 
-              dplyr::group_by(anom_method) %&gt;% 
-              dplyr::summarise(mse = mean(residual_squared)) %&gt;% 
+              mutate(residual_squared = (actual_amt - forecasted_amt)^2) %&gt;% 
+              group_by(anom_method) %&gt;% 
+              summarise(mse = mean(residual_squared)) %&gt;% 
               data.frame() %&gt;% 
-              dplyr::mutate(anom_method = factor(anom_method)) %&gt;% 
-              dplyr::mutate(anom_method = forcats::fct_reorder(anom_method, mse, .desc = FALSE))
+              mutate(anom_method = factor(anom_method)) %&gt;% 
+              mutate(anom_method = forcats::fct_reorder(anom_method, mse, .desc = FALSE))
 
 ggplot(forecast_df, aes(x = anom_method, y = round(mse, 0),
     fill = anom_method, label = as.character(round(mse, 0)))) + 
@@ -326,8 +326,8 @@ pi_df = data.frame(anom_method = c(rep(&quot;IQR&quot;, n_holdout),
                                    ts_sd_train$lower[,2],
                                    ts_orig_train$lower[,2]),
                    actual_amt = rep(validation_set, 3)) %&gt;% 
-        dplyr::mutate(pi_range = upper_bound - lower_bound) %&gt;% 
-        dplyr::mutate(actual_in_pi_range = as.integer(actual_amt &lt; upper_bound &amp; actual_amt &gt; lower_bound))
+        mutate(pi_range = upper_bound - lower_bound) %&gt;% 
+        mutate(actual_in_pi_range = as.integer(actual_amt &lt; upper_bound &amp; actual_amt &gt; lower_bound))
 </code></pre>
 
 <pre><code class="language-r">ggplot(pi_df, aes(x = anom_method, y = pi_range, color = anom_method)) + 
@@ -344,8 +344,8 @@ pi_df = data.frame(anom_method = c(rep(&quot;IQR&quot;, n_holdout),
 <p>The median PI range is the narrowest for the IQR and the widest when we don&rsquo;t replace any of the outliers. Finally let&rsquo;s consider the <strong>coverage rate</strong>, which is how often the actual value fell within the monthly prediction interval.</p>
 
 <pre><code class="language-r">print(pi_df %&gt;% 
-     dplyr::group_by(anom_method) %&gt;% 
-     dplyr::summarise(coverage_rate = round(sum(actual_in_pi_range)/12 * 100, 1)) %&gt;% 
+     group_by(anom_method) %&gt;% 
+     summarise(coverage_rate = round(sum(actual_in_pi_range)/12 * 100, 1)) %&gt;% 
      data.frame())
 </code></pre>
 
@@ -361,9 +361,9 @@ pi_df = data.frame(anom_method = c(rep(&quot;IQR&quot;, n_holdout),
          <div id="disqus_thread"></div>
 <script type="text/javascript">
     var disqus_shortname = 'https-markleboeuf-github-io\/';
-    var disqus_identifier = 'https:\/\/markleboeuf.github.io\/portfolio\/outlier_detection\/';
+    var disqus_identifier = '\/portfolio\/outlier_detection\/';
     var disqus_title = 'Time Series Outlier Detection';
-    var disqus_url = 'https:\/\/markleboeuf.github.io\/portfolio\/outlier_detection\/';
+    var disqus_url = '\/portfolio\/outlier_detection\/';
 
     (function() {
         var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
@@ -381,15 +381,15 @@ pi_df = data.frame(anom_method = c(rep(&quot;IQR&quot;, n_holdout),
           </div>
       </div>
   </div>
-  <script src="https://markleboeuf.github.io/js/jquery.min.js"></script>
-<script src="https://markleboeuf.github.io/js/bootstrap.min.js"></script>
-<script src="https://markleboeuf.github.io/js/jquery.cookie.js"> </script>
-<script src="https://markleboeuf.github.io/js/ekko-lightbox.js"></script>
-<script src="https://markleboeuf.github.io/js/jquery.scrollTo.min.js"></script>
-<script src="https://markleboeuf.github.io/js/masonry.pkgd.min.js"></script>
-<script src="https://markleboeuf.github.io/js/imagesloaded.pkgd.min.js"></script>
-<script src="https://markleboeuf.github.io/js/owl.carousel.min.js"></script>
-<script src="https://markleboeuf.github.io/js/front.js"></script>
+  <script src="/js/jquery.min.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+<script src="/js/jquery.cookie.js"> </script>
+<script src="/js/ekko-lightbox.js"></script>
+<script src="/js/jquery.scrollTo.min.js"></script>
+<script src="/js/masonry.pkgd.min.js"></script>
+<script src="/js/imagesloaded.pkgd.min.js"></script>
+<script src="/js/owl.carousel.min.js"></script>
+<script src="/js/front.js"></script>
 
 </body>
 </html>

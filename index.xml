@@ -2,32 +2,32 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Mark LeBoeuf</title>
-    <link>https://markleboeuf.github.io/</link>
+    <link>/</link>
     <description>Recent content on Mark LeBoeuf</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>&amp;copy;2017 Mark LeBoeuf</copyright>
     <lastBuildDate>Sat, 05 Nov 2016 19:41:01 +0530</lastBuildDate>
     
-	<atom:link href="https://markleboeuf.github.io/index.xml" rel="self" type="application/rss+xml" />
+	<atom:link href="/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
       <title>Forecasting with External Regressors</title>
-      <link>https://markleboeuf.github.io/portfolio/forecasting_regressors/</link>
+      <link>/portfolio/forecasting_regressors/</link>
       <pubDate>Sat, 05 Nov 2016 19:41:01 +0530</pubDate>
       
-      <guid>https://markleboeuf.github.io/portfolio/forecasting_regressors/</guid>
+      <guid>/portfolio/forecasting_regressors/</guid>
       <description>&lt;p&gt;This post focuses on some of my favorite things &amp;ndash; data, sports, and forecasting &amp;ndash; and will outline how to leverage external regressors when creating forecasts. We&amp;rsquo;ll do some webscraping in R and Python to create our dataset, and then forecast how many people will visit Tom Brady&amp;rsquo;s wikipedia page.
 &lt;/p&gt;</description>
     </item>
     
     <item>
       <title>Keras End-to-End Tutorial</title>
-      <link>https://markleboeuf.github.io/portfolio/keras_walk_through_end_to_end/</link>
+      <link>/portfolio/keras_walk_through_end_to_end/</link>
       <pubDate>Mon, 01 May 2017 19:41:01 +0530</pubDate>
       
-      <guid>https://markleboeuf.github.io/portfolio/keras_walk_through_end_to_end/</guid>
+      <guid>/portfolio/keras_walk_through_end_to_end/</guid>
       <description>&lt;p&gt;Most Keras tutorials I&amp;rsquo;ve come across outline the process of creating a Convolutional Neural Network (CNN) with built-in datasets. While this is a great place to begin, there&amp;rsquo;s a bit more involved in terms of pre-processing when starting out with just a bunch of pictures. This post provides a quick, end-to-end walkthrough of how to implement a CNN with Keras in Python from scratch.&lt;/p&gt;
 
 &lt;p&gt;&lt;/p&gt;</description>
@@ -35,20 +35,31 @@
     
     <item>
       <title>Two Flavors of Parallel Simulation</title>
-      <link>https://markleboeuf.github.io/portfolio/two_flavors_of_parallelism/</link>
+      <link>/portfolio/two_flavors_of_parallelism/</link>
       <pubDate>Thu, 12 Jan 2017 19:41:01 +0530</pubDate>
       
-      <guid>https://markleboeuf.github.io/portfolio/two_flavors_of_parallelism/</guid>
+      <guid>/portfolio/two_flavors_of_parallelism/</guid>
       <description>&lt;p&gt;Tired of waiting around for your simulations to finish? Run them in parallel! This post covers two seperate ways to add parallelism to your R code.
 &lt;/p&gt;</description>
     </item>
     
     <item>
+      <title>Predicting First Year Fantasy Football Points in Rookies</title>
+      <link>/portfolio/combine_analysis/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>/portfolio/combine_analysis/</guid>
+      <description>&lt;p&gt;Drafting a rookie in Fantasy Football can be a risky move, but it can pay huge dividends if you happen to snag a diamond in the rough. After accounting for a player&amp;rsquo;s draft position, do physical attributes (height/weight) and combine performance (40 yard dash, bench press, etc.) provide any additional explanatory power of points scored during a player&amp;rsquo;s first NFL season? I&amp;rsquo;ll explore this question for rookie Running Backs and Wide Receivers.&lt;/p&gt;
+
+&lt;p&gt;&lt;/p&gt;</description>
+    </item>
+    
+    <item>
       <title>Time Series Outlier Detection</title>
-      <link>https://markleboeuf.github.io/portfolio/outlier_detection/</link>
+      <link>/portfolio/outlier_detection/</link>
       <pubDate>Sun, 12 Mar 2017 19:41:01 +0530</pubDate>
       
-      <guid>https://markleboeuf.github.io/portfolio/outlier_detection/</guid>
+      <guid>/portfolio/outlier_detection/</guid>
       <description>&lt;p&gt;This post covers a straightforward approach to detecting and replacing outliers in time series.&lt;/p&gt;
 
 &lt;p&gt;&lt;/p&gt;</description>
@@ -56,10 +67,10 @@
     
     <item>
       <title>Feature Selection for the Wine Connoisseur</title>
-      <link>https://markleboeuf.github.io/portfolio/feature_selection/</link>
+      <link>/portfolio/feature_selection/</link>
       <pubDate>Mon, 01 May 2017 19:41:01 +0530</pubDate>
       
-      <guid>https://markleboeuf.github.io/portfolio/feature_selection/</guid>
+      <guid>/portfolio/feature_selection/</guid>
       <description>&lt;p&gt;Feature selection is an integral part of machine learning, and this post explores what happens when lots of irrelevant features are added into the modeling process. We&amp;rsquo;ll also identify which algorithms are affected the most by such features. These questions will be addressed as we build a classifier and try to predict which wines we&amp;rsquo;ll like based on their chemical properties. So pour yourself a glass of Pinot Noir and fire up your R terminal!&lt;/p&gt;
 
 &lt;p&gt;&lt;/p&gt;</description>
@@ -67,20 +78,20 @@
     
     <item>
       <title>Monte Carlo Power Calculations for Mixed Effects Models</title>
-      <link>https://markleboeuf.github.io/portfolio/monte_carlo_mixed_effects/</link>
+      <link>/portfolio/monte_carlo_mixed_effects/</link>
       <pubDate>Thu, 12 Jan 2017 19:41:01 +0530</pubDate>
       
-      <guid>https://markleboeuf.github.io/portfolio/monte_carlo_mixed_effects/</guid>
+      <guid>/portfolio/monte_carlo_mixed_effects/</guid>
       <description>&lt;p&gt;That&amp;rsquo;s a dense title &amp;ndash; Monte Carlo Simulation, Power, Mixed-Effect models. Each of these topics could be their own post. However, I&amp;rsquo;m going to discuss their interrelations in the context of experimental power and keep everything high-level. The goal is to get an intuitive idea of how we can leverage simulation to provide sample size estimates for experiments with nested data.&lt;br /&gt;
 &lt;/p&gt;</description>
     </item>
     
     <item>
       <title>Early Trend Detection</title>
-      <link>https://markleboeuf.github.io/portfolio/early_trend_detection/</link>
+      <link>/portfolio/early_trend_detection/</link>
       <pubDate>Mon, 01 May 2017 19:41:01 +0530</pubDate>
       
-      <guid>https://markleboeuf.github.io/portfolio/early_trend_detection/</guid>
+      <guid>/portfolio/early_trend_detection/</guid>
       <description>&lt;p&gt;Identifying a trend before it starts is a major area of focus in the analytics realm, because it can inform key business decisions yet remains extremely difficult. This post outlines one trend-detection method in an effort to predict where a stock&amp;rsquo;s price will go in the future.&lt;/p&gt;
 
 &lt;p&gt;&lt;/p&gt;</description>
@@ -88,10 +99,10 @@
     
     <item>
       <title>Random Forest Prediction Intervals</title>
-      <link>https://markleboeuf.github.io/portfolio/random_forest_prediction_intervals/</link>
+      <link>/portfolio/random_forest_prediction_intervals/</link>
       <pubDate>Sun, 12 Feb 2017 19:41:01 +0530</pubDate>
       
-      <guid>https://markleboeuf.github.io/portfolio/random_forest_prediction_intervals/</guid>
+      <guid>/portfolio/random_forest_prediction_intervals/</guid>
       <description>&lt;p&gt;Take a stroll through the random forest to learn how to quantify uncertainty in your predictions with one of the more popular applied machine learning algorithms.&lt;/p&gt;
 
 &lt;p&gt;&lt;/p&gt;</description>
@@ -99,20 +110,20 @@
     
     <item>
       <title>R Exception Handling</title>
-      <link>https://markleboeuf.github.io/portfolio/exception_handling/</link>
+      <link>/portfolio/exception_handling/</link>
       <pubDate>Thu, 12 Jan 2017 19:41:01 +0530</pubDate>
       
-      <guid>https://markleboeuf.github.io/portfolio/exception_handling/</guid>
+      <guid>/portfolio/exception_handling/</guid>
       <description>&lt;p&gt;Exception handling is a critical component of any data science workflow. You write code. It breaks. You create exceptions. Repeat. From my experience, a point of confusion for new R users is how to handle exceptions, which I believe is more intuitive in Python (at least initially). This post provides a practical overview of how to handle exceptions in R by first illustrating the concept in Python.
 &lt;/p&gt;</description>
     </item>
     
     <item>
       <title>Establishing Causality with Counterfactual Prediction</title>
-      <link>https://markleboeuf.github.io/portfolio/counterfactual_prediction/</link>
+      <link>/portfolio/counterfactual_prediction/</link>
       <pubDate>Mon, 01 May 2017 19:41:01 +0530</pubDate>
       
-      <guid>https://markleboeuf.github.io/portfolio/counterfactual_prediction/</guid>
+      <guid>/portfolio/counterfactual_prediction/</guid>
       <description>&lt;p&gt;Sometimes a controlled experiment isn&amp;rsquo;t an option yet you want to establish causality. This post outlines a method for quantifying the effects of an intervention via counterfactual predictions.&lt;/p&gt;
 
 &lt;p&gt;&lt;/p&gt;</description>
@@ -120,10 +131,10 @@
     
     <item>
       <title>Hello R Markdown</title>
-      <link>https://markleboeuf.github.io/post/2015-07-23-r-rmarkdown/</link>
+      <link>/post/2015-07-23-r-rmarkdown/</link>
       <pubDate>Thu, 23 Jul 2015 21:13:14 -0500</pubDate>
       
-      <guid>https://markleboeuf.github.io/post/2015-07-23-r-rmarkdown/</guid>
+      <guid>/post/2015-07-23-r-rmarkdown/</guid>
       <description>R Markdown This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see http://rmarkdown.rstudio.com.
 You can embed an R code chunk like this:
 summary(cars) ## speed dist ## Min. : 4.0 Min. : 2.00 ## 1st Qu.:12.0 1st Qu.: 26.00 ## Median :15.0 Median : 36.00 ## Mean :15.4 Mean : 42.98 ## 3rd Qu.</description>
