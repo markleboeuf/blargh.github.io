@@ -358,21 +358,7 @@ pi_df = data.frame(anom_method = c(rep(&quot;IQR&quot;, n_holdout),
 <p>The IQR and None approaches provided 100% coverage, while the SD method missed one month, yielding a coverage rate of ~92%.</p>
 
 <p>Taken together, the IQR method provided the most accurate forecasts and prediction intervals. While this is only one example, it is interesting to note that using the SD method actually reduced our forecasting accuracy and coverage rate below what would&rsquo;ve happened had we not taken any steps to remedy our outliers prior to fitting a model. This really illustrates the value of using a <strong>robust</strong> method for anomaly detection.</p>
-         <div id="disqus_thread"></div>
-<script type="text/javascript">
-    var disqus_shortname = 'https-markleboeuf-github-io\/';
-    var disqus_identifier = '\/portfolio\/outlier_detection\/';
-    var disqus_title = 'Time Series Outlier Detection';
-    var disqus_url = '\/portfolio\/outlier_detection\/';
-
-    (function() {
-        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
-        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
-        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
-    })();
-</script>
-<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
-<a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+         
       </div>
     </div>
   </div>

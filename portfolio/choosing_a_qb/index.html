@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<title>Choosing a Fantasy Football Quarterback</title>
+<meta name="description" content="...">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="all,follow">
+<meta name="googlebot" content="index,follow,snippet,archive">
+<link rel="stylesheet" href="/css/bootstrap.min.css">
+<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Roboto:400,300,700,400italic">
+<link rel="stylesheet" href="/css/font-awesome.min.css">
+<link rel="stylesheet" href="/css/owl.carousel.css">
+<link rel="stylesheet" href="/css/owl.theme.css">
+
+
+  <link href="/css/style.red.css" rel="stylesheet" id="theme-stylesheet">
+
+
+<link href="/css/custom.css" rel="stylesheet">
+<link rel="shortcut icon" href="/img/favicon.png">
+
+
+<script>
+window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+ga('create', 'UA-101855339-1', 'auto');
+ga('send', 'pageview');
+</script>
+<script async src='//www.google-analytics.com/analytics.js'></script>
+
+</head>
+<body>
+  <div id="all">
+      <div class="container-fluid">
+          <div class="row row-offcanvas row-offcanvas-left">
+              <div id="sidebar" class="col-xs-6 col-sm-4 col-md-3 sidebar-offcanvas">
+  <div class="sidebar-content">
+    <h1 class="sidebar-heading"><a href="/">Mark LeBoeuf</a></h1>
+    
+      <p class="sidebar-p">I am a Data Scientist currently based in Portland, OR.</p>
+    
+    <ul class="sidebar-menu">
+      
+      
+        <li><a href="/">Home</a></li>
+      
+        <li><a href="/about/">About</a></li>
+      
+    </ul>
+    <p class="social">
+  
+  
+  
+  
+  
+  
+  <a href="https://www.linkedin.com/in/markleboeuf/" data-animate-hover="pulse">
+    <i class="fa fa-linkedin"></i>
+  </a>
+  
+  
+  
+  <a href="https://github.com/markleboeuf/markleboeuf.github.io" data-animate-hover="pulse">
+    <i class="fa fa-github"></i>
+  </a>
+  
+</p>
+
+
+    <div class="copyright">
+      <p class="credit">
+        
+          &copy;2017 Mark LeBoeuf
+        
+        | Template by <a href="https://bootstrapious.com/free-templates" class="external">Bootstrapious.com</a>
+
+&amp; ported to Hugo by <a href="https://github.com/kishaningithub">Kishan B</a>
+
+      </p>
+    </div>
+  </div>
+</div>
+
+              
+<div class="col-xs-12 col-sm-8 col-md-9 content-column white-background">
+  <div class="small-navbar visible-xs">
+  <button type="button" data-toggle="offcanvas" class="btn btn-ghost pull-left"> <i class="fa fa-align-left"> </i>Menu</button>
+  <h1 class="small-navbar-heading"><a href="/">Mark LeBoeuf</a></h1>
+</div>
+
+  <div class="row">
+    <div class="col-lg-8">
+      <div class="content-column-content">
+         <h1>Choosing a Fantasy Football Quarterback</h1>
+         <p>Aaron Rodgers or Tom Brady? Carson Wentz or Drew Brees? Choosing the right Fantasy Football QB each week is challenging. To remove some of the guesswork from the decision-making process, I devised an approach that&rsquo;s worked well over the past few seasons. Read on to learn more about using the Beta Distribution to pick your weekly starting QB.</p>
+
+<p></p>
+
+<p><img src="../qb_post_images/mariota.jpg" class="img-responsive" style="display: block; margin: auto;" /></p>
+
+<ul>
+<li><a href="#overview">Overview</a></li>
+<li><a href="#collecting-qb-data">Collecting QB Data</a></li>
+<li><a href="#modeling-qb-performance-with-the-beta-distribution">Modeling QB Performance with the Beta Distribution</a></li>
+<li><a href="#decisions-based-on-upper-confidence-bound">Decisions based on Upper Confidence Bound</a></li>
+<li><a href="#decisions-based-on-simulation">Decisions based on Simulation</a></li>
+<li><a href="#key-takeaways">Key Takeaways</a></li>
+</ul>
+
+<h3 id="overview">Overview</h3>
+
+<p>I&rsquo;ll introduce the idea of using the Beta Distribution to determine your weekly starter in the context of my 2015 Fantasy Football season. At the outset of that season, I drafted two quarterbacks: Joe Flacco and Marcus Mariota (it was a tough draft). Flacco had been in the NFL for a few years, while Mariota was still a rookie yet to play a game. I was also considering a separate rookie, Jameis Winston, who was available to pick up any time during the season off the waiver wire. Throughout the season, I was faced with the following questions:</p>
+
+<ul>
+<li>Who do I make the starting QB?</li>
+<li>If one QB is performing poorly, when is the right time to make the switch (e.g., Flacco -&gt; Mariota; Flacco -&gt; Winston; Mariota -&gt; Winston)?</li>
+</ul>
+
+<p>This question is faced by NFL coaches and fantasy owners alike. If your QB has a few bad weeks, should you continue with them into the next week, replace them with the 2nd string QB, or sign a free agent to your team mid-season?</p>
+
+<p>Before getting into the technical details, let&rsquo;s first define what &ldquo;Success&rdquo; looks like for a Fantasy Football QB. Success can be defined in one word: Consistency. A QB that throws three touchdowns (TDs) every game for the first six games of the season (18 total) is better than a QB who throws five TDs for the first three games and then one TD during the next three games, despite having thrown the same number of TDs. Simply put - you want consistent, reliable performance every week. It doesn&rsquo;t matter if you win by one point or 50 points &ndash; a win is a win. Thus I evaluate my QB&rsquo;s performance on the following criteria: A &ldquo;successful&rdquo; performance is defined as <strong>3 or more touchdowns AND/OR 300 or more yards</strong> for a given week. Touchdowns and passing yards are the two primary sources of QB fantasy points, and a +3TD|300yard weekly statline should cement a QB amongst that week&rsquo;s top performers. Failing to meet either of these criteria was defined as an &ldquo;unsuccessful&rdquo; performance. Note that this label could also factor in interceptions, pass completions, and fumballs, but we&rsquo;ll keep it simple and just focus on passing yards and passing touchdowns.</p>
+
+<p>Having defined the evaluation criteria, the data generating process was modeled via the beta distribution. Recall that the beta distribution defines a distribution of probabilities. We are interested in the probability our QB will have a &ldquo;successful&rdquo; week. We have several years of performance history on Joe Flacco, so we can provide a reasonably informed estimate of his weekly probabilty for achieving success (i.e., our prior). In contrast, there is no NFL game history on Mariota or Winston, so we&rsquo;ll assign each a <em>uniform</em> or <em>uninformative</em> prior. Our estimate of the &ldquo;success&rdquo; parameter for Winston and Mariota will change rapidly as we acquire in-season data, because our posterior is determined entirely from the data. We could create a more informed&ndash;and stronger&ndash;prior by assigning Mariota and Winston the historic first year league average for all rookie QBs entering the NFL but we&rsquo;ll keep it simple. A uniform prior in this case means that all probabilities from 0-1 are equally likely.</p>
+
+<h3 id="collecting-qb-data">Collecting QB Data</h3>
+
+<p>We&rsquo;ll use the <code>nflgame</code> python package to gather QB data. We&rsquo;ll pull 2013-2014 weekly performance data for Joe Flacco to calculate our prior, as well as the 2015 data for all 3 players. During the season we&rsquo;ll update our priors to determine which QB we should play for a given week. That is, as we acquire results over the season, updates will be made to obtain a better, more reliable estimate of the &ldquo;success&rdquo; parameter for each QB.</p>
+
+<pre><code class="language-python">import nflgame
+import pandas as pd
+
+game_years = range(2013, 2016)
+game_weeks = range(1, 17)
+qbs = (&quot;Joe Flacco&quot;, 
+       &quot;Marcus Mariota&quot;,
+       &quot;Jameis Winston&quot;)
+       
+def get_passing_data(year, week, players, qbs):
+    qb_list = list()
+    for p in players.passing():
+        player = &quot; &quot;.join(str(p.player).split(&quot; &quot;)[:2]) 
+        if player in qbs:
+            qb_list.append([year, week, player, p.passing_tds, p.passing_yds])
+    return qb_list
+    
+quarterback_data = pd.DataFrame()
+for year in game_years:
+    print &quot;Retrieving Player Data for {year}&quot;.format(year = year)
+    for week in game_weeks:
+        games = nflgame.games(year, week)
+        players = nflgame.combine_game_stats(games)
+        temp_qb_stats = get_passing_data(year, week, players, qbs)
+        quarterback_data = quarterback_data.append(pd.DataFrame(temp_qb_stats))
+        
+quarterback_data.columns = [&quot;year&quot;, &quot;week&quot;, &quot;player&quot;, &quot;touchdowns&quot;, &quot;passing_yds&quot;]
+quarterback_data.to_csv(&quot;quarterback_data.csv&quot;, index = False)
+</code></pre>
+
+<p>Next let&rsquo;s define a plot styling function, bring the data into R, and examine the last 10 rows.</p>
+
+<pre><code class="language-r">my_plot_theme = function(){
+    font_family = &quot;Helvetica&quot;
+    font_face = &quot;bold&quot;
+    return(theme(
+        axis.text.x = element_text(size = 18, face = font_face, family = font_family),
+        axis.text.y = element_text(size = 18, face = font_face, family = font_family),
+        axis.title.x = element_text(size = 20, face = font_face, family = font_family),
+        axis.title.y = element_text(size = 20, face = font_face, family = font_family),
+        strip.text.y = element_text(size = 18, face = font_face, family = font_family),
+        plot.title = element_text(size = 24, face = font_face, family = font_family),
+        legend.position = &quot;top&quot;,
+        legend.title = element_text(colour = &quot;white&quot;, size = 16,
+                                    face = font_face,
+                                    family = font_family),
+        legend.text = element_text(colour = &quot;white&quot;, size = 14,
+                                   face = font_face,
+                                   family = font_family),
+        strip.text.x = element_text(size =12, 
+                                    face = font_face,
+                                    family = font_family)
+    ))
+}
+
+libs = c('dplyr', 'zeallot', 'janitor', 'reshape', 
+         'artyfarty',  'knitr',
+         'ggplot2')
+lapply(libs, require, character.only = TRUE)
+working_dir = 'your_wd_here'
+player_data = 'quarterback_data.csv'
+
+# define success metrics
+n_touchdowns = 3
+n_passing_yds = 300
+
+qb_df = read.csv(file.path(working_dir, player_data)) %&gt;% 
+        mutate(success = ifelse(touchdowns &gt;= n_touchdowns | passing_yds &gt;= n_passing_yds, 
+                                1, 0))
+</code></pre>
+
+<p><img src="../qb_post_images/table_1.png" class="img-responsive" style="display: block; margin: auto;" /></p>
+
+<p>We now have all the data to get started.</p>
+
+<h3 id="modeling-qb-performance-with-the-beta-distribution">Modeling QB Performance with the Beta Distribution</h3>
+
+<p>The Beta Distribution is used to model processes involving successes/failure, purchase/non-purchase, clicks/non-clicks &ndash; basically any process where there are two potential outcomes, and we&rsquo;re interested in the probability of one of those outcomes occurring. It is defined with two parameters &ndash; <em>alpha</em> (the number of successes) and <em>beta</em> (the number of failures). We&rsquo;ll calculate Flacco&rsquo;s prior based on the 2013-2014 season performance. He played a total of 30 games during this time, and he threw 3TDs|300yards in eight of those weeks. Accordingly, Flacco&rsquo;s alpha and beta are 8 and 22, respectively. Mariota and Winston have no history, so their alpha and beta will be 1 and 1.</p>
+
+<pre><code class="language-r"># this will hold the data we'll update
+flacco_prior =  qb_df %&gt;% 
+                filter(player == 'Joe Flacco' &amp; year &lt; 2015)
+
+c(flacco_beta, flacco_alpha) %&lt;-% unname(table(flacco_prior$success))
+c(mariota_beta, mariota_alpha) %&lt;-% c(1, 1)
+c(winston_beta, winston_alpha) %&lt;-% c(1, 1)
+# define priors
+players_list = list()
+
+# players_list_reference stores posterior distribution after each week
+players_list_reference = list()
+players_list[['Joe Flacco']] = c(flacco_alpha, flacco_beta)
+players_list[['Marcus Mariota']] = c(mariota_alpha, mariota_beta)
+players_list[['Jameis Winston']] = c(mariota_alpha, mariota_beta)
+</code></pre>
+
+<p>Let&rsquo;s filter the data to the current season and iterate through each week. The alpha or beta parameter is incremented by one, depending on whether the quarterback achieved success for that week, via the <code>update_player_beta</code> function below.</p>
+
+<pre><code class="language-r">update_player_beta = function(players_list, current_week, stat_field){
+    for(temp_player in names(players_list)){
+        player_stats = current_week %&gt;% 
+            filter(player == temp_player) %&gt;% 
+            select(stat_field)
+        if(nrow(player_stats) == 0){
+            next
+        }
+        if(player_stats == 1){
+            players_list[[temp_player]][1] = players_list[[temp_player]][1] + 1
+        } else {
+            players_list[[temp_player]][2] = players_list[[temp_player]][2] + 1
+        } 
+    }
+    return(players_list)
+}
+</code></pre>
+
+<p>We&rsquo;ll also calculate the density for each player&rsquo;s distribution for every value from 0 - 1. This indicates the likelihood of each player achieving success for a given week. For example, a mean of 0.4 would indicate that there&rsquo;s a 40 percent chance that, after accounting for historical performance, a QB will throw +3TDs|300yards in the following week. We aren&rsquo;t considering the uncertainty surrounding the estimate of our mean yet, but we&rsquo;ll tackle that issue in a second.</p>
+
+<pre><code class="language-r">format_posterior = function(players_list){
+    posterior = lapply(players_list, function(x) dbeta(seq(0, 
+                                                           1, 
+                                                           by = 0.01), 
+                                                           x[1], 
+                                                           x[2])) %&gt;% 
+        data.frame() %&gt;% 
+        mutate(x = seq(0, 1, by = 0.01)) %&gt;% 
+        select(x, 1:(length(players_list))) %&gt;% 
+        reshape::melt(id.vars = &quot;x&quot;) %&gt;% 
+        dplyr::rename(player = variable,
+                      density = value) %&gt;% 
+        mutate(weeks_elapsed = i)
+    return(posterior)
+}
+</code></pre>
+
+<pre><code class="language-r">current_season = qb_df %&gt;% 
+  filter(year == 2015) %&gt;% 
+  select(year, week) %&gt;% 
+  distinct()
+
+beta_evolution_df = data.frame(NULL)
+for(i in 1:nrow(current_season)){
+    c(cur_year, cur_week) %&lt;-% current_season[i,]
+    current_week = qb_df %&gt;% 
+                   filter(year == cur_year, 
+                          week == cur_week)
+    
+    players_list = update_player_beta(players_list, 
+                                      current_week, 
+                                      'success')
+    players_list_reference[[i]] = players_list
+    
+    posterior = format_posterior(players_list)
+    beta_evolution_df = bind_rows(beta_evolution_df, 
+                                  posterior)  
+    
+}
+
+beta_evolution_df = beta_evolution_df %&gt;% 
+                    mutate(player = gsub(&quot;\\.&quot;, &quot; &quot;, player))
+
+</code></pre>
+
+<p>Let&rsquo;s examine how our estimates for each player change as the season unfolds. I&rsquo;ve plotted this process by storing the Probability Density Functions (PDFs) following each week (a total of 16 games) during the regular season.</p>
+
+<pre><code class="language-r">ggplot(beta_evolution_df, aes(x, density, color = player)) + 
+  geom_line(size = 1) + 
+  facet_wrap(~weeks_elapsed) + 
+  theme_monokai_full() + 
+  my_plot_theme() + 
+  theme(legend.title=element_blank(),
+        axis.text.x = element_text(size = 10)
+        ) + 
+  ylab(&quot;Density&quot;)
+</code></pre>
+
+<p><img src="../qb_post_images/plot1.png" class="img-responsive" style="display: block; margin: auto;" /></p>
+
+<p>By the end of the season, it looks like Mariota would&rsquo;ve been the correct choice, even though there is a fair amount of overlap between the distributions. However, knowing this at Week 16 isn&rsquo;t helpful &ndash; the fantasy season is over. Let&rsquo;s say we started the veteran QB Joe Flacco for Week 1, and Week 2 we decided to use some maths to help us choose between our three QBs. There are two related approaches we could use to address this question:</p>
+
+<ul>
+<li>Upper Confidence Bound</li>
+<li>Simulation</li>
+</ul>
+
+<p>I&rsquo;ll outline both in detail below.</p>
+
+<h3 id="decisions-based-on-the-upper-confidence-bound">Decisions based on the Upper Confidence Bound</h3>
+
+<p>The <em>Upper Confidence Bound</em> algorithm is one way to make decisions in the face of uncertainty, in this case which quarterback to fire up in our lineup each week. The idea is to choose the option with the greatest potential for a favorable outcome, even if our estimate of the probability of that outcome is uncertain (see <a href="http://banditalgs.com/2016/09/18/the-upper-confidence-bound-algorithm/">here</a> for more detail). We&rsquo;ll calculate a 90% credible interval for our beta parameter each week. A <em>credible interval</em> is like a confidence interval, but it&rsquo;s interpretation is a bit different and, in my opinion, easier to understand. In the current context, a 90% credible interval is the range of values in which we are 90% certain that the probability of weekly success falls based on the data we have thus far (see <a href="http://www.john-uebersax.com/stat312/17%20Credible%20Intervals%20and%20Confidence%20Intervals.pdf">here</a> for an excellent explanation  in the distinction between confidence and credible intervals).</p>
+
+<p>Taking these concepts together, we&rsquo;ll choose the QB in Week 2 with the highest upper bound on their credible interval. I&rsquo;ll also include an additional five weeks to show how the interval evolves as we obtain more information.</p>
+
+<pre><code class="language-r">credible_intervals = data.frame(NULL)
+for(week in 2:length(players_list_reference)){
+  temp_week = players_list_reference[[week]]
+  for(player in names(temp_week)){
+    temp_player = temp_week[[player]]
+    lower_cred_int = qbeta(0.05,temp_player[1], temp_player[2])
+    upper_cred_int = qbeta(0.95,temp_player[1], temp_player[2])
+    alpha = temp_player[1]
+    beta = temp_player[2]
+    credible_intervals = bind_rows(credible_intervals,
+                                   data.frame(player = player,
+                                                week = week,
+                                                lower = lower_cred_int,
+                                                mean = alpha/(alpha + beta),
+                                                upper = upper_cred_int))
+  }
+}
+</code></pre>
+
+<pre><code class="language-r">ggplot(credible_intervals %&gt;% filter(week &lt; 11), aes(x = mean, y = player, color = player)) + 
+  geom_point(size = 3) + 
+  geom_errorbarh(aes(xmin = lower,
+                    xmax = upper),
+                 size = 2) + 
+  xlab(&quot;Chance of Achieving +300yds | +3TDs During Week&quot;) + 
+  theme_monokai_full() + 
+  my_plot_theme() + 
+  facet_grid(week ~.) + 
+  theme(axis.text.y = element_blank(),
+        axis.title.y = element_blank(),
+        legend.position = &quot;top&quot;,
+        legend.title = element_blank())
+</code></pre>
+
+<p><img src="../qb_post_images/plot2.png" class="img-responsive" style="display: block; margin: auto;" /></p>
+
+<p>Mariota has the largest upper bound for his credible interval, so we should start Mariota during Week 2 and continue starting him as a quarterback until another QB&rsquo;s upper bound is greater than his. Note also that Flacco&rsquo;s interval is both narrower and remains relatively unchanged over the six week period. This is because we have a lot more information on Flacco going into the season &ndash; that is, our prior is a lot stronger! A few successful or unsuccessful games during the season wont shift Flacco&rsquo;s interval much. We already have two seasons worth of data indicating that Flacco&rsquo;s probability of success hovers somewhere around 30% but is likely not higher than 40% or lower than 20%. In contrast, Marriota&rsquo;s credible interval changes rapidly from one week to the next. By Week 7, Mariota&rsquo;s interval drifts toward a more reasonable range (0.15 - 0.70), a process known formally as <em>shrinkage</em>.</p>
+
+<p>The Upper Bound approach is an easy way to choose a QB. But what if we wanted a specific estimate of the probability that one QB was &ldquo;better&rdquo; than the other? For that question we&rsquo;ll turn to simulation.</p>
+
+<h2 id="decisions-based-on-simulation">Decisions Based on Simulation</h2>
+
+<p>Let&rsquo;s keep this simple and compare Flacco vs. Mariota following Week 2. Our goal is to determine the probability that one QB, or, more formally, their beta distribution, is greater/better than the other, according to our criteria for success. We&rsquo;ll simulate 1000 draws from the posterior distribution of each week, then compare the number of instances in which Mariota&rsquo;s sampled beta was greater than Flacco&rsquo;s.</p>
+
+<pre><code class="language-r">simulate_weeks = function(player_1, player_2, n_simulations, players_list_reference){
+  simulated_outcome = data.frame(NULL)
+  set.seed(123)
+  for(reference_week in 1:length(players_list_reference)){
+      player1_simulation = rbeta(n_simulations,
+            players_list_reference[[reference_week]][player_1][[1]][1],
+            players_list_reference[[reference_week]][player_1][[1]][2])
+
+      player2_simulation = rbeta(n_simulations,
+                                 players_list_reference[[reference_week]][player_2][[1]][1],
+                                 players_list_reference[[reference_week]][player_2][[1]][2])
+
+      player1_v_player2 = mean(player1_simulation &gt; player2_simulation)
+      simulated_outcome = bind_rows(simulated_outcome,
+                data.frame(weeks_elapsed = reference_week,
+                 player = c(player_1, player_2),
+                 simulations_won = c(player1_v_player2,
+                                     1 - player1_v_player2)
+                ))
+  }
+  return(simulated_outcome)
+}
+
+</code></pre>
+
+<pre><code class="language-r">player_1 = &quot;Marcus Mariota&quot;
+player_2 = &quot;Joe Flacco&quot;
+n_simulations = 1000
+simulated_outcome = simulate_weeks(player_1, 
+                                   player_2, 
+                                   n_simulations, 
+                                   players_list_reference)
+
+</code></pre>
+
+<pre><code class="language-r">ggplot(simulated_outcome, aes(x = weeks_elapsed, y = simulations_won, 
+                              color = player)) +
+    scale_x_continuous(breaks = seq(0, 20, 5)) + 
+    xlab(&quot;N Weeks Elapsed&quot;) + 
+    ylab(&quot;Simulations Won&quot;) + 
+    theme_monokai_full() + 
+    geom_point(size = 2) + geom_line(size = 2) + 
+    my_plot_theme() + 
+    theme(legend.title=element_blank()) + 
+    scale_x_continuous(breaks = seq(1, 16))
+</code></pre>
+
+<p><img src="../qb_post_images/plot3.png" class="img-responsive" style="display: block; margin: auto;" /></p>
+
+<p>From Week 2 there is an ~80% chance that Mariota is the better choice relative to Flacco. By Week 7 there is ~75% chance, and by Week 12 there is a ~79% chance. If someone asked you at the end of the season who was the better quarterback, you could say with about 75% certainty that Mariota was better than Flacco, according to the criteria defined here.</p>
+
+<h3 id="key-takeaways">Key Takeaways</h3>
+
+<p>As mentioned above, this system has worked well for me over the past few seasons. It does have some obvious shortcomings, namely that it doesn&rsquo;t account for the strength of an opposing defense, health of receivers, recent performance, or the Over/Under for the game &ndash; all factors that should be considered when selecting a weekly QB. However, this approach provides an objective way to quantify the potential of a QB to deliver a solid weekly performance.</p>
+         
+      </div>
+    </div>
+  </div>
+</div>
+
+          </div>
+      </div>
+  </div>
+  <script src="/js/jquery.min.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+<script src="/js/jquery.cookie.js"> </script>
+<script src="/js/ekko-lightbox.js"></script>
+<script src="/js/jquery.scrollTo.min.js"></script>
+<script src="/js/masonry.pkgd.min.js"></script>
+<script src="/js/imagesloaded.pkgd.min.js"></script>
+<script src="/js/owl.carousel.min.js"></script>
+<script src="/js/front.js"></script>
+
+</body>
+</html>

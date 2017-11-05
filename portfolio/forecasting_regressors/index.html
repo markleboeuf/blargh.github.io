@@ -601,21 +601,7 @@ geom_label(label.size = 1, size = 10, color = &quot;white&quot;)
 <p>Hang on a second. So the model with the correct number of playoff games won (3) actually had the lowest accuracy? Yes and here&rsquo;s why: Across the history of our time series, the Patriots had never actually won 3 playoff games. They had only won 0, 1 or 2 games. Thus we are extrapolating to values not contained in our data set, which can be a recipe for disaster. If you look at the change in our forecast as we increase the number of playoff games won by 1 for the month of February, we expect an additional 296K visitors. We are making the assumption that there is a linear relationship between wins and page views, such that each additional win generates +296K views. This is clearly not the case, and the incorrect assumption is reflected in the accuracy of the resulting forecast.</p>
 
 <p>Hopefully this post has eliminated some of the mystery around creating forecasts with external regressors.</p>
-         <div id="disqus_thread"></div>
-<script type="text/javascript">
-    var disqus_shortname = 'https-markleboeuf-github-io\/';
-    var disqus_identifier = '\/portfolio\/forecasting_regressors\/';
-    var disqus_title = 'Forecasting with External Regressors';
-    var disqus_url = '\/portfolio\/forecasting_regressors\/';
-
-    (function() {
-        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
-        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
-        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
-    })();
-</script>
-<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
-<a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+         
       </div>
     </div>
   </div>

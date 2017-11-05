@@ -400,21 +400,7 @@ type_II_vec = c(type_II_vec, as.integer(dplyr::between(0, ci_df$lower_bound, ci_
 </code></pre>
 
 <p>So there you have it &ndash; our simulation obtained similar results relative to the <code>simr</code> package. If we increased the number of simulations, the power estimates would converge to the same number. However, if you copied this code and ran it in R, you&rsquo;ll notice that it ran pretty slow.  In a seperate <a href="https://markleboeuf.github.io/portfolio/two_flavors_of_parallelism/">post</a> I&rsquo;ll show you how to speed up any simulation by executing the entire process in parallel in order to run more simulations and get better estimates! Stay tuned!</p>
-         <div id="disqus_thread"></div>
-<script type="text/javascript">
-    var disqus_shortname = 'https-markleboeuf-github-io\/';
-    var disqus_identifier = '\/portfolio\/monte_carlo_mixed_effects\/';
-    var disqus_title = 'Monte Carlo Power Calculations for Mixed Effects Models';
-    var disqus_url = '\/portfolio\/monte_carlo_mixed_effects\/';
-
-    (function() {
-        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
-        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
-        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
-    })();
-</script>
-<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
-<a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+         
       </div>
     </div>
   </div>

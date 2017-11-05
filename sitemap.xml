@@ -2,18 +2,12 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
-    <loc>/portfolio/forecasting_regressors/</loc>
-    <lastmod>2016-11-05T19:41:01+05:30</lastmod>
-  </url>
-  
-  <url>
-    <loc>/portfolio/keras_walk_through_end_to_end/</loc>
-    <lastmod>2017-05-01T19:41:01+05:30</lastmod>
-  </url>
-  
-  <url>
     <loc>/portfolio/two_flavors_of_parallelism/</loc>
     <lastmod>2017-01-12T19:41:01+05:30</lastmod>
+  </url>
+  
+  <url>
+    <loc>/portfolio/choosing_a_qb/</loc>
   </url>
   
   <url>
@@ -26,7 +20,17 @@
   </url>
   
   <url>
+    <loc>/portfolio/forecasting_regressors/</loc>
+    <lastmod>2016-11-05T19:41:01+05:30</lastmod>
+  </url>
+  
+  <url>
     <loc>/portfolio/feature_selection/</loc>
+    <lastmod>2017-05-01T19:41:01+05:30</lastmod>
+  </url>
+  
+  <url>
+    <loc>/portfolio/keras_walk_through_end_to_end/</loc>
     <lastmod>2017-05-01T19:41:01+05:30</lastmod>
   </url>
   
@@ -68,6 +72,11 @@
   <url>
     <loc>/post/2015-07-23-r-rmarkdown/</loc>
     <lastmod>2015-07-23T21:13:14-05:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/tags/beta-distribution/</loc>
+    <priority>0</priority>
   </url>
   
   <url>
@@ -142,7 +151,7 @@
   
   <url>
     <loc>/</loc>
-    <lastmod>2016-11-05T19:41:01+05:30</lastmod>
+    <lastmod>2017-01-12T19:41:01+05:30</lastmod>
     <priority>0</priority>
   </url>
   
@@ -178,7 +187,7 @@
   
   <url>
     <loc>/portfolio/</loc>
-    <lastmod>2016-11-05T19:41:01+05:30</lastmod>
+    <lastmod>2017-01-12T19:41:01+05:30</lastmod>
     <priority>0</priority>
   </url>
   
@@ -208,7 +217,7 @@
   
   <url>
     <loc>/tags/r/</loc>
-    <lastmod>2016-11-05T19:41:01+05:30</lastmod>
+    <lastmod>2017-01-12T19:41:01+05:30</lastmod>
     <priority>0</priority>
   </url>
   

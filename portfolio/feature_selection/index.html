@@ -468,21 +468,7 @@ for(i in n_noise_vars){
 <p><img src="../feature_selection_images/plot4.png" class="img-responsive" style="display: block; margin: auto;" /></p>
 
 <p>So a few irrelevant features (i.e., 10 - 100) has a neglible impact on modeling performance, at least with the current use case. This goes to show that pre-processing and feature selection is an important part of the model building process if you are dealing with lots of potential features. Beyond reducing the training time, pruning irrelevant features can vastly improve model performance. As illustrated above, including irrelevant features can wreak havoc on your model when using methods with lots of flexible parameters. It would be interesting to see how these results change if we added in some regularization measures to protect against overfitting. For example, one way to reduce overfitting with Random Forest is to limit the maximum depth of a tree (i.e., each tree can only have a single split instead of multiple splits). Or for Neural Networks L2 regularization can be used, which discourages weight vectors in the network from becoming too large. If you try any of these approaches, I&rsquo;d love to hear how it goes!</p>
-         <div id="disqus_thread"></div>
-<script type="text/javascript">
-    var disqus_shortname = 'https-markleboeuf-github-io\/';
-    var disqus_identifier = '\/portfolio\/feature_selection\/';
-    var disqus_title = 'Feature Selection for the Wine Connoisseur';
-    var disqus_url = '\/portfolio\/feature_selection\/';
-
-    (function() {
-        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
-        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
-        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
-    })();
-</script>
-<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
-<a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+         
       </div>
     </div>
   </div>

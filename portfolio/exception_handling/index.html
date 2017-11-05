@@ -211,21 +211,7 @@ print(unname(sapply(strings, extract_element_tc, &quot; &quot;, 5)))
 </code></pre>
 
 <p>Boom. No errors this time. R is different in that <code>tryCatch</code> will have seperate functions, referred to as <strong>handlers</strong>, that get called depending on the condition that occurs. In this case, we have 2 conditions&ndash; our desired condition, and the error condition. There are additional conditions that can be handled  (see <a href="http://adv-r.had.co.nz/Exceptions-Debugging.html">here</a> for more detail). For example, you can also include a handler for <code>warnings</code> as well, which can be extremely helpful for finding exceptions that don&rsquo;t break your code but instead give you undesired results.</p>
-         <div id="disqus_thread"></div>
-<script type="text/javascript">
-    var disqus_shortname = 'https-markleboeuf-github-io\/';
-    var disqus_identifier = '\/portfolio\/exception_handling\/';
-    var disqus_title = 'R Exception Handling';
-    var disqus_url = '\/portfolio\/exception_handling\/';
-
-    (function() {
-        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
-        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
-        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
-    })();
-</script>
-<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
-<a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+         
       </div>
     </div>
   </div>

@@ -7,31 +7,10 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>&amp;copy;2017 Mark LeBoeuf</copyright>
-    <lastBuildDate>Sat, 05 Nov 2016 19:41:01 +0530</lastBuildDate>
+    <lastBuildDate>Thu, 12 Jan 2017 19:41:01 +0530</lastBuildDate>
     
 	<atom:link href="/index.xml" rel="self" type="application/rss+xml" />
     
-    
-    <item>
-      <title>Forecasting with External Regressors</title>
-      <link>/portfolio/forecasting_regressors/</link>
-      <pubDate>Sat, 05 Nov 2016 19:41:01 +0530</pubDate>
-      
-      <guid>/portfolio/forecasting_regressors/</guid>
-      <description>&lt;p&gt;This post focuses on some of my favorite things &amp;ndash; data, sports, and forecasting &amp;ndash; and will outline how to leverage external regressors when creating forecasts. We&amp;rsquo;ll do some webscraping in R and Python to create our dataset, and then forecast how many people will visit Tom Brady&amp;rsquo;s wikipedia page.
-&lt;/p&gt;</description>
-    </item>
-    
-    <item>
-      <title>Keras End-to-End Tutorial</title>
-      <link>/portfolio/keras_walk_through_end_to_end/</link>
-      <pubDate>Mon, 01 May 2017 19:41:01 +0530</pubDate>
-      
-      <guid>/portfolio/keras_walk_through_end_to_end/</guid>
-      <description>&lt;p&gt;Most Keras tutorials I&amp;rsquo;ve come across outline the process of creating a Convolutional Neural Network (CNN) with built-in datasets. While this is a great place to begin, there&amp;rsquo;s a bit more involved in terms of pre-processing when starting out with just a bunch of pictures. This post provides a quick, end-to-end walkthrough of how to implement a CNN with Keras in Python from scratch.&lt;/p&gt;
-
-&lt;p&gt;&lt;/p&gt;</description>
-    </item>
     
     <item>
       <title>Two Flavors of Parallel Simulation</title>
@@ -41,6 +20,17 @@
       <guid>/portfolio/two_flavors_of_parallelism/</guid>
       <description>&lt;p&gt;Tired of waiting around for your simulations to finish? Run them in parallel! This post covers two seperate ways to add parallelism to your R code.
 &lt;/p&gt;</description>
+    </item>
+    
+    <item>
+      <title>Choosing a Fantasy Football Quarterback</title>
+      <link>/portfolio/choosing_a_qb/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>/portfolio/choosing_a_qb/</guid>
+      <description>&lt;p&gt;Aaron Rodgers or Tom Brady? Carson Wentz or Drew Brees? Choosing the right Fantasy Football QB each week is challenging. To remove some of the guesswork from the decision-making process, I devised an approach that&amp;rsquo;s worked well over the past few seasons. Read on to learn more about using the Beta Distribution to pick your weekly starting QB.&lt;/p&gt;
+
+&lt;p&gt;&lt;/p&gt;</description>
     </item>
     
     <item>
@@ -66,12 +56,33 @@
     </item>
     
     <item>
+      <title>Forecasting with External Regressors</title>
+      <link>/portfolio/forecasting_regressors/</link>
+      <pubDate>Sat, 05 Nov 2016 19:41:01 +0530</pubDate>
+      
+      <guid>/portfolio/forecasting_regressors/</guid>
+      <description>&lt;p&gt;This post focuses on some of my favorite things &amp;ndash; data, sports, and forecasting &amp;ndash; and will outline how to leverage external regressors when creating forecasts. We&amp;rsquo;ll do some webscraping in R and Python to create our dataset, and then forecast how many people will visit Tom Brady&amp;rsquo;s wikipedia page.
+&lt;/p&gt;</description>
+    </item>
+    
+    <item>
       <title>Feature Selection for the Wine Connoisseur</title>
       <link>/portfolio/feature_selection/</link>
       <pubDate>Mon, 01 May 2017 19:41:01 +0530</pubDate>
       
       <guid>/portfolio/feature_selection/</guid>
       <description>&lt;p&gt;Feature selection is an integral part of machine learning, and this post explores what happens when lots of irrelevant features are added into the modeling process. We&amp;rsquo;ll also identify which algorithms are affected the most by such features. These questions will be addressed as we build a classifier and try to predict which wines we&amp;rsquo;ll like based on their chemical properties. So pour yourself a glass of Pinot Noir and fire up your R terminal!&lt;/p&gt;
+
+&lt;p&gt;&lt;/p&gt;</description>
+    </item>
+    
+    <item>
+      <title>Keras End-to-End Tutorial</title>
+      <link>/portfolio/keras_walk_through_end_to_end/</link>
+      <pubDate>Mon, 01 May 2017 19:41:01 +0530</pubDate>
+      
+      <guid>/portfolio/keras_walk_through_end_to_end/</guid>
+      <description>&lt;p&gt;Most Keras tutorials I&amp;rsquo;ve come across outline the process of creating a Convolutional Neural Network (CNN) with built-in datasets. While this is a great place to begin, there&amp;rsquo;s a bit more involved in terms of pre-processing when starting out with just a bunch of pictures. This post provides a quick, end-to-end walkthrough of how to implement a CNN with Keras in Python from scratch.&lt;/p&gt;
 
 &lt;p&gt;&lt;/p&gt;</description>
     </item>
